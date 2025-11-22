@@ -6,8 +6,10 @@ import DestinationCard from "@/components/DestinationCard";
 import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero-travel.jpg";
 import { Compass, Landmark, Palmtree, Mountain, Ship, Camera } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Home = () => {
+  const { t } = useLanguage();
   // Mock data - will be replaced with API calls
   const trendingTours = [
     {
@@ -102,10 +104,10 @@ const Home = () => {
 
         <div className="relative z-10 container mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in text-balance">
-            Discover experiences you'll<br />remember forever
+            {t("heroTitle")}
           </h1>
           <p className="text-xl text-white/90 mb-12 animate-slide-up">
-            Book amazing things to do around the world
+            {t("heroSubtitle")}
           </p>
 
           {/* Search Bar */}
@@ -117,7 +119,7 @@ const Home = () => {
 
       {/* Categories */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-8">Explore by category</h2>
+        <h2 className="text-3xl font-bold mb-8">{t("categoriesTitle")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((category) => (
             <Link
@@ -138,12 +140,12 @@ const Home = () => {
       {/* Trending Tours */}
       <section className="container mx-auto px-4 py-16 bg-muted/30">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold">Trending experiences</h2>
+          <h2 className="text-3xl font-bold">{t("trendingTitle")}</h2>
           <Link
             to="/tours"
             className="text-primary hover:underline font-semibold"
           >
-            View all
+            {t("viewAll")}
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -155,7 +157,7 @@ const Home = () => {
 
       {/* Popular Destinations */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-8">Popular destinations</h2>
+        <h2 className="text-3xl font-bold mb-8">{t("destinationsTitle")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {destinations.map((destination) => (
             <DestinationCard key={destination.slug} {...destination} />
