@@ -12,11 +12,13 @@ import {
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const [selectedLanguage, setSelectedLanguage] = useState("EN");
+  
   const languages = [
-    { code: "en", name: "English" },
-    { code: "uz", name: "Uzbek" },
-    { code: "ru", name: "Russian" },
-    { code: "de", name: "German" },
+    { code: "EN", name: "English" },
+    { code: "UZ", name: "Uzbek" },
+    { code: "RU", name: "Russian" },
+    { code: "DE", name: "German" },
   ];
 
   return (
@@ -66,14 +68,18 @@ const Navbar = () => {
             {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hidden sm:flex">
-                  <Globe className="h-4 w-4 mr-2" />
-                  EN
+                <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
+                  <Globe className="h-4 w-4" />
+                  {selectedLanguage}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="min-w-[140px]">
                 {languages.map((lang) => (
-                  <DropdownMenuItem key={lang.code}>
+                  <DropdownMenuItem 
+                    key={lang.code}
+                    onClick={() => setSelectedLanguage(lang.code)}
+                    className="cursor-pointer"
+                  >
                     {lang.name}
                   </DropdownMenuItem>
                 ))}
