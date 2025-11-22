@@ -8,17 +8,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage } from "@/contexts/LanguageContext";
+import type { Language } from "@/lib/translations";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const [selectedLanguage, setSelectedLanguage] = useState("EN");
+  const { language, setLanguage, t } = useLanguage();
   
   const languages = [
-    { code: "EN", name: "English" },
-    { code: "UZ", name: "Uzbek" },
-    { code: "RU", name: "Russian" },
-    { code: "DE", name: "German" },
+    { code: "EN" as Language, name: "English" },
+    { code: "UZ" as Language, name: "Uzbek" },
+    { code: "RU" as Language, name: "Russian" },
+    { code: "DE" as Language, name: "German" },
   ];
 
   return (
@@ -41,25 +42,25 @@ const Navbar = () => {
               to="/destinations"
               className="text-foreground hover:text-primary transition-colors"
             >
-              Destinations
+              {t("destinations")}
             </Link>
             <Link
               to="/tours"
               className="text-foreground hover:text-primary transition-colors"
             >
-              Tours
+              {t("tours")}
             </Link>
             <Link
               to="/categories"
               className="text-foreground hover:text-primary transition-colors"
             >
-              Categories
+              {t("categories")}
             </Link>
             <Link
               to="/about"
               className="text-foreground hover:text-primary transition-colors"
             >
-              About
+              {t("about")}
             </Link>
           </div>
 
@@ -70,14 +71,14 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
                   <Globe className="h-4 w-4" />
-                  {selectedLanguage}
+                  {language}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[140px]">
                 {languages.map((lang) => (
                   <DropdownMenuItem 
                     key={lang.code}
-                    onClick={() => setSelectedLanguage(lang.code)}
+                    onClick={() => setLanguage(lang.code)}
                     className="cursor-pointer"
                   >
                     {lang.name}
@@ -89,7 +90,7 @@ const Navbar = () => {
             {/* User Account */}
             <Button variant="ghost" size="sm">
               <User className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Sign in</span>
+              <span className="hidden sm:inline">{t("signIn")}</span>
             </Button>
 
             {/* Mobile Menu Toggle */}
@@ -116,28 +117,28 @@ const Navbar = () => {
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Destinations
+              {t("destinations")}
             </Link>
             <Link
               to="/tours"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Tours
+              {t("tours")}
             </Link>
             <Link
               to="/categories"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Categories
+              {t("categories")}
             </Link>
             <Link
               to="/about"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              About
+              {t("about")}
             </Link>
           </div>
         )}

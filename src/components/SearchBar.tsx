@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Calendar, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const SearchBar = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
@@ -26,11 +28,11 @@ const SearchBar = () => {
           <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           <div className="flex-1">
             <label className="text-xs text-muted-foreground block">
-              Where to?
+              {t("searchLocation")}
             </label>
             <Input
               type="text"
-              placeholder="City or attraction"
+              placeholder={t("searchLocation")}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="border-0 p-0 h-6 focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -42,7 +44,7 @@ const SearchBar = () => {
         <div className="flex items-center space-x-3 p-3 rounded-lg border border-border focus-within:border-primary transition-colors">
           <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           <div className="flex-1">
-            <label className="text-xs text-muted-foreground block">Date</label>
+            <label className="text-xs text-muted-foreground block">{t("searchDate")}</label>
             <Input
               type="date"
               value={date}
@@ -57,7 +59,7 @@ const SearchBar = () => {
           <Users className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           <div className="flex-1">
             <label className="text-xs text-muted-foreground block">
-              Travelers
+              {t("searchTravelers")}
             </label>
             <Input
               type="number"
@@ -76,7 +78,7 @@ const SearchBar = () => {
           className="hero-gradient text-white h-auto py-4"
         >
           <Search className="h-5 w-5 mr-2" />
-          Search
+          {t("searchButton")}
         </Button>
       </div>
     </form>
