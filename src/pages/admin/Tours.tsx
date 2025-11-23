@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Tour = {
@@ -36,6 +36,17 @@ type Tour = {
 type Category = { id: string; name_en: string; };
 type Destination = { id: string; name_en: string; };
 
+type ItineraryStop = {
+  title: string;
+  description: string;
+  extra_fee: boolean;
+};
+
+type ItineraryData = {
+  starting_location: string;
+  stops: ItineraryStop[];
+};
+
 const Tours = () => {
   const [tours, setTours] = useState<Tour[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -59,6 +70,10 @@ const Tours = () => {
     is_bestseller: false,
     category_id: "",
     destination_id: "",
+  });
+  const [itineraryData, setItineraryData] = useState<ItineraryData>({
+    starting_location: "",
+    stops: []
   });
   const [isTranslating, setIsTranslating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -136,12 +151,15 @@ const Tours = () => {
     setIsTranslating(true);
 
     try {
+      // Convert itinerary data to JSON string
+      const itineraryJson = JSON.stringify(itineraryData);
+      
       // Translate all text fields
       const fieldsToTranslate = [
         { key: 'title', value: formData.title_en },
         { key: 'description', value: formData.description_en },
         { key: 'overview', value: formData.overview_en },
-        { key: 'itinerary', value: formData.itinerary_en },
+        { key: 'itinerary', value: itineraryJson },
         { key: 'important_info', value: formData.important_info_en },
         { key: 'location', value: formData.location_en },
         { key: 'included', value: formData.included_en },
@@ -259,6 +277,19 @@ const Tours = () => {
       category_id: tour.category_id || "",
       destination_id: tour.destination_id || "",
     });
+    
+    // Parse itinerary JSON if exists
+    if (tour.itinerary_en) {
+      try {
+        const parsed = JSON.parse(tour.itinerary_en);
+        setItineraryData(parsed);
+      } catch {
+        setItineraryData({ starting_location: "", stops: [] });
+      }
+    } else {
+      setItineraryData({ starting_location: "", stops: [] });
+    }
+    
     setOpen(true);
   };
 
@@ -296,6 +327,25 @@ const Tours = () => {
       category_id: "",
       destination_id: "",
     });
+    setItineraryData({ starting_location: "", stops: [] });
+  };
+
+  const addItineraryStop = () => {
+    setItineraryData({
+      ...itineraryData,
+      stops: [...itineraryData.stops, { title: "", description: "", extra_fee: false }]
+    });
+  };
+
+  const removeItineraryStop = (index: number) => {
+    const newStops = itineraryData.stops.filter((_, i) => i !== index);
+    setItineraryData({ ...itineraryData, stops: newStops });
+  };
+
+  const updateItineraryStop = (index: number, field: keyof ItineraryStop, value: any) => {
+    const newStops = [...itineraryData.stops];
+    newStops[index] = { ...newStops[index], [field]: value };
+    setItineraryData({ ...itineraryData, stops: newStops });
   };
 
   return (
@@ -414,9 +464,81 @@ const Tours = () => {
                 <Textarea value={formData.overview_en} onChange={(e) => setFormData({ ...formData, overview_en: e.target.value })} rows={4} placeholder="Tur haqida umumiy ma'lumot" />
               </div>
 
-              <div className="space-y-2">
-                <Label>Itinerary - Marshrutni rejasi (Inglizcha)</Label>
-                <Textarea value={formData.itinerary_en} onChange={(e) => setFormData({ ...formData, itinerary_en: e.target.value })} rows={5} placeholder="Kun tartibi va marshrutni rejasi" />
+              <div className="space-y-4">
+                <Label className="text-lg font-semibold">Itinerary - Marshrutni rejasi</Label>
+                
+                <div className="space-y-2">
+                  <Label>Boshlang'ich joylashuv (Starting location)</Label>
+                  <Input 
+                    value={itineraryData.starting_location} 
+                    onChange={(e) => setItineraryData({ ...itineraryData, starting_location: e.target.value })}
+                    placeholder="Amir Temur Mausoleum Gur-i Amir Complex"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>To'xtash joylari (Stops)</Label>
+                    <Button type="button" size="sm" onClick={addItineraryStop}>
+                      <Plus className="h-4 w-4 mr-1" />
+                      To'xtash qo'shish
+                    </Button>
+                  </div>
+
+                  {itineraryData.stops.map((stop, index) => (
+                    <Card key={index} className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label className="font-medium">To'xtash #{index + 1}</Label>
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => removeItineraryStop(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label className="text-sm">Joylashuv / Nomi</Label>
+                          <Input 
+                            value={stop.title}
+                            onChange={(e) => updateItineraryStop(index, 'title', e.target.value)}
+                            placeholder="Amir Temur Mausoleum, Samarkand"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label className="text-sm">Tavsif</Label>
+                          <Textarea 
+                            value={stop.description}
+                            onChange={(e) => updateItineraryStop(index, 'description', e.target.value)}
+                            placeholder="Visit, Guided tour, Walk (100 minutes)"
+                            rows={2}
+                          />
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`extra-fee-${index}`}
+                            checked={stop.extra_fee}
+                            onCheckedChange={(checked) => updateItineraryStop(index, 'extra_fee', checked)}
+                          />
+                          <Label htmlFor={`extra-fee-${index}`} className="text-sm cursor-pointer">
+                            Extra fee (Qo'shimcha to'lov)
+                          </Label>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+
+                  {itineraryData.stops.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+                      To'xtash joylari mavjud emas. Yuqoridagi tugma orqali qo'shing.
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
