@@ -43,13 +43,7 @@ const Tours = () => {
   const [editingTour, setEditingTour] = useState<Tour | null>(null);
   const [formData, setFormData] = useState({
     title_en: "",
-    title_uz: "",
-    title_ru: "",
-    title_de: "",
     description_en: "",
-    description_uz: "",
-    description_ru: "",
-    description_de: "",
     price: "",
     duration: "",
     image_url: "",
@@ -59,6 +53,7 @@ const Tours = () => {
     category_id: "",
     destination_id: "",
   });
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -88,39 +83,77 @@ const Tours = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const tourData = {
-      ...formData,
-      price: parseFloat(formData.price),
-      rating: parseFloat(formData.rating),
-      reviews_count: parseInt(formData.reviews_count),
-      category_id: formData.category_id || null,
-      destination_id: formData.destination_id || null,
-    };
+    setIsTranslating(true);
 
-    if (editingTour) {
-      const { error } = await supabase
-        .from("tours")
-        .update(tourData)
-        .eq("id", editingTour.id);
-      
-      if (error) {
-        toast({ title: "Xatolik", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Muvaffaqiyat", description: "Tur yangilandi" });
-        fetchTours();
-        handleClose();
+    try {
+      const { data: titleTranslations, error: titleError } = await supabase.functions.invoke('translate', {
+        body: { 
+          text: formData.title_en,
+          targetLanguages: ['Uzbek', 'Russian', 'German']
+        }
+      });
+
+      if (titleError) throw titleError;
+
+      let descTranslations = { Uzbek: '', Russian: '', German: '' };
+      if (formData.description_en) {
+        const { data: descData, error: descError } = await supabase.functions.invoke('translate', {
+          body: { 
+            text: formData.description_en,
+            targetLanguages: ['Uzbek', 'Russian', 'German']
+          }
+        });
+        if (descError) throw descError;
+        descTranslations = descData.translations;
       }
-    } else {
-      const { error } = await supabase.from("tours").insert([tourData]);
-      
-      if (error) {
-        toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+
+      const tourData = {
+        title_en: formData.title_en,
+        title_uz: titleTranslations.translations.Uzbek,
+        title_ru: titleTranslations.translations.Russian,
+        title_de: titleTranslations.translations.German,
+        description_en: formData.description_en || null,
+        description_uz: descTranslations.Uzbek || null,
+        description_ru: descTranslations.Russian || null,
+        description_de: descTranslations.German || null,
+        price: parseFloat(formData.price),
+        duration: formData.duration,
+        image_url: formData.image_url || null,
+        rating: parseFloat(formData.rating),
+        reviews_count: parseInt(formData.reviews_count),
+        is_bestseller: formData.is_bestseller,
+        category_id: formData.category_id || null,
+        destination_id: formData.destination_id || null,
+      };
+
+      if (editingTour) {
+        const { error } = await supabase
+          .from("tours")
+          .update(tourData)
+          .eq("id", editingTour.id);
+        
+        if (error) {
+          toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Muvaffaqiyat", description: "Tur yangilandi" });
+          fetchTours();
+          handleClose();
+        }
       } else {
-        toast({ title: "Muvaffaqiyat", description: "Tur qo'shildi" });
-        fetchTours();
-        handleClose();
+        const { error } = await supabase.from("tours").insert([tourData]);
+        
+        if (error) {
+          toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Muvaffaqiyat", description: "Tur qo'shildi" });
+          fetchTours();
+          handleClose();
+        }
       }
+    } catch (error: any) {
+      toast({ title: "Xatolik", description: error.message || "Tarjima xatosi", variant: "destructive" });
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -128,13 +161,7 @@ const Tours = () => {
     setEditingTour(tour);
     setFormData({
       title_en: tour.title_en,
-      title_uz: tour.title_uz,
-      title_ru: tour.title_ru,
-      title_de: tour.title_de,
       description_en: tour.description_en || "",
-      description_uz: tour.description_uz || "",
-      description_ru: tour.description_ru || "",
-      description_de: tour.description_de || "",
       price: tour.price.toString(),
       duration: tour.duration,
       image_url: tour.image_url || "",
@@ -165,13 +192,7 @@ const Tours = () => {
     setEditingTour(null);
     setFormData({
       title_en: "",
-      title_uz: "",
-      title_ru: "",
-      title_de: "",
       description_en: "",
-      description_uz: "",
-      description_ru: "",
-      description_de: "",
       price: "",
       duration: "",
       image_url: "",
@@ -202,23 +223,10 @@ const Tours = () => {
               <DialogTitle>{editingTour ? "Turni tahrirlash" : "Yangi tur"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Inglizcha nomi</Label>
-                  <Input value={formData.title_en} onChange={(e) => setFormData({ ...formData, title_en: e.target.value })} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>O'zbekcha nomi</Label>
-                  <Input value={formData.title_uz} onChange={(e) => setFormData({ ...formData, title_uz: e.target.value })} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Ruscha nomi</Label>
-                  <Input value={formData.title_ru} onChange={(e) => setFormData({ ...formData, title_ru: e.target.value })} required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Nemischa nomi</Label>
-                  <Input value={formData.title_de} onChange={(e) => setFormData({ ...formData, title_de: e.target.value })} required />
-                </div>
+              <div className="space-y-2">
+                <Label>Nomi (Inglizcha)</Label>
+                <Input value={formData.title_en} onChange={(e) => setFormData({ ...formData, title_en: e.target.value })} required placeholder="Tur nomini kiriting" />
+                <p className="text-sm text-muted-foreground">Boshqa tillarga avtomatik tarjima qilinadi</p>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -279,28 +287,15 @@ const Tours = () => {
                 <Label htmlFor="bestseller" className="cursor-pointer">Bestseller</Label>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Inglizcha tavsif</Label>
-                  <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} rows={3} />
-                </div>
-                <div className="space-y-2">
-                  <Label>O'zbekcha tavsif</Label>
-                  <Textarea value={formData.description_uz} onChange={(e) => setFormData({ ...formData, description_uz: e.target.value })} rows={3} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Ruscha tavsif</Label>
-                  <Textarea value={formData.description_ru} onChange={(e) => setFormData({ ...formData, description_ru: e.target.value })} rows={3} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Nemischa tavsif</Label>
-                  <Textarea value={formData.description_de} onChange={(e) => setFormData({ ...formData, description_de: e.target.value })} rows={3} />
-                </div>
+              <div className="space-y-2">
+                <Label>Tavsif (Inglizcha)</Label>
+                <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} rows={3} placeholder="Tur tavsifini kiriting" />
+                <p className="text-sm text-muted-foreground">Boshqa tillarga avtomatik tarjima qilinadi</p>
               </div>
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={handleClose}>Bekor qilish</Button>
-                <Button type="submit">{editingTour ? "Yangilash" : "Qo'shish"}</Button>
+                <Button type="submit" disabled={isTranslating}>{isTranslating ? "Tarjima qilinmoqda..." : editingTour ? "Yangilash" : "Qo'shish"}</Button>
               </div>
             </form>
           </DialogContent>

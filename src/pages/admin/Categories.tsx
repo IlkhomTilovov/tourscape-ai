@@ -24,11 +24,9 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
     name_en: "",
-    name_uz: "",
-    name_ru: "",
-    name_de: "",
     icon: "",
   });
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -46,30 +44,54 @@ const Categories = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingCategory) {
-      const { error } = await supabase
-        .from("categories")
-        .update(formData)
-        .eq("id", editingCategory.id);
+    setIsTranslating(true);
+
+    try {
+      const { data: translationData, error: translationError } = await supabase.functions.invoke('translate', {
+        body: { 
+          text: formData.name_en,
+          targetLanguages: ['Uzbek', 'Russian', 'German']
+        }
+      });
+
+      if (translationError) throw translationError;
+
+      const dataToSave = {
+        name_en: formData.name_en,
+        name_uz: translationData.translations.Uzbek,
+        name_ru: translationData.translations.Russian,
+        name_de: translationData.translations.German,
+        icon: formData.icon,
+      };
       
-      if (error) {
-        toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      if (editingCategory) {
+        const { error } = await supabase
+          .from("categories")
+          .update(dataToSave)
+          .eq("id", editingCategory.id);
+        
+        if (error) {
+          toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Muvaffaqiyat", description: "Kategoriya yangilandi" });
+          fetchCategories();
+          handleClose();
+        }
       } else {
-        toast({ title: "Muvaffaqiyat", description: "Kategoriya yangilandi" });
-        fetchCategories();
-        handleClose();
+        const { error } = await supabase.from("categories").insert([dataToSave]);
+        
+        if (error) {
+          toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+        } else {
+          toast({ title: "Muvaffaqiyat", description: "Kategoriya qo'shildi" });
+          fetchCategories();
+          handleClose();
+        }
       }
-    } else {
-      const { error } = await supabase.from("categories").insert([formData]);
-      
-      if (error) {
-        toast({ title: "Xatolik", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Muvaffaqiyat", description: "Kategoriya qo'shildi" });
-        fetchCategories();
-        handleClose();
-      }
+    } catch (error: any) {
+      toast({ title: "Xatolik", description: error.message || "Tarjima xatosi", variant: "destructive" });
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -77,9 +99,6 @@ const Categories = () => {
     setEditingCategory(category);
     setFormData({
       name_en: category.name_en,
-      name_uz: category.name_uz,
-      name_ru: category.name_ru,
-      name_de: category.name_de,
       icon: category.icon || "",
     });
     setOpen(true);
@@ -101,7 +120,7 @@ const Categories = () => {
   const handleClose = () => {
     setOpen(false);
     setEditingCategory(null);
-    setFormData({ name_en: "", name_uz: "", name_ru: "", name_de: "", icon: "" });
+    setFormData({ name_en: "", icon: "" });
   };
 
   return (
@@ -113,7 +132,7 @@ const Categories = () => {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditingCategory(null); setFormData({ name_en: "", name_uz: "", name_ru: "", name_de: "", icon: "" }); }}>
+            <Button onClick={() => { setEditingCategory(null); setFormData({ name_en: "", icon: "" }); }}>
               <Plus className="h-4 w-4 mr-2" />
               Yangi qo'shish
             </Button>
@@ -123,43 +142,16 @@ const Categories = () => {
               <DialogTitle>{editingCategory ? "Kategoriyani tahrirlash" : "Yangi kategoriya"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name_en">Inglizcha nomi</Label>
-                  <Input
-                    id="name_en"
-                    value={formData.name_en}
-                    onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name_uz">O'zbekcha nomi</Label>
-                  <Input
-                    id="name_uz"
-                    value={formData.name_uz}
-                    onChange={(e) => setFormData({ ...formData, name_uz: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name_ru">Ruscha nomi</Label>
-                  <Input
-                    id="name_ru"
-                    value={formData.name_ru}
-                    onChange={(e) => setFormData({ ...formData, name_ru: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name_de">Nemischa nomi</Label>
-                  <Input
-                    id="name_de"
-                    value={formData.name_de}
-                    onChange={(e) => setFormData({ ...formData, name_de: e.target.value })}
-                    required
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="name_en">Nomi (Inglizcha)</Label>
+                <Input
+                  id="name_en"
+                  value={formData.name_en}
+                  onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
+                  required
+                  placeholder="Kategoriya nomini kiriting"
+                />
+                <p className="text-sm text-muted-foreground">Boshqa tillarga avtomatik tarjima qilinadi</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="icon">Ikonka (lucide icon nomi)</Label>
@@ -174,8 +166,8 @@ const Categories = () => {
                 <Button type="button" variant="outline" onClick={handleClose}>
                   Bekor qilish
                 </Button>
-                <Button type="submit">
-                  {editingCategory ? "Yangilash" : "Qo'shish"}
+                <Button type="submit" disabled={isTranslating}>
+                  {isTranslating ? "Tarjima qilinmoqda..." : editingCategory ? "Yangilash" : "Qo'shish"}
                 </Button>
               </div>
             </form>
