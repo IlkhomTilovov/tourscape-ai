@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Globe, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,12 +14,13 @@ import type { Language } from "@/lib/translations";
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const navigate = useNavigate();
   
   const languages = [
-    { code: "EN" as Language, name: "English" },
-    { code: "UZ" as Language, name: "Uzbek" },
-    { code: "RU" as Language, name: "Russian" },
-    { code: "DE" as Language, name: "German" },
+    { code: "EN" as Language, name: "English", display: "EN" },
+    { code: "UZ" as Language, name: "Uzbek", display: "UZ" },
+    { code: "RU" as Language, name: "Russian", display: "RU" },
+    { code: "DE" as Language, name: "German", display: "DE" },
   ];
 
   return (
@@ -36,45 +37,76 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/destinations"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              {t("destinations")}
-            </Link>
-            <Link
-              to="/tours"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              {t("tours")}
-            </Link>
-            <Link
-              to="/categories"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              {t("categories")}
-            </Link>
-            <Link
-              to="/about"
-              className="text-foreground hover:text-primary transition-colors"
-            >
+          {/* Desktop Navigation with Dropdowns */}
+          <div className="hidden md:flex items-center space-x-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-1">
+                  {t("destinations")}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => navigate("/destinations")}>
+                  {t("destinations")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-1">
+                  {t("tours")}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => navigate("/tours")}>
+                  {t("tours")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-1">
+                  {t("categories")}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => navigate("/categories")}>
+                  {t("categories")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="ghost" onClick={() => navigate("/about")}>
               {t("about")}
-            </Link>
+            </Button>
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
+            {/* Wishlist */}
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Heart className="h-5 w-5" />
+            </Button>
+
+            {/* Cart */}
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <ShoppingCart className="h-5 w-5" />
+            </Button>
+
             {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
+                <Button variant="ghost" size="sm" className="hidden sm:flex gap-1">
                   <Globe className="h-4 w-4" />
                   {language}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-[140px]">
+              <DropdownMenuContent align="end">
                 {languages.map((lang) => (
                   <DropdownMenuItem 
                     key={lang.code}
@@ -87,16 +119,15 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Account */}
-            <Button variant="ghost" size="sm">
-              <User className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">{t("signIn")}</span>
+            {/* User Profile */}
+            <Button variant="ghost" size="icon">
+              <User className="h-5 w-5" />
             </Button>
 
             {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
@@ -109,37 +140,58 @@ const Navbar = () => {
           </div>
         </div>
 
+
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-4 animate-fade-in">
-            <Link
-              to="/destinations"
-              className="block text-foreground hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
+          <div className="md:hidden py-4 space-y-2 animate-fade-in">
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/destinations");
+                setMobileMenuOpen(false);
+              }}
             >
               {t("destinations")}
-            </Link>
-            <Link
-              to="/tours"
-              className="block text-foreground hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/tours");
+                setMobileMenuOpen(false);
+              }}
             >
               {t("tours")}
-            </Link>
-            <Link
-              to="/categories"
-              className="block text-foreground hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/categories");
+                setMobileMenuOpen(false);
+              }}
             >
               {t("categories")}
-            </Link>
-            <Link
-              to="/about"
-              className="block text-foreground hover:text-primary transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/about");
+                setMobileMenuOpen(false);
+              }}
             >
               {t("about")}
-            </Link>
+            </Button>
+            <div className="flex items-center gap-2 pt-2 border-t">
+              <Button variant="ghost" size="icon">
+                <Heart className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
