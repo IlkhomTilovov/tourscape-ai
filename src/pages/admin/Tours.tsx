@@ -44,6 +44,12 @@ const Tours = () => {
   const [formData, setFormData] = useState({
     title_en: "",
     description_en: "",
+    overview_en: "",
+    itinerary_en: "",
+    important_info_en: "",
+    location_en: "",
+    included_en: "",
+    not_included_en: "",
     price: "",
     duration: "",
     image_url: "",
@@ -86,36 +92,68 @@ const Tours = () => {
     setIsTranslating(true);
 
     try {
-      const { data: titleTranslations, error: titleError } = await supabase.functions.invoke('translate', {
-        body: { 
-          text: formData.title_en,
-          targetLanguages: ['Uzbek', 'Russian', 'German']
+      // Translate all text fields
+      const fieldsToTranslate = [
+        { key: 'title', value: formData.title_en },
+        { key: 'description', value: formData.description_en },
+        { key: 'overview', value: formData.overview_en },
+        { key: 'itinerary', value: formData.itinerary_en },
+        { key: 'important_info', value: formData.important_info_en },
+        { key: 'location', value: formData.location_en },
+        { key: 'included', value: formData.included_en },
+        { key: 'not_included', value: formData.not_included_en },
+      ];
+
+      const translations: Record<string, any> = {};
+
+      for (const field of fieldsToTranslate) {
+        if (field.value) {
+          const { data, error } = await supabase.functions.invoke('translate', {
+            body: { 
+              text: field.value,
+              targetLanguages: ['Uzbek', 'Russian', 'German']
+            }
+          });
+          if (error) throw error;
+          translations[field.key] = data.translations;
+        } else {
+          translations[field.key] = { Uzbek: '', Russian: '', German: '' };
         }
-      });
-
-      if (titleError) throw titleError;
-
-      let descTranslations = { Uzbek: '', Russian: '', German: '' };
-      if (formData.description_en) {
-        const { data: descData, error: descError } = await supabase.functions.invoke('translate', {
-          body: { 
-            text: formData.description_en,
-            targetLanguages: ['Uzbek', 'Russian', 'German']
-          }
-        });
-        if (descError) throw descError;
-        descTranslations = descData.translations;
       }
 
       const tourData = {
         title_en: formData.title_en,
-        title_uz: titleTranslations.translations.Uzbek,
-        title_ru: titleTranslations.translations.Russian,
-        title_de: titleTranslations.translations.German,
+        title_uz: translations.title.Uzbek,
+        title_ru: translations.title.Russian,
+        title_de: translations.title.German,
         description_en: formData.description_en || null,
-        description_uz: descTranslations.Uzbek || null,
-        description_ru: descTranslations.Russian || null,
-        description_de: descTranslations.German || null,
+        description_uz: translations.description.Uzbek || null,
+        description_ru: translations.description.Russian || null,
+        description_de: translations.description.German || null,
+        overview_en: formData.overview_en || null,
+        overview_uz: translations.overview.Uzbek || null,
+        overview_ru: translations.overview.Russian || null,
+        overview_de: translations.overview.German || null,
+        itinerary_en: formData.itinerary_en || null,
+        itinerary_uz: translations.itinerary.Uzbek || null,
+        itinerary_ru: translations.itinerary.Russian || null,
+        itinerary_de: translations.itinerary.German || null,
+        important_info_en: formData.important_info_en || null,
+        important_info_uz: translations.important_info.Uzbek || null,
+        important_info_ru: translations.important_info.Russian || null,
+        important_info_de: translations.important_info.German || null,
+        location_en: formData.location_en || null,
+        location_uz: translations.location.Uzbek || null,
+        location_ru: translations.location.Russian || null,
+        location_de: translations.location.German || null,
+        included_en: formData.included_en || null,
+        included_uz: translations.included.Uzbek || null,
+        included_ru: translations.included.Russian || null,
+        included_de: translations.included.German || null,
+        not_included_en: formData.not_included_en || null,
+        not_included_uz: translations.not_included.Uzbek || null,
+        not_included_ru: translations.not_included.Russian || null,
+        not_included_de: translations.not_included.German || null,
         price: parseFloat(formData.price),
         duration: formData.duration,
         image_url: formData.image_url || null,
@@ -157,11 +195,17 @@ const Tours = () => {
     }
   };
 
-  const handleEdit = (tour: Tour) => {
+  const handleEdit = (tour: any) => {
     setEditingTour(tour);
     setFormData({
       title_en: tour.title_en,
       description_en: tour.description_en || "",
+      overview_en: tour.overview_en || "",
+      itinerary_en: tour.itinerary_en || "",
+      important_info_en: tour.important_info_en || "",
+      location_en: tour.location_en || "",
+      included_en: tour.included_en || "",
+      not_included_en: tour.not_included_en || "",
       price: tour.price.toString(),
       duration: tour.duration,
       image_url: tour.image_url || "",
@@ -193,6 +237,12 @@ const Tours = () => {
     setFormData({
       title_en: "",
       description_en: "",
+      overview_en: "",
+      itinerary_en: "",
+      important_info_en: "",
+      location_en: "",
+      included_en: "",
+      not_included_en: "",
       price: "",
       duration: "",
       image_url: "",
@@ -290,8 +340,39 @@ const Tours = () => {
               <div className="space-y-2">
                 <Label>Tavsif (Inglizcha)</Label>
                 <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} rows={3} placeholder="Tur tavsifini kiriting" />
-                <p className="text-sm text-muted-foreground">Boshqa tillarga avtomatik tarjima qilinadi</p>
               </div>
+
+              <div className="space-y-2">
+                <Label>Overview (Inglizcha)</Label>
+                <Textarea value={formData.overview_en} onChange={(e) => setFormData({ ...formData, overview_en: e.target.value })} rows={4} placeholder="Tur haqida umumiy ma'lumot" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Itinerary - Marshrutni rejasi (Inglizcha)</Label>
+                <Textarea value={formData.itinerary_en} onChange={(e) => setFormData({ ...formData, itinerary_en: e.target.value })} rows={5} placeholder="Kun tartibi va marshrutni rejasi" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Important Information - Muhim ma'lumot (Inglizcha)</Label>
+                <Textarea value={formData.important_info_en} onChange={(e) => setFormData({ ...formData, important_info_en: e.target.value })} rows={4} placeholder="Please arrive 15 minutes before..." />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Location - Joylashuv (Inglizcha)</Label>
+                <Textarea value={formData.location_en} onChange={(e) => setFormData({ ...formData, location_en: e.target.value })} rows={3} placeholder="Manzil va joylashuv ma'lumoti" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Included - Nima kiritilgan (Inglizcha)</Label>
+                <Textarea value={formData.included_en} onChange={(e) => setFormData({ ...formData, included_en: e.target.value })} rows={4} placeholder="Skip-the-line ticket\nExpert guide\nSummit access" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Not Included - Nima kiritilmagan (Inglizcha)</Label>
+                <Textarea value={formData.not_included_en} onChange={(e) => setFormData({ ...formData, not_included_en: e.target.value })} rows={4} placeholder="Hotel pickup\nFood & drinks\nGratuities" />
+              </div>
+
+              <p className="text-sm text-muted-foreground italic">Barcha maydonlar boshqa tillarga avtomatik tarjima qilinadi</p>
 
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={handleClose}>Bekor qilish</Button>

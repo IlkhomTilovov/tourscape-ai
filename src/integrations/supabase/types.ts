@@ -107,7 +107,31 @@ export type Database = {
           duration: string
           id: string
           image_url: string | null
+          important_info_de: string | null
+          important_info_en: string | null
+          important_info_ru: string | null
+          important_info_uz: string | null
+          included_de: string | null
+          included_en: string | null
+          included_ru: string | null
+          included_uz: string | null
           is_bestseller: boolean | null
+          itinerary_de: string | null
+          itinerary_en: string | null
+          itinerary_ru: string | null
+          itinerary_uz: string | null
+          location_de: string | null
+          location_en: string | null
+          location_ru: string | null
+          location_uz: string | null
+          not_included_de: string | null
+          not_included_en: string | null
+          not_included_ru: string | null
+          not_included_uz: string | null
+          overview_de: string | null
+          overview_en: string | null
+          overview_ru: string | null
+          overview_uz: string | null
           price: number
           rating: number | null
           reviews_count: number | null
@@ -128,7 +152,31 @@ export type Database = {
           duration: string
           id?: string
           image_url?: string | null
+          important_info_de?: string | null
+          important_info_en?: string | null
+          important_info_ru?: string | null
+          important_info_uz?: string | null
+          included_de?: string | null
+          included_en?: string | null
+          included_ru?: string | null
+          included_uz?: string | null
           is_bestseller?: boolean | null
+          itinerary_de?: string | null
+          itinerary_en?: string | null
+          itinerary_ru?: string | null
+          itinerary_uz?: string | null
+          location_de?: string | null
+          location_en?: string | null
+          location_ru?: string | null
+          location_uz?: string | null
+          not_included_de?: string | null
+          not_included_en?: string | null
+          not_included_ru?: string | null
+          not_included_uz?: string | null
+          overview_de?: string | null
+          overview_en?: string | null
+          overview_ru?: string | null
+          overview_uz?: string | null
           price: number
           rating?: number | null
           reviews_count?: number | null
@@ -149,7 +197,31 @@ export type Database = {
           duration?: string
           id?: string
           image_url?: string | null
+          important_info_de?: string | null
+          important_info_en?: string | null
+          important_info_ru?: string | null
+          important_info_uz?: string | null
+          included_de?: string | null
+          included_en?: string | null
+          included_ru?: string | null
+          included_uz?: string | null
           is_bestseller?: boolean | null
+          itinerary_de?: string | null
+          itinerary_en?: string | null
+          itinerary_ru?: string | null
+          itinerary_uz?: string | null
+          location_de?: string | null
+          location_en?: string | null
+          location_ru?: string | null
+          location_uz?: string | null
+          not_included_de?: string | null
+          not_included_en?: string | null
+          not_included_ru?: string | null
+          not_included_uz?: string | null
+          overview_de?: string | null
+          overview_en?: string | null
+          overview_ru?: string | null
+          overview_uz?: string | null
           price?: number
           rating?: number | null
           reviews_count?: number | null
