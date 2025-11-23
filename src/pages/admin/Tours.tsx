@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Tour = {
@@ -475,6 +476,11 @@ const Tours = () => {
                   <TableCell>{tour.rating} ⭐</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="ghost" asChild>
+                        <Link to={`/tour/${tour.id}`} target="_blank" rel="noopener noreferrer">
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => handleEdit(tour)}>
                         <Edit className="h-4 w-4" />
                       </Button>
