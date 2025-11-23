@@ -35,6 +35,7 @@ const Destinations = () => {
     country: "",
   });
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,6 +48,46 @@ const Destinations = () => {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
     } else {
       setDestinations(data || []);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Xatolik", description: "Rasm hajmi 5MB dan kichik bo'lishi kerak", variant: "destructive" });
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Xatolik", description: "Faqat rasm fayllarini yuklash mumkin", variant: "destructive" });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `destinations/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('tour-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('tour-images')
+        .getPublicUrl(filePath);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      toast({ title: "Muvaffaqiyat", description: "Rasm yuklandi" });
+    } catch (error: any) {
+      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -186,8 +227,31 @@ const Destinations = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Rasm URL</Label>
-                <Input value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} />
+                <Label>Rasm yuklash</Label>
+                <div className="flex items-center gap-4">
+                  <Input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                    className="cursor-pointer"
+                  />
+                  {isUploading && <span className="text-sm text-muted-foreground">Yuklanmoqda...</span>}
+                </div>
+                {formData.image_url && (
+                  <div className="mt-2">
+                    <img src={formData.image_url} alt="Preview" className="h-32 w-auto rounded-lg object-cover border" />
+                  </div>
+                )}
+                <div className="flex items-center gap-2 mt-2">
+                  <Label className="text-sm text-muted-foreground">yoki URL kiriting:</Label>
+                  <Input 
+                    value={formData.image_url} 
+                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                    placeholder="https://..."
+                    className="flex-1"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
