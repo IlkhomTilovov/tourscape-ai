@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   Star,
   Clock,
@@ -22,6 +26,13 @@ import {
 const TourDetails = () => {
   const { id } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    guest_name: "",
+    rating: 5,
+    comment: "",
+  });
 
   const images = [
     "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80",
@@ -55,6 +66,56 @@ const TourDetails = () => {
 
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  // Fetch reviews
+  useEffect(() => {
+    if (id) {
+      fetchReviews();
+    }
+  }, [id]);
+
+  const fetchReviews = async () => {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("tour_id", id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching reviews:", error);
+    } else {
+      setReviews(data || []);
+    }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!reviewForm.guest_name.trim() || !reviewForm.comment.trim()) {
+      toast.error("Iltimos, barcha maydonlarni to'ldiring");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const { error } = await supabase.from("reviews").insert({
+      tour_id: id,
+      guest_name: reviewForm.guest_name.trim(),
+      rating: reviewForm.rating,
+      comment: reviewForm.comment.trim(),
+    });
+
+    if (error) {
+      toast.error("Xatolik yuz berdi. Iltimos, qayta urinib ko'ring");
+      console.error("Error submitting review:", error);
+    } else {
+      toast.success("Izoh muvaffaqiyatli qo'shildi!");
+      setReviewForm({ guest_name: "", rating: 5, comment: "" });
+      fetchReviews();
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -239,9 +300,121 @@ const TourDetails = () => {
 
               <TabsContent value="reviews" className="mt-6">
                 <h2 className="text-2xl font-bold mb-6">Customer reviews</h2>
-                <p className="text-muted-foreground">
-                  Reviews section coming soon...
-                </p>
+                
+                {/* Review Form */}
+                <div className="bg-card border border-border rounded-xl p-6 mb-8">
+                  <h3 className="text-xl font-semibold mb-4">Izoh qoldiring</h3>
+                  <form onSubmit={handleSubmitReview} className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Ismingiz
+                      </label>
+                      <Input
+                        value={reviewForm.guest_name}
+                        onChange={(e) =>
+                          setReviewForm({ ...reviewForm, guest_name: e.target.value })
+                        }
+                        placeholder="Ismingizni kiriting"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Reyting
+                      </label>
+                      <div className="flex space-x-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() =>
+                              setReviewForm({ ...reviewForm, rating: star })
+                            }
+                            className="focus:outline-none"
+                          >
+                            <Star
+                              className={`h-8 w-8 ${
+                                star <= reviewForm.rating
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">
+                        Izoh
+                      </label>
+                      <Textarea
+                        value={reviewForm.comment}
+                        onChange={(e) =>
+                          setReviewForm({ ...reviewForm, comment: e.target.value })
+                        }
+                        placeholder="Tajribangiz haqida yozing..."
+                        rows={4}
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full hero-gradient text-white"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Yuborilmoqda..." : "Izoh yuborish"}
+                    </Button>
+                  </form>
+                </div>
+
+                {/* Reviews List */}
+                <div className="space-y-6">
+                  {reviews.length > 0 ? (
+                    reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="bg-card border border-border rounded-xl p-6"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold text-lg">
+                              {review.guest_name}
+                            </h4>
+                            <div className="flex items-center space-x-1 mt-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i < review.rating
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "text-muted-foreground"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(review.created_at).toLocaleDateString("uz-UZ", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {review.comment}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Hozircha izohlar yo'q. Birinchi bo'lib izoh qoldiring!
+                    </p>
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="location" className="mt-6">

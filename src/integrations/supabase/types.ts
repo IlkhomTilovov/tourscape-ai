@@ -95,6 +95,41 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string
+          created_at: string
+          guest_name: string
+          id: string
+          rating: number
+          tour_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          guest_name: string
+          id?: string
+          rating: number
+          tour_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          guest_name?: string
+          id?: string
+          rating?: number
+          tour_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tours: {
         Row: {
           category_id: string | null
