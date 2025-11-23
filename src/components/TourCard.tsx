@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Star, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TourCardProps {
   id: string;
@@ -27,6 +28,8 @@ const TourCard = ({
   category,
   bestseller,
 }: TourCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Link to={`/tour/${id}`}>
       <div className="card-elevated rounded-xl overflow-hidden bg-card group cursor-pointer">
@@ -40,7 +43,7 @@ const TourCard = ({
           />
           {bestseller && (
             <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">
-              Bestseller
+              {t("bestseller")}
             </Badge>
           )}
           <Badge className="absolute top-3 right-3 bg-background/90 text-foreground">
@@ -74,7 +77,7 @@ const TourCard = ({
               <span className="font-semibold text-sm">{rating}</span>
             </div>
             <span className="text-sm text-muted-foreground">
-              ({reviewCount} reviews)
+              ({reviewCount} {t("reviews")})
             </span>
           </div>
 
@@ -82,11 +85,11 @@ const TourCard = ({
           <div className="pt-2 border-t border-border">
             <div className="flex items-baseline justify-between">
               <div>
-                <span className="text-sm text-muted-foreground">From </span>
+                <span className="text-sm text-muted-foreground">{t("from")} </span>
                 <span className="text-2xl font-bold text-foreground">
                   ${price}
                 </span>
-                <span className="text-sm text-muted-foreground"> /person</span>
+                <span className="text-sm text-muted-foreground"> {t("perPerson")}</span>
               </div>
             </div>
           </div>
