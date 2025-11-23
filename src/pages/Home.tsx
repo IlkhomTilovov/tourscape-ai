@@ -1,93 +1,67 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import SearchBar from "@/components/SearchBar";
 import TourCard from "@/components/TourCard";
 import DestinationCard from "@/components/DestinationCard";
 import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero-travel.jpg";
-import { Compass, Landmark, Palmtree, Mountain, Ship, Camera } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Home = () => {
-  const { t } = useLanguage();
-  // Mock data - will be replaced with API calls
-  const trendingTours = [
-    {
-      id: "1",
-      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-      title: "Eiffel Tower: Summit Access with Host",
-      location: "Paris, France",
-      duration: "2 hours",
-      rating: 4.8,
-      reviewCount: 12453,
-      price: 89,
-      category: "Landmarks",
-      bestseller: true,
-    },
-    {
-      id: "2",
-      image: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=800&q=80",
-      title: "Colosseum Underground and Arena Floor Tour",
-      location: "Rome, Italy",
-      duration: "3 hours",
-      rating: 4.9,
-      reviewCount: 8932,
-      price: 125,
-      category: "History",
-      bestseller: true,
-    },
-    {
-      id: "3",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
-      title: "Northern Lights Chase with Photography",
-      location: "Reykjavik, Iceland",
-      duration: "5 hours",
-      rating: 4.7,
-      reviewCount: 3421,
-      price: 180,
-      category: "Nature",
-    },
-  ];
+  const { t, language } = useLanguage();
+  const [categories, setCategories] = useState<any[]>([]);
+  const [destinations, setDestinations] = useState<any[]>([]);
+  const [tours, setTours] = useState<any[]>([]);
 
-  const destinations = [
-    {
-      name: "Paris",
-      country: "France",
-      image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800&q=80",
-      tourCount: 1234,
-      slug: "paris",
-    },
-    {
-      name: "Tokyo",
-      country: "Japan",
-      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80",
-      tourCount: 892,
-      slug: "tokyo",
-    },
-    {
-      name: "New York",
-      country: "USA",
-      image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80",
-      tourCount: 1567,
-      slug: "new-york",
-    },
-    {
-      name: "Barcelona",
-      country: "Spain",
-      image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=800&q=80",
-      tourCount: 743,
-      slug: "barcelona",
-    },
-  ];
+  useEffect(() => {
+    fetchCategories();
+    fetchDestinations();
+    fetchTours();
+  }, []);
 
-  const categories = [
-    { name: "Museums & Art", icon: Landmark, count: 2341 },
-    { name: "Outdoor Activities", icon: Mountain, count: 1876 },
-    { name: "City Tours", icon: Compass, count: 3421 },
-    { name: "Beach & Water", icon: Palmtree, count: 987 },
-    { name: "Cruises", icon: Ship, count: 654 },
-    { name: "Photography", icon: Camera, count: 432 },
-  ];
+  const fetchCategories = async () => {
+    const { data } = await supabase.from("categories").select("*").limit(6);
+    if (data) {
+      setCategories(data);
+    }
+  };
+
+  const fetchDestinations = async () => {
+    const { data } = await supabase.from("destinations").select("*").limit(4);
+    if (data) {
+      setDestinations(data);
+    }
+  };
+
+  const fetchTours = async () => {
+    const { data } = await supabase
+      .from("tours")
+      .select("*, destinations(name_en, name_uz, name_ru, name_de), categories(name_en, name_uz, name_ru, name_de)")
+      .eq("is_bestseller", true)
+      .limit(3);
+    if (data) {
+      setTours(data);
+    }
+  };
+
+  const getIconComponent = (iconName: string | null) => {
+    if (!iconName) return LucideIcons.Compass;
+    const Icon = (LucideIcons as any)[iconName];
+    return Icon || LucideIcons.Compass;
+  };
+
+  const getLocalizedName = (item: any, field: string) => {
+    const fieldMap: any = {
+      uz: `${field}_uz`,
+      ru: `${field}_ru`,
+      de: `${field}_de`,
+      en: `${field}_en`,
+    };
+    return item[fieldMap[language]] || item[`${field}_en`] || "";
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -121,19 +95,21 @@ const Home = () => {
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold mb-8">{t("categoriesTitle")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category) => (
-            <Link
-              key={category.name}
-              to={`/category/${category.name.toLowerCase().replace(/ /g, "-")}`}
-              className="card-elevated rounded-xl p-6 text-center bg-card hover:bg-accent/5 transition-colors"
-            >
-              <div className="w-12 h-12 hero-gradient rounded-full flex items-center justify-center mx-auto mb-3">
-                <category.icon className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-sm mb-1">{category.name}</h3>
-              <p className="text-xs text-muted-foreground">{category.count} activities</p>
-            </Link>
-          ))}
+          {categories.map((category) => {
+            const IconComponent = getIconComponent(category.icon);
+            return (
+              <Link
+                key={category.id}
+                to={`/search?category=${category.id}`}
+                className="card-elevated rounded-xl p-6 text-center bg-card hover:bg-accent/5 transition-colors"
+              >
+                <div className="w-12 h-12 hero-gradient rounded-full flex items-center justify-center mx-auto mb-3">
+                  <IconComponent className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-sm mb-1">{getLocalizedName(category, "name")}</h3>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -142,15 +118,27 @@ const Home = () => {
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold">{t("trendingTitle")}</h2>
           <Link
-            to="/tours"
+            to="/search"
             className="text-primary hover:underline font-semibold"
           >
             {t("viewAll")}
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trendingTours.map((tour) => (
-            <TourCard key={tour.id} {...tour} />
+          {tours.map((tour) => (
+            <TourCard
+              key={tour.id}
+              id={tour.id}
+              image={tour.image_url || ""}
+              title={getLocalizedName(tour, "title")}
+              location={tour.destinations ? getLocalizedName(tour.destinations, "name") : ""}
+              duration={tour.duration}
+              rating={Number(tour.rating)}
+              reviewCount={tour.reviews_count}
+              price={Number(tour.price)}
+              category={tour.categories ? getLocalizedName(tour.categories, "name") : ""}
+              bestseller={tour.is_bestseller}
+            />
           ))}
         </div>
       </section>
@@ -160,7 +148,14 @@ const Home = () => {
         <h2 className="text-3xl font-bold mb-8">{t("destinationsTitle")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {destinations.map((destination) => (
-            <DestinationCard key={destination.slug} {...destination} />
+            <DestinationCard
+              key={destination.id}
+              name={getLocalizedName(destination, "name")}
+              country={destination.country}
+              image={destination.image_url || ""}
+              tourCount={0}
+              slug={destination.id}
+            />
           ))}
         </div>
       </section>
