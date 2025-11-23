@@ -14,16 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string | null
+          icon: string | null
+          id: string
+          name_de: string
+          name_en: string
+          name_ru: string
+          name_uz: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name_de: string
+          name_en: string
+          name_ru: string
+          name_uz: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name_de?: string
+          name_en?: string
+          name_ru?: string
+          name_uz?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      destinations: {
+        Row: {
+          country: string
+          created_at: string | null
+          description_de: string | null
+          description_en: string | null
+          description_ru: string | null
+          description_uz: string | null
+          id: string
+          image_url: string | null
+          name_de: string
+          name_en: string
+          name_ru: string
+          name_uz: string
+          updated_at: string | null
+        }
+        Insert: {
+          country: string
+          created_at?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          description_ru?: string | null
+          description_uz?: string | null
+          id?: string
+          image_url?: string | null
+          name_de: string
+          name_en: string
+          name_ru: string
+          name_uz: string
+          updated_at?: string | null
+        }
+        Update: {
+          country?: string
+          created_at?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          description_ru?: string | null
+          description_uz?: string | null
+          id?: string
+          image_url?: string | null
+          name_de?: string
+          name_en?: string
+          name_ru?: string
+          name_uz?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tours: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description_de: string | null
+          description_en: string | null
+          description_ru: string | null
+          description_uz: string | null
+          destination_id: string | null
+          duration: string
+          id: string
+          image_url: string | null
+          is_bestseller: boolean | null
+          price: number
+          rating: number | null
+          reviews_count: number | null
+          title_de: string
+          title_en: string
+          title_ru: string
+          title_uz: string
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          description_ru?: string | null
+          description_uz?: string | null
+          destination_id?: string | null
+          duration: string
+          id?: string
+          image_url?: string | null
+          is_bestseller?: boolean | null
+          price: number
+          rating?: number | null
+          reviews_count?: number | null
+          title_de: string
+          title_en: string
+          title_ru: string
+          title_uz: string
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          description_ru?: string | null
+          description_uz?: string | null
+          destination_id?: string | null
+          duration?: string
+          id?: string
+          image_url?: string | null
+          is_bestseller?: boolean | null
+          price?: number
+          rating?: number | null
+          reviews_count?: number | null
+          title_de?: string
+          title_en?: string
+          title_ru?: string
+          title_uz?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tours_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tours_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +338,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
