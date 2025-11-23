@@ -24,6 +24,8 @@ import {
   Share2,
   ArrowLeft,
   Loader2,
+  Upload,
+  ImageIcon,
 } from "lucide-react";
 
 interface Tour {
@@ -85,6 +87,7 @@ const TourDetails = () => {
     guest_name: "",
     rating: 5,
     comment: "",
+    images: [] as File[],
   });
 
   const images = tour?.image_url ? [tour.image_url] : [
@@ -196,30 +199,94 @@ const TourDetails = () => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validImages = files.filter(file => file.type.startsWith('image/'));
+    
+    if (validImages.length + reviewForm.images.length > 5) {
+      toast.error(language === "UZ" ? "Maksimal 5 ta rasm yuklash mumkin" : 
+                  language === "EN" ? "Maximum 5 images allowed" :
+                  language === "RU" ? "Максимум 5 изображений" :
+                  "Maximal 5 Bilder erlaubt");
+      return;
+    }
+    
+    setReviewForm({ ...reviewForm, images: [...reviewForm.images, ...validImages] });
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...reviewForm.images];
+    newImages.splice(index, 1);
+    setReviewForm({ ...reviewForm, images: newImages });
+  };
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!reviewForm.guest_name.trim() || !reviewForm.comment.trim()) {
-      toast.error("Iltimos, barcha maydonlarni to'ldiring");
+      toast.error(language === "UZ" ? "Iltimos, barcha maydonlarni to'ldiring" :
+                  language === "EN" ? "Please fill in all fields" :
+                  language === "RU" ? "Пожалуйста, заполните все поля" :
+                  "Bitte füllen Sie alle Felder aus");
       return;
     }
 
     setIsSubmitting(true);
 
-    const { error } = await supabase.from("reviews").insert({
-      tour_id: id,
-      guest_name: reviewForm.guest_name.trim(),
-      rating: reviewForm.rating,
-      comment: reviewForm.comment.trim(),
-    });
+    try {
+      // Upload images to storage
+      const imageUrls: string[] = [];
+      
+      for (const image of reviewForm.images) {
+        const fileExt = image.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+        const filePath = `${id}/${fileName}`;
 
-    if (error) {
-      toast.error("Xatolik yuz berdi. Iltimos, qayta urinib ko'ring");
-      console.error("Error submitting review:", error);
-    } else {
-      toast.success("Izoh muvaffaqiyatli qo'shildi!");
-      setReviewForm({ guest_name: "", rating: 5, comment: "" });
-      fetchReviews();
+        const { error: uploadError } = await supabase.storage
+          .from('review-images')
+          .upload(filePath, image);
+
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('review-images')
+          .getPublicUrl(filePath);
+
+        imageUrls.push(publicUrl);
+      }
+
+      // Insert review with image URLs
+      const { error } = await supabase.from("reviews").insert({
+        tour_id: id,
+        guest_name: reviewForm.guest_name.trim(),
+        rating: reviewForm.rating,
+        comment: reviewForm.comment.trim(),
+        image_urls: imageUrls,
+      });
+
+      if (error) {
+        toast.error(language === "UZ" ? "Xatolik yuz berdi. Iltimos, qayta urinib ko'ring" :
+                    language === "EN" ? "An error occurred. Please try again" :
+                    language === "RU" ? "Произошла ошибка. Пожалуйста, попробуйте еще раз" :
+                    "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut");
+        console.error("Error submitting review:", error);
+      } else {
+        toast.success(language === "UZ" ? "Izoh muvaffaqiyatli qo'shildi!" :
+                      language === "EN" ? "Review submitted successfully!" :
+                      language === "RU" ? "Отзыв успешно добавлен!" :
+                      "Bewertung erfolgreich hinzugefügt!");
+        setReviewForm({ guest_name: "", rating: 5, comment: "", images: [] });
+        fetchReviews();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(language === "UZ" ? "Xatolik yuz berdi" :
+                  language === "EN" ? "An error occurred" :
+                  language === "RU" ? "Произошла ошибка" :
+                  "Ein Fehler ist aufgetreten");
     }
 
     setIsSubmitting(false);
@@ -494,6 +561,52 @@ const TourDetails = () => {
                         />
                       </div>
 
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">
+                          {language === "UZ" ? "Rasmlar (ixtiyoriy)" : language === "EN" ? "Images (optional)" : language === "RU" ? "Изображения (опционально)" : "Bilder (optional)"}
+                        </label>
+                        <div className="space-y-3">
+                          <label className="flex items-center justify-center gap-2 border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-primary transition-colors">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={handleImageChange}
+                              className="hidden"
+                              disabled={reviewForm.images.length >= 5}
+                            />
+                            <Upload className="h-5 w-5" />
+                            <span className="text-sm">
+                              {language === "UZ" ? "Rasm yuklash (maksimal 5 ta)" : 
+                               language === "EN" ? "Upload images (max 5)" :
+                               language === "RU" ? "Загрузить изображения (макс. 5)" :
+                               "Bilder hochladen (max. 5)"}
+                            </span>
+                          </label>
+                          
+                          {reviewForm.images.length > 0 && (
+                            <div className="grid grid-cols-3 gap-2">
+                              {reviewForm.images.map((image, index) => (
+                                <div key={index} className="relative group">
+                                  <img
+                                    src={URL.createObjectURL(image)}
+                                    alt={`Preview ${index + 1}`}
+                                    className="w-full h-24 object-cover rounded-lg"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
                       <Button type="submit" disabled={isSubmitting} className="w-full">
                         {isSubmitting ? (
                           <>
@@ -543,7 +656,21 @@ const TourDetails = () => {
                               </div>
                             </div>
                           </div>
-                          <p className="text-muted-foreground">{review.comment}</p>
+                          <p className="text-muted-foreground mb-3">{review.comment}</p>
+                          
+                          {review.image_urls && review.image_urls.length > 0 && (
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-3">
+                              {review.image_urls.map((url: string, index: number) => (
+                                <img
+                                  key={index}
+                                  src={url}
+                                  alt={`Review image ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                  onClick={() => window.open(url, '_blank')}
+                                />
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))
                     )}

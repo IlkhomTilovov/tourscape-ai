@@ -101,6 +101,7 @@ export type Database = {
           created_at: string
           guest_name: string
           id: string
+          image_urls: string[] | null
           rating: number
           tour_id: string
         }
@@ -109,6 +110,7 @@ export type Database = {
           created_at?: string
           guest_name: string
           id?: string
+          image_urls?: string[] | null
           rating: number
           tour_id: string
         }
@@ -117,6 +119,7 @@ export type Database = {
           created_at?: string
           guest_name?: string
           id?: string
+          image_urls?: string[] | null
           rating?: number
           tour_id?: string
         }
