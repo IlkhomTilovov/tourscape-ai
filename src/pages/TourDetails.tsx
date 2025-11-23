@@ -493,12 +493,75 @@ const TourDetails = () => {
 
                 <TabsContent value="itinerary" className="mt-6">
                   <h2 className="text-2xl font-bold mb-6">
-                    {language === "UZ" ? "Batafsil marshrutni" : language === "EN" ? "Detailed itinerary" : language === "RU" ? "Подробный маршрут" : "Detaillierte Reiseroute"}
+                    {language === "UZ" ? "Batafsil marshrutni" : language === "EN" ? "Itinerary" : language === "RU" ? "Подробный маршрут" : "Detaillierte Reiseroute"}
                   </h2>
-                  <div className="text-muted-foreground whitespace-pre-line">
-                    {getLocalizedText(tour.itinerary_en, tour.itinerary_uz, tour.itinerary_ru, tour.itinerary_de) || 
-                     (language === "UZ" ? "Marshrutni ma'lumoti yo'q" : language === "EN" ? "No itinerary information available" : language === "RU" ? "Информация о маршруте недоступна" : "Keine Reiseverlaufsinformationen verfügbar")}
-                  </div>
+                  {(() => {
+                    const itineraryText = getLocalizedText(tour.itinerary_en, tour.itinerary_uz, tour.itinerary_ru, tour.itinerary_de);
+                    
+                    if (!itineraryText) {
+                      return (
+                        <div className="text-muted-foreground">
+                          {language === "UZ" ? "Marshrutni ma'lumoti yo'q" : language === "EN" ? "No itinerary information available" : language === "RU" ? "Информация о маршруте недоступна" : "Keine Reiseverlaufsinformationen verfügbar"}
+                        </div>
+                      );
+                    }
+
+                    try {
+                      const itineraryData = JSON.parse(itineraryText);
+                      
+                      return (
+                        <div className="space-y-6">
+                          {/* Starting Location */}
+                          {itineraryData.starting_location && (
+                            <div className="flex gap-4">
+                              <div className="flex flex-col items-center">
+                                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
+                                  S
+                                </div>
+                                <div className="w-1 h-full bg-primary/30 mt-2" style={{ minHeight: '40px' }} />
+                              </div>
+                              <div className="flex-1 pb-6">
+                                <div className="text-lg font-semibold mb-1">
+                                  {language === "UZ" ? "Boshlang'ich joylashuv:" : language === "EN" ? "Starting location:" : language === "RU" ? "Начальная локация:" : "Startort:"}
+                                </div>
+                                <p className="text-foreground">{itineraryData.starting_location}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Stops */}
+                          {itineraryData.stops && itineraryData.stops.map((stop: any, index: number) => (
+                            <div key={index} className="flex gap-4">
+                              <div className="flex flex-col items-center">
+                                <div className="w-10 h-10 rounded-full bg-secondary border-2 border-primary flex items-center justify-center flex-shrink-0">
+                                  <MapPin className="w-5 h-5" />
+                                </div>
+                                {index < itineraryData.stops.length - 1 && (
+                                  <div className="w-1 h-full bg-primary/30 mt-2" style={{ minHeight: '40px' }} />
+                                )}
+                              </div>
+                              <div className="flex-1 pb-6">
+                                <h3 className="text-lg font-semibold mb-2">{stop.title}</h3>
+                                <p className="text-foreground mb-2">{stop.description}</p>
+                                {stop.extra_fee && (
+                                  <Badge variant="outline" className="text-muted-foreground">
+                                    {language === "UZ" ? "Qo'shimcha to'lov" : language === "EN" ? "Extra fee" : language === "RU" ? "Дополнительная плата" : "Zusätzliche Gebühr"}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    } catch (error) {
+                      // Fallback to plain text if JSON parsing fails
+                      return (
+                        <div className="text-muted-foreground whitespace-pre-line">
+                          {itineraryText}
+                        </div>
+                      );
+                    }
+                  })()}
                 </TabsContent>
 
                 <TabsContent value="reviews" className="mt-6">
