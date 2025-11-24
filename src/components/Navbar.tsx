@@ -205,6 +205,24 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-2 animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-hide">
             {menuItems.map((item) => {
+              // Check if this is Destinations with children - make it a direct link instead of select
+              if (item.url === "/destinations" && item.children && item.children.length > 0) {
+                return (
+                  <div key={item.id} className="space-y-1">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start font-medium"
+                      onClick={() => {
+                        navigate(item.url || "/");
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {getMenuName(item)}
+                    </Button>
+                  </div>
+                );
+              }
+              
               if (item.children && item.children.length > 0) {
                 return (
                   <div key={item.id} className="px-3">
