@@ -302,6 +302,7 @@ const Destinations = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Rasm</TableHead>
                 <TableHead>Inglizcha</TableHead>
                 <TableHead>O'zbekcha</TableHead>
                 <TableHead>Mamlakat</TableHead>
@@ -312,6 +313,19 @@ const Destinations = () => {
             <TableBody>
               {destinations.map((destination) => (
                 <TableRow key={destination.id}>
+                  <TableCell>
+                    {destination.image_url ? (
+                      <img 
+                        src={destination.image_url} 
+                        alt={destination.name_en}
+                        className="h-16 w-24 object-cover rounded border"
+                      />
+                    ) : (
+                      <div className="h-16 w-24 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
+                        Rasm yo'q
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>{destination.name_en}</TableCell>
                   <TableCell>{destination.name_uz}</TableCell>
                   <TableCell>{destination.country}</TableCell>
