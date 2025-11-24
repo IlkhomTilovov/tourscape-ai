@@ -21,6 +21,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminDestinations from "./pages/admin/Destinations";
 import AdminTours from "./pages/admin/Tours";
+import AdminCategories from "./pages/admin/Categories";
 import AdminFlights from "./pages/admin/Flights";
 import AdminHotels from "./pages/admin/Hotels";
 import AdminVisas from "./pages/admin/Visas";
@@ -53,6 +54,7 @@ const App = () => (
                 <Route index element={<Dashboard />} />
                 <Route path="destinations" element={<AdminDestinations />} />
                 <Route path="tours" element={<AdminTours />} />
+                <Route path="categories" element={<AdminCategories />} />
                 <Route path="flights" element={<AdminFlights />} />
                 <Route path="hotels" element={<AdminHotels />} />
                 <Route path="visas" element={<AdminVisas />} />
