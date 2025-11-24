@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import TourCard from "@/components/TourCard";
 import DestinationCard from "@/components/DestinationCard";
 import Footer from "@/components/Footer";
+import OptimizedImage from "@/components/OptimizedImage";
 import {
   Carousel,
   CarouselContent,
@@ -134,11 +135,11 @@ const Home = () => {
                 className="group relative h-64 rounded-2xl overflow-hidden"
               >
                 {/* Background Image with Gradient Overlay */}
-                <img
+                <OptimizedImage
                   src={destination.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800'}
                   alt={getLocalizedName(destination, "name")}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/70" />
 

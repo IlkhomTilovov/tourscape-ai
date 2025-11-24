@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface TourCardProps {
   id: string;
@@ -49,11 +50,11 @@ const TourCard = ({
       <div className="card-elevated rounded-xl overflow-hidden bg-card group cursor-pointer">
         {/* Image */}
         <div className="relative h-56 overflow-hidden">
-          <img
+          <OptimizedImage
             src={image}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           {bestseller && (
             <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">
