@@ -3,11 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import DestinationCard from "@/components/DestinationCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
 import { ChevronRight } from "lucide-react";
 import * as LucideIcons from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Destination {
   id: string;
@@ -33,6 +33,11 @@ interface Category {
   icon: string | null;
 }
 
+interface CategoryWithCount extends Category {
+  destinationCount: number;
+  tourCount: number;
+}
+
 const categoryLabels: Record<string, Record<Language, string>> = {
   regions: { UZ: "Viloyatlar bo'yicha", EN: "By Regions", RU: "По регионам", DE: "Nach Regionen" },
   cities: { UZ: "Shaharlar bo'yicha", EN: "By Cities", RU: "По городам", DE: "Nach Städten" },
@@ -49,15 +54,13 @@ const Destinations = () => {
   const { language, t } = useLanguage();
   const navigate = useNavigate();
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryWithCount[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tourCounts, setTourCounts] = useState<Record<string, number>>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
     fetchDestinations();
-    fetchTourCounts();
 
     // Real-time updates for categories
     const categoriesChannel = supabase
@@ -91,7 +94,7 @@ const Destinations = () => {
       )
       .subscribe();
 
-    // Real-time updates for tours (for tour counts)
+    // Real-time updates for tours
     const toursChannel = supabase
       .channel('destinations-tours-changes')
       .on(
@@ -102,7 +105,7 @@ const Destinations = () => {
           table: 'tours'
         },
         () => {
-          fetchTourCounts();
+          fetchCategories();
         }
       )
       .subscribe();
@@ -116,15 +119,45 @@ const Destinations = () => {
 
   const fetchCategories = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: categoriesData, error: catError } = await supabase
         .from("categories")
         .select("*")
         .order("created_at", { ascending: true });
 
-      if (error) throw error;
-      setCategories(data || []);
+      if (catError) throw catError;
+
+      // Get destinations to count for each category
+      const { data: destinationsData } = await supabase
+        .from("destinations")
+        .select("id, name_en");
+
+      // Get tours with category_id
+      const { data: toursData } = await supabase
+        .from("tours")
+        .select("id, category_id");
+
+      // Count destinations and tours for each category
+      const categoriesWithCounts = (categoriesData || []).map(cat => {
+        const categoryDestinations = destinationsData?.filter(
+          dest => dest.name_en.toLowerCase() === cat.name_en.toLowerCase()
+        ) || [];
+        
+        const categoryTours = toursData?.filter(
+          tour => tour.category_id === cat.id
+        ) || [];
+
+        return {
+          ...cat,
+          destinationCount: categoryDestinations.length,
+          tourCount: categoryTours.length
+        };
+      });
+
+      setCategories(categoriesWithCounts);
     } catch (error) {
       console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,30 +172,11 @@ const Destinations = () => {
       setDestinations(data || []);
     } catch (error) {
       console.error("Error fetching destinations:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const fetchTourCounts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("tours")
-        .select("destination_id");
-
-      if (error) throw error;
-      
-      const counts: Record<string, number> = {};
-      data?.forEach((tour) => {
-        if (tour.destination_id) {
-          counts[tour.destination_id] = (counts[tour.destination_id] || 0) + 1;
-        }
-      });
-      
-      setTourCounts(counts);
-    } catch (error) {
-      console.error("Error fetching tour counts:", error);
-    }
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/search?category=${categoryId}`);
   };
 
   const getLocalizedText = (
@@ -201,12 +215,9 @@ const Destinations = () => {
     return item[field as keyof Category] || item.name_en;
   };
 
-  const filteredDestinations = selectedCategory
-    ? destinations.filter((d) => {
-        // Filter destinations by category_id from tours table
-        return true; // For now show all, we'll filter by category relationship
-      })
-    : destinations;
+  const filteredCategories = selectedCategory
+    ? categories.filter((c) => c.id === selectedCategory)
+    : categories;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -269,45 +280,58 @@ const Destinations = () => {
               </div>
             </div>
 
-            {/* Right Content - Destinations */}
+            {/* Right Content - Categories */}
             <div className="flex-1">
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="h-80 bg-muted animate-pulse rounded-lg" />
+                    <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
                   ))}
                 </div>
-              ) : filteredDestinations.length === 0 ? (
+              ) : filteredCategories.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
-                    {language === "UZ" && "Yo'nalishlar topilmadi"}
-                    {language === "EN" && "No destinations found"}
-                    {language === "RU" && "Направления не найдены"}
-                    {language === "DE" && "Keine Reiseziele gefunden"}
+                    {language === "UZ" && "Kategoriyalar topilmadi"}
+                    {language === "EN" && "No categories found"}
+                    {language === "RU" && "Категории не найдены"}
+                    {language === "DE" && "Keine Kategorien gefunden"}
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredDestinations.map((destination) => (
-                    <div
-                      key={destination.id}
-                      onClick={() => handleDestinationClick(destination.id)}
-                      className="cursor-pointer"
-                    >
-                      <DestinationCard
-                        name={getLocalizedText(
-                          destination.name_en,
-                          destination.name_uz,
-                          destination.name_ru,
-                          destination.name_de
-                        )}
-                        country={destination.country}
-                        image={destination.image_url || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800"}
-                        tourCount={tourCounts[destination.id] || 0}
-                        slug={destination.id}
-                      />
-                    </div>
-                  ))}
+                  {filteredCategories.map((category) => {
+                    const Icon = getIconComponent(category.icon);
+                    return (
+                      <Card
+                        key={category.id}
+                        onClick={() => handleCategoryClick(category.id)}
+                        className="cursor-pointer hover:shadow-lg transition-shadow group"
+                      >
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                              <Icon className="w-8 h-8 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold mb-2">
+                                {getLocalizedName(category)}
+                              </h3>
+                              <div className="space-y-1 text-sm text-muted-foreground">
+                                <p>
+                                  {category.tourCount} {
+                                    language === "UZ" ? "ta tur" :
+                                    language === "RU" ? "туров" :
+                                    language === "DE" ? "Touren" :
+                                    "tours"
+                                  }
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </div>
