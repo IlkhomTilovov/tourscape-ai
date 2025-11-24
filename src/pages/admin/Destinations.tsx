@@ -22,6 +22,7 @@ type Destination = {
   description_de: string | null;
   image_url: string | null;
   country: string;
+  category: string | null;
 };
 
 const Destinations = () => {
@@ -33,6 +34,7 @@ const Destinations = () => {
     description_en: "",
     image_url: "",
     country: "",
+    category: "",
   });
   const [isTranslating, setIsTranslating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -128,6 +130,7 @@ const Destinations = () => {
         description_de: descTranslations.German || null,
         image_url: formData.image_url || null,
         country: formData.country,
+        category: formData.category || null,
       };
       
       if (editingDestination) {
@@ -168,6 +171,7 @@ const Destinations = () => {
       description_en: destination.description_en || "",
       image_url: destination.image_url || "",
       country: destination.country,
+      category: destination.category || "",
     });
     setOpen(true);
   };
@@ -193,6 +197,7 @@ const Destinations = () => {
       description_en: "",
       image_url: "",
       country: "",
+      category: "",
     });
   };
 
@@ -205,7 +210,7 @@ const Destinations = () => {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditingDestination(null); setFormData({ name_en: "", description_en: "", image_url: "", country: "" }); }}>
+            <Button onClick={() => { setEditingDestination(null); setFormData({ name_en: "", description_en: "", image_url: "", country: "", category: "" }); }}>
               <Plus className="h-4 w-4 mr-2" />
               Yangi qo'shish
             </Button>
@@ -224,6 +229,26 @@ const Destinations = () => {
               <div className="space-y-2">
                 <Label>Mamlakat</Label>
                 <Input value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })} required />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Kategoriya</Label>
+                <select 
+                  value={formData.category} 
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="">Tanlang</option>
+                  <option value="regions">Viloyatlar bo'yicha</option>
+                  <option value="cities">Shaharlar bo'yicha</option>
+                  <option value="nature">Tabiiy yo'nalishlar</option>
+                  <option value="cultural">Madaniy yo'nalishlar</option>
+                  <option value="eco_tourism">Eko-turizm</option>
+                  <option value="health_spa">Sog'lomlashtirish va SPA</option>
+                  <option value="seasonal">Mavsumiy yo'nalishlar</option>
+                  <option value="thematic">Tematik yo'nalishlar</option>
+                  <option value="events">Mahalliy tadbirlar</option>
+                </select>
               </div>
 
               <div className="space-y-2">
@@ -280,6 +305,7 @@ const Destinations = () => {
                 <TableHead>Inglizcha</TableHead>
                 <TableHead>O'zbekcha</TableHead>
                 <TableHead>Mamlakat</TableHead>
+                <TableHead>Kategoriya</TableHead>
                 <TableHead className="text-right">Amallar</TableHead>
               </TableRow>
             </TableHeader>
@@ -289,6 +315,7 @@ const Destinations = () => {
                   <TableCell>{destination.name_en}</TableCell>
                   <TableCell>{destination.name_uz}</TableCell>
                   <TableCell>{destination.country}</TableCell>
+                  <TableCell>{destination.category || "-"}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="outline" onClick={() => handleEdit(destination)}>

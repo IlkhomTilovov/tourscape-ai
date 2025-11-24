@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import DestinationCard from "@/components/DestinationCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
+import { Button } from "@/components/ui/button";
 
 interface Destination {
   id: string;
@@ -19,7 +20,20 @@ interface Destination {
   description_de: string | null;
   country: string;
   image_url: string | null;
+  category: string | null;
 }
+
+const categoryLabels: Record<string, Record<Language, string>> = {
+  regions: { UZ: "Viloyatlar bo'yicha", EN: "By Regions", RU: "По регионам", DE: "Nach Regionen" },
+  cities: { UZ: "Shaharlar bo'yicha", EN: "By Cities", RU: "По городам", DE: "Nach Städten" },
+  nature: { UZ: "Tabiiy yo'nalishlar", EN: "Nature Destinations", RU: "Природные направления", DE: "Naturdestinationen" },
+  cultural: { UZ: "Madaniy yo'nalishlar", EN: "Cultural Destinations", RU: "Культурные направления", DE: "Kulturdestinationen" },
+  eco_tourism: { UZ: "Eko-turizm", EN: "Eco-tourism", RU: "Эко-туризм", DE: "Ökotourismus" },
+  health_spa: { UZ: "Sog'lomlashtirish va SPA", EN: "Health & SPA", RU: "Здоровье и СПА", DE: "Gesundheit & SPA" },
+  seasonal: { UZ: "Mavsumiy yo'nalishlar", EN: "Seasonal Destinations", RU: "Сезонные направления", DE: "Saisonale Reiseziele" },
+  thematic: { UZ: "Tematik yo'nalishlar", EN: "Thematic Destinations", RU: "Тематические направления", DE: "Themendestinationen" },
+  events: { UZ: "Mahalliy tadbirlar", EN: "Local Events", RU: "Местные события", DE: "Lokale Veranstaltungen" },
+};
 
 const Destinations = () => {
   const { language, t } = useLanguage();
@@ -27,6 +41,7 @@ const Destinations = () => {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(true);
   const [tourCounts, setTourCounts] = useState<Record<string, number>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDestinations();
@@ -89,6 +104,12 @@ const Destinations = () => {
     navigate(`/search?destination=${destinationId}`);
   };
 
+  const filteredDestinations = selectedCategory
+    ? destinations.filter((d) => d.category === selectedCategory)
+    : destinations;
+
+  const categories = Array.from(new Set(destinations.map((d) => d.category).filter(Boolean)));
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -103,13 +124,38 @@ const Destinations = () => {
             {language === "DE" && "Entdecken Sie erstaunliche Reiseziele"}
           </p>
 
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-8">
+              <Button
+                variant={selectedCategory === null ? "default" : "outline"}
+                onClick={() => setSelectedCategory(null)}
+                size="sm"
+              >
+                {language === "UZ" && "Barchasi"}
+                {language === "EN" && "All"}
+                {language === "RU" && "Все"}
+                {language === "DE" && "Alle"}
+              </Button>
+              {categories.map((cat) => (
+                <Button
+                  key={cat}
+                  variant={selectedCategory === cat ? "default" : "outline"}
+                  onClick={() => setSelectedCategory(cat)}
+                  size="sm"
+                >
+                  {categoryLabels[cat]?.[language] || cat}
+                </Button>
+              ))}
+            </div>
+          )}
+
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="h-80 bg-muted animate-pulse rounded-lg" />
               ))}
             </div>
-          ) : destinations.length === 0 ? (
+          ) : filteredDestinations.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 {language === "UZ" && "Yo'nalishlar topilmadi"}
@@ -120,7 +166,7 @@ const Destinations = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {destinations.map((destination) => (
+              {filteredDestinations.map((destination) => (
                 <div
                   key={destination.id}
                   onClick={() => handleDestinationClick(destination.id)}
