@@ -46,6 +46,43 @@ const Destinations = () => {
   useEffect(() => {
     fetchDestinations();
     fetchTourCounts();
+
+    // Real-time updates for destinations
+    const destinationsChannel = supabase
+      .channel('destinations-page-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'destinations'
+        },
+        () => {
+          fetchDestinations();
+        }
+      )
+      .subscribe();
+
+    // Real-time updates for tours (for tour counts)
+    const toursChannel = supabase
+      .channel('destinations-tours-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tours'
+        },
+        () => {
+          fetchTourCounts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(destinationsChannel);
+      supabase.removeChannel(toursChannel);
+    };
   }, []);
 
   const fetchDestinations = async () => {

@@ -20,6 +20,60 @@ const Home = () => {
     fetchCategories();
     fetchDestinations();
     fetchTours();
+
+    // Real-time updates for categories
+    const categoriesChannel = supabase
+      .channel('categories-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'categories'
+        },
+        () => {
+          fetchCategories();
+        }
+      )
+      .subscribe();
+
+    // Real-time updates for destinations
+    const destinationsChannel = supabase
+      .channel('destinations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'destinations'
+        },
+        () => {
+          fetchDestinations();
+        }
+      )
+      .subscribe();
+
+    // Real-time updates for tours
+    const toursChannel = supabase
+      .channel('tours-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tours'
+        },
+        () => {
+          fetchTours();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(categoriesChannel);
+      supabase.removeChannel(destinationsChannel);
+      supabase.removeChannel(toursChannel);
+    };
   }, []);
 
   const fetchCategories = async () => {
