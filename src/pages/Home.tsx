@@ -154,46 +154,60 @@ const Home = () => {
 
 
 
-      {/* Popular Destinations */}
+      {/* Categories Section */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-8">{t("destinationsTitle")}</h2>
-        
-        {/* Mobile: Grid Layout */}
-        <div className="grid grid-cols-1 gap-6 md:hidden">
-          {destinations.map((destination) => (
-            <DestinationCard
-              key={destination.id}
-              name={getLocalizedName(destination, "name")}
-              country={destination.country}
-              image={destination.image_url || ""}
-              tourCount={0}
-              slug={destination.id}
-            />
-          ))}
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Left Sidebar - Categories List */}
+          <div className="lg:col-span-1">
+            <h2 className="text-2xl font-semibold text-muted-foreground mb-6">CATEGORIES</h2>
+            <div className="space-y-2">
+              {destinations.slice(0, 3).map((destination) => (
+                <Link
+                  key={destination.id}
+                  to={`/search?destination=${destination.id}`}
+                  className="flex items-center justify-between p-4 rounded-lg hover:bg-accent transition-colors group"
+                >
+                  <span className="text-foreground group-hover:text-primary transition-colors">
+                    {getLocalizedName(destination, "name")}
+                  </span>
+                  <LucideIcons.ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </Link>
+              ))}
+            </div>
+          </div>
 
-        {/* Desktop/Tablet: Carousel */}
-        <Carousel
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          className="w-full hidden md:block"
-        >
-          <CarouselContent className="-ml-2 md:-ml-4">
-            {destinations.map((destination) => (
-              <CarouselItem key={destination.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                <DestinationCard
-                  name={getLocalizedName(destination, "name")}
-                  country={destination.country}
-                  image={destination.image_url || ""}
-                  tourCount={0}
-                  slug={destination.id}
-                />
-              </CarouselItem>
+          {/* Right Side - Large Destination Cards */}
+          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {destinations.slice(0, 3).map((destination) => (
+              <Link
+                key={destination.id}
+                to={`/search?destination=${destination.id}`}
+                className="group relative h-64 rounded-2xl overflow-hidden"
+              >
+                {/* Background Image with Gradient Overlay */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
+                  style={{
+                    backgroundImage: `url(${destination.image_url || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800'})`,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/70" />
+                </div>
+
+                {/* Content */}
+                <div className="relative h-full p-6 flex flex-col justify-end text-white">
+                  <h3 className="text-3xl font-bold mb-2">
+                    {getLocalizedName(destination, "name")}
+                  </h3>
+                  <p className="text-white/90 mb-4">
+                    {getLocalizedName(destination, "description") || "Explore amazing places"}
+                  </p>
+                  <LucideIcons.ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-2" />
+                </div>
+              </Link>
             ))}
-          </CarouselContent>
-        </Carousel>
+          </div>
+        </div>
       </section>
 
       {/* Trust Section */}
