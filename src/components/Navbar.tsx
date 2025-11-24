@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -15,16 +15,30 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
 import MegaMenu from "./MegaMenu";
 
-interface MenuItem {
+interface Category {
   id: string;
   name_en: string;
   name_uz: string;
   name_ru: string;
   name_de: string;
-  url: string | null;
-  parent_id: string | null;
-  display_order: number;
-  children?: MenuItem[];
+}
+
+interface Destination {
+  id: string;
+  name_en: string;
+  name_uz: string;
+  name_ru: string;
+  name_de: string;
+  category_id: string | null;
+}
+
+interface Tour {
+  id: string;
+  title_en: string;
+  title_uz: string;
+  title_ru: string;
+  title_de: string;
+  category_id: string | null;
 }
 
 const Navbar = () => {
@@ -40,61 +54,57 @@ const Navbar = () => {
     { code: "DE" as Language, name: "German", display: "DE" },
   ];
 
-  const { data: menuItems = [], refetch } = useQuery({
-    queryKey: ["menuItems"],
+  // Fetch categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("menu_items")
+        .from("categories")
         .select("*")
-        .order("display_order");
+        .order("name_en");
       if (error) throw error;
-      
-      // Build hierarchical structure
-      const items = data as MenuItem[];
-      const parentItems = items.filter((item) => !item.parent_id);
-      
-      return parentItems.map((parent) => ({
-        ...parent,
-        children: items.filter((item) => item.parent_id === parent.id),
-      }));
+      return data as Category[];
     },
   });
 
-  // Real-time updates for menu items
-  useEffect(() => {
-    const channel = supabase
-      .channel('menu-items-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'menu_items'
-        },
-        () => {
-          refetch();
-        }
-      )
-      .subscribe();
+  // Fetch destinations
+  const { data: destinations = [] } = useQuery({
+    queryKey: ["destinations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("destinations")
+        .select("*")
+        .order("name_en");
+      if (error) throw error;
+      return data as Destination[];
+    },
+  });
 
-    return () => {
-      supabase.removeChannel(channel);
+  // Fetch tours
+  const { data: tours = [] } = useQuery({
+    queryKey: ["tours"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tours")
+        .select("*")
+        .order("title_en")
+        .limit(20);
+      if (error) throw error;
+      return data as Tour[];
+    },
+  });
+
+  const getLabel = (key: string) => {
+    const labels: Record<string, Record<Language, string>> = {
+      categories: { EN: "Categories", UZ: "Kategoriyalar", RU: "Категории", DE: "Kategorien" },
+      destinations: { EN: "Destinations", UZ: "Manzillar", RU: "Направления", DE: "Reiseziele" },
+      tours: { EN: "Tours", UZ: "Turlar", RU: "Туры", DE: "Touren" },
+      flights: { EN: "Flights", UZ: "Parvozlar", RU: "Рейсы", DE: "Flüge" },
+      hotels: { EN: "Hotels", UZ: "Mehmonxonalar", RU: "Отели", DE: "Hotels" },
+      visas: { EN: "Visas", UZ: "Vizalar", RU: "Визы", DE: "Visa" },
+      about: { EN: "About", UZ: "Haqida", RU: "О нас", DE: "Über uns" },
     };
-  }, [refetch]);
-
-  const getMenuName = (item: MenuItem) => {
-    switch (language) {
-      case "EN":
-        return item.name_en;
-      case "UZ":
-        return item.name_uz;
-      case "RU":
-        return item.name_ru;
-      case "DE":
-        return item.name_de;
-      default:
-        return item.name_en;
-    }
+    return labels[key]?.[language] || key;
   };
 
   return (
@@ -113,37 +123,46 @@ const Navbar = () => {
 
           {/* Desktop Navigation with Mega Menu */}
           <div className="hidden md:flex items-center space-x-2">
-            {menuItems.map((item) => {
-              if (item.children && item.children.length > 0) {
-                return (
-                  <div key={item.id} className="relative">
-                    <Button 
-                      variant="ghost" 
-                      className="gap-1"
-                      onClick={() => setMegaMenuOpen(megaMenuOpen === item.id ? null : item.id)}
-                    >
-                      {getMenuName(item)}
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                    {megaMenuOpen === item.id && (
-                      <MegaMenu 
-                        categories={item.children}
-                        onClose={() => setMegaMenuOpen(null)}
-                      />
-                    )}
-                  </div>
-                );
-              }
-              return (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  onClick={() => navigate(item.url || "/")}
-                >
-                  {getMenuName(item)}
-                </Button>
-              );
-            })}
+            {/* Categories with Mega Menu */}
+            <div className="relative">
+              <Button 
+                variant="ghost" 
+                className="gap-1"
+                onClick={() => setMegaMenuOpen(megaMenuOpen === "categories" ? null : "categories")}
+              >
+                {getLabel("categories")}
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+              {megaMenuOpen === "categories" && (
+                <MegaMenu 
+                  categories={categories}
+                  destinations={destinations}
+                  tours={tours}
+                  language={language}
+                  onClose={() => setMegaMenuOpen(null)}
+                />
+              )}
+            </div>
+
+            {/* Direct Links */}
+            <Button variant="ghost" onClick={() => navigate("/destinations")}>
+              {getLabel("destinations")}
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/tours")}>
+              {getLabel("tours")}
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/flights")}>
+              {getLabel("flights")}
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/hotels")}>
+              {getLabel("hotels")}
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/visas")}>
+              {getLabel("visas")}
+            </Button>
+            <Button variant="ghost" onClick={() => navigate("/about")}>
+              {getLabel("about")}
+            </Button>
           </div>
 
           {/* Right Side Actions */}
@@ -204,60 +223,86 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-2 animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-hide">
-            {menuItems.map((item) => {
-              // Check if this is Destinations with children - make it a direct link instead of select
-              if (item.url === "/destinations" && item.children && item.children.length > 0) {
-                return (
-                  <div key={item.id} className="space-y-1">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start font-medium"
-                      onClick={() => {
-                        navigate(item.url || "/");
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      {getMenuName(item)}
-                    </Button>
-                  </div>
-                );
-              }
-              
-              if (item.children && item.children.length > 0) {
-                return (
-                  <div key={item.id} className="px-3">
-                    <Select onValueChange={(value) => {
-                      navigate(value);
-                      setMobileMenuOpen(false);
-                    }}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={getMenuName(item)} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {item.children.map((child) => (
-                          <SelectItem key={child.id} value={child.url || "/"}>
-                            {getMenuName(child)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                );
-              }
-              return (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    navigate(item.url || "/");
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  {getMenuName(item)}
-                </Button>
-              );
-            })}
+            {/* Categories Dropdown */}
+            <div className="px-3">
+              <Select onValueChange={(value) => {
+                navigate(value);
+                setMobileMenuOpen(false);
+              }}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={getLabel("categories")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={`/categories?category=${category.id}`}>
+                      {category[`name_${language.toLowerCase()}` as keyof Category] as string}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Direct Navigation Links */}
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/destinations");
+                setMobileMenuOpen(false);
+              }}
+            >
+              {getLabel("destinations")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/tours");
+                setMobileMenuOpen(false);
+              }}
+            >
+              {getLabel("tours")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/flights");
+                setMobileMenuOpen(false);
+              }}
+            >
+              {getLabel("flights")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/hotels");
+                setMobileMenuOpen(false);
+              }}
+            >
+              {getLabel("hotels")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/visas");
+                setMobileMenuOpen(false);
+              }}
+            >
+              {getLabel("visas")}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => {
+                navigate("/about");
+                setMobileMenuOpen(false);
+              }}
+            >
+              {getLabel("about")}
+            </Button>
             <div className="flex items-center gap-2 pt-2 border-t">
               <Button variant="ghost" size="icon">
                 <Heart className="h-5 w-5" />
