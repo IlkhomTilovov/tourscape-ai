@@ -4,8 +4,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,11 +22,6 @@ export default function Checkout() {
   const { language } = useLanguage();
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-  });
   
   
   const [adults, setAdults] = useState("1");
@@ -45,24 +38,18 @@ export default function Checkout() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.fullName || !formData.email || !formData.phone) {
+    if (!bookingDate) {
       toast({
         title: getText("Xato", "Error", "Ошибка", "Fehler"),
         description: getText(
-          "Iltimos, barcha majburiy maydonlarni to'ldiring",
-          "Please fill in all required fields",
-          "Пожалуйста, заполните все обязательные поля",
-          "Bitte füllen Sie alle Pflichtfelder aus"
+          "Iltimos, sanani tanlang",
+          "Please select a date",
+          "Пожалуйста, выберите дату",
+          "Bitte wählen Sie ein Datum"
         ),
         variant: "destructive",
       });
@@ -74,7 +61,6 @@ export default function Checkout() {
       date: bookingDate?.toLocaleDateString(),
       adults: adults,
       totalPrice: ((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2),
-      formData: formData,
     };
 
     navigate("/payment", { state: bookingData });
@@ -139,9 +125,9 @@ export default function Checkout() {
 
                     {/* Select Time */}
                     <div className="space-y-3">
-                      <Label className="text-base font-semibold">
+                      <p className="text-base font-semibold">
                         {getText("Boshlanish vaqtini tanlang", "Select a starting time", "Выберите время начала", "Wählen Sie eine Startzeit")}
-                      </Label>
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {bookingDate ? format(bookingDate, "EEEE, MMMM d, yyyy") : getText("Avval sanani tanlang", "Please select a date first", "Сначала выберите дату", "Bitte wählen Sie zuerst ein Datum")}
                       </p>
@@ -209,59 +195,6 @@ export default function Checkout() {
                 </Card>
               ))}
 
-              <form onSubmit={handleSubmit}>
-                {/* Contact Information */}
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle>
-                      {getText("Aloqa ma'lumotlari", "Contact Information", "Контактная информация", "Kontaktinformationen")}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="fullName">
-                        {getText("To'liq ism", "Full Name", "Полное имя", "Vollständiger Name")} *
-                      </Label>
-                      <Input
-                        id="fullName"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="email">
-                          {getText("Email", "Email", "Электронная почта", "E-Mail")} *
-                        </Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="phone">
-                          {getText("Telefon", "Phone", "Телефон", "Telefon")} *
-                        </Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-              </form>
             </div>
 
             {/* Booking Summary */}
