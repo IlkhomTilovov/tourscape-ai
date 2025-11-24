@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Banknote, Building2, Users, CalendarIcon, CheckCircle } from "lucide-react";
+import { CreditCard, Banknote, Building2, Users, CalendarIcon, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +36,7 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [adults, setAdults] = useState("1");
   const [bookingDate, setBookingDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState("9:00 AM");
 
   const getText = (uz: string, en: string, ru: string, de: string) => {
     switch (language) {
@@ -105,8 +106,120 @@ export default function Checkout() {
           </h1>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Form Section */}
-            <div className="lg:col-span-2">
+            {/* Tour Details & Form Section */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Tour Details Card */}
+              {items.map((item) => (
+                <Card key={item.id} className="overflow-hidden">
+                  <CardHeader className="bg-muted/30 pb-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-2xl mb-2">{item.title}</CardTitle>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {getText(
+                            "Ajoyib sayohat tajribasi sizni kutmoqda",
+                            "Discover amazing travel experiences",
+                            "Откройте для себя удивительные впечатления от путешествий",
+                            "Entdecken Sie erstaunliche Reiseerlebnisse"
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="pt-6 space-y-6">
+                    {/* Duration & Guide Info */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-semibold">{item.duration} {getText("soat", "hours", "часов", "Stunden")}</p>
+                          <p className="text-xs text-muted-foreground">{getText("Davomiyligi", "Duration", "Продолжительность", "Dauer")}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-semibold">{getText("Ingliz tili", "English", "Английский", "Englisch")}</p>
+                          <p className="text-xs text-muted-foreground">{getText("Gid tili", "Guide language", "Язык гида", "Sprache des Führers")}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Select Time */}
+                    <div className="space-y-3">
+                      <Label className="text-base font-semibold">
+                        {getText("Boshlanish vaqtini tanlang", "Select a starting time", "Выберите время начала", "Wählen Sie eine Startzeit")}
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        {bookingDate ? format(bookingDate, "EEEE, MMMM d, yyyy") : getText("Avval sanani tanlang", "Please select a date first", "Сначала выберите дату", "Bitte wählen Sie zuerst ein Datum")}
+                      </p>
+                      <div className="flex gap-3 flex-wrap">
+                        {["9:00 AM", "3:00 PM", "6:00 PM"].map((time) => (
+                          <Button
+                            key={time}
+                            type="button"
+                            variant={selectedTime === time ? "default" : "outline"}
+                            onClick={() => setSelectedTime(time)}
+                            className="min-w-[100px]"
+                          >
+                            {time}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Policies */}
+                    <div className="space-y-3">
+                      <div className="flex gap-2 text-sm">
+                        <CheckCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <p>
+                          {getText(
+                            "9:00 AM gacha bekor qilsangiz to'liq qaytariladi",
+                            "Cancel before 9:00 AM for a full refund",
+                            "Отмена до 9:00 для полного возврата средств",
+                            "Stornierung vor 9:00 Uhr für volle Rückerstattung"
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <CheckCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <p>
+                          {getText(
+                            "Band qiling va keyinroq to'lang.",
+                            "You can reserve now & pay later.",
+                            "Вы можете забронировать сейчас и оплатить позже.",
+                            "Sie können jetzt reservieren und später bezahlen."
+                          )}{" "}
+                          <span className="underline cursor-pointer">
+                            {getText("Ko'proq", "Learn more", "Подробнее", "Mehr erfahren")}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Price Summary */}
+                    <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold">${item.price}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {adults} {getText("kattalar", "Adult", "Взрослый", "Erwachsene")} x ${item.price}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {getText("Barcha soliq va to'lovlar kiritilgan", "All taxes and fees included", "Все налоги и сборы включены", "Alle Steuern und Gebühren inklusive")}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
               <form onSubmit={handleSubmit}>
                 {/* Contact Information */}
                 <Card className="mb-6">
@@ -215,27 +328,47 @@ export default function Checkout() {
                   </CardHeader>
                   <CardContent>
                     <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer">
+                      <Label
+                        htmlFor="card"
+                        className={cn(
+                          "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
+                          paymentMethod === "card" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                        )}
+                      >
                         <RadioGroupItem value="card" id="card" />
-                        <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
-                          <CreditCard className="h-5 w-5" />
+                        <CreditCard className="h-5 w-5" />
+                        <span className="flex-1">
                           {getText("Karta orqali", "Credit/Debit Card", "Кредитная/дебетовая карта", "Kredit-/Debitkarte")}
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer">
+                        </span>
+                      </Label>
+
+                      <Label
+                        htmlFor="cash"
+                        className={cn(
+                          "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
+                          paymentMethod === "cash" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                        )}
+                      >
                         <RadioGroupItem value="cash" id="cash" />
-                        <Label htmlFor="cash" className="flex items-center gap-2 cursor-pointer flex-1">
-                          <Banknote className="h-5 w-5" />
+                        <Banknote className="h-5 w-5" />
+                        <span className="flex-1">
                           {getText("Naqd pul", "Cash on Arrival", "Наличные при прибытии", "Barzahlung bei Ankunft")}
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer">
+                        </span>
+                      </Label>
+
+                      <Label
+                        htmlFor="transfer"
+                        className={cn(
+                          "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
+                          paymentMethod === "transfer" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                        )}
+                      >
                         <RadioGroupItem value="transfer" id="transfer" />
-                        <Label htmlFor="transfer" className="flex items-center gap-2 cursor-pointer flex-1">
-                          <Building2 className="h-5 w-5" />
+                        <Building2 className="h-5 w-5" />
+                        <span className="flex-1">
                           {getText("Bank o'tkazmasi", "Bank Transfer", "Банковский перевод", "Banküberweisung")}
-                        </Label>
-                      </div>
+                        </span>
+                      </Label>
                     </RadioGroup>
                   </CardContent>
                 </Card>
