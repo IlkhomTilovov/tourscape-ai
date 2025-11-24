@@ -252,21 +252,17 @@ const Navbar = () => {
             
             {/* Language Selector for Mobile */}
             <div className="pt-2 border-t mt-2 px-3">
-              <div className="py-2 text-sm font-medium text-muted-foreground flex items-center gap-2 mb-2">
-                <Globe className="h-4 w-4" />
-                {language === "EN" && "Language"}
-                {language === "UZ" && "Til"}
-                {language === "RU" && "Язык"}
-                {language === "DE" && "Sprache"}
-              </div>
               <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {language === "EN" && "Language"}
-                    {language === "UZ" && "Til"}
-                    {language === "RU" && "Язык"}
-                    {language === "DE" && "Sprache"}
-                  </SelectValue>
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" />
+                    <SelectValue>
+                      {language === "EN" && "Language"}
+                      {language === "UZ" && "Til"}
+                      {language === "RU" && "Язык"}
+                      {language === "DE" && "Sprache"}
+                    </SelectValue>
+                  </div>
                 </SelectTrigger>
                 <SelectContent>
                   {languages.map((lang) => (
