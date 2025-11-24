@@ -12,6 +12,7 @@ import TourDetails from "./pages/TourDetails";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Tours from "./pages/Tours";
 import Categories from "./pages/Categories";
 import Destinations from "./pages/Destinations";
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/visas" element={<Visas />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="destinations" element={<AdminDestinations />} />

@@ -135,8 +135,10 @@ export default function Cart() {
                       <span>${totalPrice}</span>
                     </div>
                   </div>
-                  <Button className="w-full" size="lg">
-                    {getText("Buyurtma berish", "Checkout", "Оформить заказ", "Zur Kasse")}
+                  <Button className="w-full" size="lg" asChild>
+                    <Link to="/checkout">
+                      {getText("Buyurtma berish", "Checkout", "Оформить заказ", "Zur Kasse")}
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
