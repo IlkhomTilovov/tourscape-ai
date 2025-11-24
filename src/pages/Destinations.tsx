@@ -21,7 +21,7 @@ interface Destination {
   description_de: string | null;
   country: string;
   image_url: string | null;
-  category: string | null;
+  category_id: string | null;
 }
 
 interface Category {
@@ -189,9 +189,8 @@ const Destinations = () => {
 
   const filteredDestinations = selectedCategory
     ? destinations.filter((d) => {
-        // Check if destination's name matches selected category
-        return d.name_en.toLowerCase() === selectedCategory.toLowerCase() ||
-               d.category === selectedCategory;
+        // Check if destination's category_id matches selected category ID
+        return d.category_id === selectedCategory;
       })
     : destinations;
 
@@ -249,9 +248,9 @@ const Destinations = () => {
                   return (
                     <button
                       key={category.id}
-                      onClick={() => handleCategoryClick(category.name_en)}
+                      onClick={() => handleCategoryClick(category.id)}
                       className={`w-full flex items-center justify-between p-4 rounded-lg transition-colors ${
-                        selectedCategory === category.name_en
+                        selectedCategory === category.id
                           ? "bg-primary text-primary-foreground"
                           : "bg-card hover:bg-accent text-foreground border border-border"
                       }`}
