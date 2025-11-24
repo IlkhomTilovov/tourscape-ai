@@ -11,18 +11,24 @@ import { CreditCard, Wallet } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
   const { clearCart } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("uzum");
+  const [isProcessing, setIsProcessing] = useState(false);
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
     cardName: "",
     expiryDate: "",
     cvv: "",
+  });
+  const [contactDetails, setContactDetails] = useState({
+    email: "",
+    phone: "",
   });
 
   const bookingData = location.state || {};
@@ -44,8 +50,26 @@ const Payment = () => {
     });
   };
 
-  const handlePayment = (e: React.FormEvent) => {
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContactDetails({
+      ...contactDetails,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate contact details
+    if (!contactDetails.email && !contactDetails.phone) {
+      toast.error(getText(
+        "Iltimos, email yoki telefon raqamini kiriting",
+        "Please enter email or phone number",
+        "Пожалуйста, введите email или номер телефона",
+        "Bitte geben Sie E-Mail oder Telefonnummer ein"
+      ));
+      return;
+    }
 
     if (paymentMethod === "card") {
       if (!cardDetails.cardNumber || !cardDetails.cardName || !cardDetails.expiryDate || !cardDetails.cvv) {
@@ -57,20 +81,75 @@ const Payment = () => {
         ));
         return;
       }
+      
+      // For card payment, just show success (demo mode)
+      toast.success(getText(
+        "To'lov muvaffaqiyatli amalga oshirildi!",
+        "Payment successful!",
+        "Оплата прошла успешно!",
+        "Zahlung erfolgreich!"
+      ));
+      clearCart();
+      setTimeout(() => navigate("/"), 2000);
+      return;
     }
 
-    toast.success(getText(
-      "To'lov muvaffaqiyatli amalga oshirildi!",
-      "Payment successful!",
-      "Оплата прошла успешно!",
-      "Zahlung erfolgreich!"
-    ));
+    if (paymentMethod === "uzum") {
+      setIsProcessing(true);
+      
+      try {
+        const { data, error } = await supabase.functions.invoke('create-uzum-payment', {
+          body: {
+            tourId: bookingData.tourId,
+            adults: bookingData.adults || 1,
+            bookingDate: bookingData.date,
+            bookingTime: bookingData.time,
+            totalPrice: bookingData.totalPrice,
+            userEmail: contactDetails.email,
+            userPhone: contactDetails.phone,
+          }
+        });
 
-    clearCart();
-    
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
+        if (error) throw error;
+
+        if (data.success) {
+          toast.success(getText(
+            "Buyurtma yaratildi! Uzum to'lov sahifasiga o'tilmoqda...",
+            "Booking created! Redirecting to Uzum payment...",
+            "Заказ создан! Переход на страницу оплаты Uzum...",
+            "Buchung erstellt! Weiterleitung zur Uzum-Zahlung..."
+          ));
+
+          if (data.mock) {
+            // Demo mode - show info about API integration
+            toast.info(getText(
+              "Demo rejim: Uzum API kalitlari qo'shilganda real to'lov ishga tushadi",
+              "Demo mode: Real payment will work when Uzum API keys are added",
+              "Демо режим: Реальная оплата будет работать при добавлении API ключей Uzum",
+              "Demo-Modus: Echte Zahlung funktioniert nach Hinzufügen der Uzum-API-Schlüssel"
+            ), { duration: 5000 });
+          }
+
+          clearCart();
+          
+          // In real implementation, redirect to Uzum payment page:
+          // window.location.href = data.paymentUrl;
+          
+          // For demo, just redirect home after delay
+          setTimeout(() => navigate("/"), 3000);
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        toast.error(getText(
+          "To'lovda xatolik yuz berdi",
+          "Payment error occurred",
+          "Ошибка при оплате",
+          "Zahlungsfehler aufgetreten"
+        ));
+      } finally {
+        setIsProcessing(false);
+      }
+    }
   };
 
   return (
@@ -124,19 +203,50 @@ const Payment = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePayment} className="space-y-6">
+                {/* Contact Information */}
+                <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="font-semibold">
+                    {getText("Aloqa ma'lumotlari", "Contact Information", "Контактная информация", "Kontaktinformationen")}
+                  </h3>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="example@email.com"
+                      value={contactDetails.email}
+                      onChange={handleContactChange}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">
+                      {getText("Telefon raqami", "Phone Number", "Номер телефона", "Telefonnummer")}
+                    </Label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+998 90 123 45 67"
+                      value={contactDetails.phone}
+                      onChange={handleContactChange}
+                    />
+                  </div>
+                </div>
+
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="uzum" id="uzum" />
+                    <Label htmlFor="uzum" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <Wallet className="h-5 w-5" />
+                      <span>Uzum</span>
+                    </Label>
+                  </div>
                   <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
                       <CreditCard className="h-5 w-5" />
                       <span>{getText("Plastik karta", "Credit/Debit Card", "Банковская карта", "Kreditkarte")}</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="wallet" id="wallet" />
-                    <Label htmlFor="wallet" className="flex items-center gap-2 cursor-pointer flex-1">
-                      <Wallet className="h-5 w-5" />
-                      <span>{getText("Elektron hamyon", "Digital Wallet", "Электронный кошелек", "Digitale Geldbörse")}</span>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -198,19 +308,37 @@ const Payment = () => {
                   </div>
                 )}
 
-                {paymentMethod === "wallet" && (
-                  <div className="text-center py-8 text-muted-foreground animate-in fade-in-50">
-                    {getText(
-                      "Elektron hamyon orqali to'lov tez orada qo'shiladi",
-                      "Digital wallet payment coming soon",
-                      "Оплата через электронный кошелек скоро будет доступна",
-                      "Digitale Geldbörse-Zahlung kommt bald"
-                    )}
+                {paymentMethod === "uzum" && (
+                  <div className="text-center py-8 space-y-4 animate-in fade-in-50">
+                    <div className="text-lg font-semibold">
+                      {getText(
+                        "Uzum orqali to'lash",
+                        "Pay with Uzum",
+                        "Оплата через Uzum",
+                        "Bezahlen mit Uzum"
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {getText(
+                        "Siz Uzum to'lov tizimiga yo'naltirilasiz",
+                        "You will be redirected to Uzum payment system",
+                        "Вы будете перенаправлены в систему оплаты Uzum",
+                        "Sie werden zum Uzum-Zahlungssystem weitergeleitet"
+                      )}
+                    </p>
                   </div>
                 )}
 
-                <Button type="submit" className="w-full h-14 text-lg font-semibold" size="lg">
-                  {getText("To'lovni tasdiqlash", "Confirm Payment", "Подтвердить оплату", "Zahlung bestätigen")}
+                <Button 
+                  type="submit" 
+                  className="w-full h-14 text-lg font-semibold" 
+                  size="lg"
+                  disabled={isProcessing}
+                >
+                  {isProcessing 
+                    ? getText("Kutilmoqda...", "Processing...", "Обработка...", "Verarbeitung...")
+                    : getText("To'lovni tasdiqlash", "Confirm Payment", "Подтвердить оплату", "Zahlung bestätigen")
+                  }
                 </Button>
               </form>
             </CardContent>

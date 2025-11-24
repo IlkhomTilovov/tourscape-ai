@@ -1,1 +1,4 @@
 project_id = "cryyvpzjerhlwbxpeeks"
+
+[functions.create-uzum-payment]
+verify_jwt = false

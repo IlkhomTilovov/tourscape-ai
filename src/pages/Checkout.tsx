@@ -57,8 +57,10 @@ export default function Checkout() {
     }
 
     const bookingData = {
+      tourId: items[0]?.id,
       tourTitle: items[0]?.title,
       date: bookingDate?.toLocaleDateString(),
+      time: selectedTime,
       adults: adults,
       totalPrice: ((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2),
     };
