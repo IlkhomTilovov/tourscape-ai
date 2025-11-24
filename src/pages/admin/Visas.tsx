@@ -59,17 +59,17 @@ const Visas = () => {
     queryKey: ["visas"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("visas")
+        .from("visas" as any)
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as Visa[];
+      return data as unknown as Visa[];
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("visas").insert([data]);
+      const { error } = await supabase.from("visas" as any).insert([data]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -85,7 +85,7 @@ const Visas = () => {
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
       const { error } = await supabase
-        .from("visas")
+        .from("visas" as any)
         .update(data)
         .eq("id", id);
       if (error) throw error;
@@ -102,7 +102,7 @@ const Visas = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("visas").delete().eq("id", id);
+      const { error } = await supabase.from("visas" as any).delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {

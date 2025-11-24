@@ -26,7 +26,7 @@ const AdminAbout = () => {
   const fetchAboutData = async () => {
     try {
       const { data, error } = await supabase
-        .from("about")
+        .from("about" as any)
         .select("*")
         .single();
       
@@ -35,13 +35,13 @@ const AdminAbout = () => {
       if (data) {
         setDataExists(true);
         setFormData({
-          title: data.title || "",
-          description: data.description || "",
-          mission: data.mission || "",
-          vision: data.vision || "",
-          contact_email: data.contact_email || "",
-          contact_phone: data.contact_phone || "",
-          address: data.address || "",
+          title: (data as any).title || "",
+          description: (data as any).description || "",
+          mission: (data as any).mission || "",
+          vision: (data as any).vision || "",
+          contact_email: (data as any).contact_email || "",
+          contact_phone: (data as any).contact_phone || "",
+          address: (data as any).address || "",
         });
       }
     } catch (error) {
@@ -56,13 +56,13 @@ const AdminAbout = () => {
     try {
       if (dataExists) {
         const { error } = await supabase
-          .from("about")
+          .from("about" as any)
           .update(formData)
           .eq("id", "1");
         if (error) throw error;
       } else {
         const { error } = await supabase
-          .from("about")
+          .from("about" as any)
           .insert([{ ...formData, id: "1" }]);
         if (error) throw error;
         setDataExists(true);
