@@ -66,6 +66,9 @@ const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category");
   const destinationParam = searchParams.get("destination");
+  const locationParam = searchParams.get("location");
+  const dateParam = searchParams.get("date");
+  const travelersParam = searchParams.get("travelers");
   
   const [tours, setTours] = useState<Tour[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -175,6 +178,24 @@ const SearchResults = () => {
   const getFilteredAndSortedTours = () => {
     let filtered = [...tours];
 
+    // Location search filter
+    if (locationParam) {
+      const searchTerm = locationParam.toLowerCase();
+      filtered = filtered.filter(tour => {
+        const title = getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de).toLowerCase();
+        const location = getLocalizedText(tour.location_en, tour.location_uz, tour.location_ru, tour.location_de).toLowerCase();
+        const destName = tour.destinations ? 
+          (language === "UZ" ? tour.destinations.name_uz :
+           language === "EN" ? tour.destinations.name_en :
+           language === "RU" ? tour.destinations.name_ru :
+           tour.destinations.name_de).toLowerCase() : "";
+        
+        return title.includes(searchTerm) || 
+               location.includes(searchTerm) || 
+               destName.includes(searchTerm);
+      });
+    }
+
     // Category filter
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(tour => 
@@ -224,6 +245,37 @@ const SearchResults = () => {
              language === "RU" ? "Результаты поиска" :
              "Suchergebnisse"}
           </h1>
+          
+          {/* Search Parameters Display */}
+          {(locationParam || dateParam || travelersParam) && (
+            <div className="flex flex-wrap gap-3 mb-4">
+              {locationParam && (
+                <div className="bg-primary/10 px-4 py-2 rounded-full text-sm">
+                  <span className="font-medium">
+                    {language === "UZ" ? "Manzil" : language === "EN" ? "Location" : language === "RU" ? "Местоположение" : "Standort"}:
+                  </span>{" "}
+                  {locationParam}
+                </div>
+              )}
+              {dateParam && (
+                <div className="bg-primary/10 px-4 py-2 rounded-full text-sm">
+                  <span className="font-medium">
+                    {language === "UZ" ? "Sana" : language === "EN" ? "Date" : language === "RU" ? "Дата" : "Datum"}:
+                  </span>{" "}
+                  {new Date(dateParam).toLocaleDateString(language === "UZ" ? "uz-UZ" : language === "RU" ? "ru-RU" : language === "DE" ? "de-DE" : "en-US")}
+                </div>
+              )}
+              {travelersParam && (
+                <div className="bg-primary/10 px-4 py-2 rounded-full text-sm">
+                  <span className="font-medium">
+                    {language === "UZ" ? "Sayohatchilar" : language === "EN" ? "Travelers" : language === "RU" ? "Путешественники" : "Reisende"}:
+                  </span>{" "}
+                  {travelersParam}
+                </div>
+              )}
+            </div>
+          )}
+          
           <p className="text-muted-foreground text-lg">
             {loading ? (
               <span className="flex items-center gap-2">
