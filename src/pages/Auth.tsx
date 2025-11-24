@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
@@ -22,20 +24,59 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Xatolik",
+        description: "Iltimos, email va parolni kiriting",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     const { error } = await signIn(email, password);
     setLoading(false);
+    
     if (!error) {
+      toast({
+        title: "Muvaffaqiyatli!",
+        description: "Tizimga kirdingiz",
+      });
       navigate("/admin");
     }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Xatolik",
+        description: "Iltimos, email va parolni kiriting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Xatolik",
+        description: "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     const { error } = await signUp(email, password);
     setLoading(false);
+    
     if (!error) {
+      toast({
+        title: "Muvaffaqiyatli!",
+        description: "Ro'yxatdan o'tdingiz. Endi tizimga kirishingiz mumkin.",
+      });
       navigate("/admin");
     }
   };
