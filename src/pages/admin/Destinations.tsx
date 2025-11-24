@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Plus, Edit, Trash2, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Destination = {
@@ -26,8 +27,18 @@ type Destination = {
   category: string | null;
 };
 
+type Tour = {
+  id: string;
+  title_en: string;
+  title_uz: string;
+  price: number;
+  duration: string;
+  destination_id: string;
+};
+
 const Destinations = () => {
   const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [tours, setTours] = useState<Tour[]>([]);
   const [open, setOpen] = useState(false);
   const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [formData, setFormData] = useState({
@@ -43,6 +54,7 @@ const Destinations = () => {
 
   useEffect(() => {
     fetchDestinations();
+    fetchTours();
   }, []);
 
   const fetchDestinations = async () => {
@@ -53,6 +65,41 @@ const Destinations = () => {
       setDestinations(data || []);
     }
   };
+
+  const fetchTours = async () => {
+    const { data, error } = await supabase.from("tours").select("id, title_en, title_uz, price, duration, destination_id");
+    if (error) {
+      console.error("Tours fetch error:", error);
+    } else {
+      setTours(data || []);
+    }
+  };
+
+  const getToursForDestination = (destinationId: string) => {
+    return tours.filter(tour => tour.destination_id === destinationId);
+  };
+
+  const getCategoryName = (category: string | null) => {
+    const categories: Record<string, string> = {
+      regions: "Viloyatlar bo'yicha",
+      cities: "Shaharlar bo'yicha",
+      nature: "Tabiiy yo'nalishlar",
+      cultural: "Madaniy yo'nalishlar",
+      eco_tourism: "Eko-turizm",
+      health_spa: "Sog'lomlashtirish va SPA",
+      seasonal: "Mavsumiy yo'nalishlar",
+      thematic: "Tematik yo'nalishlar",
+      events: "Mahalliy tadbirlar"
+    };
+    return category ? categories[category] || category : "Boshqa";
+  };
+
+  const groupedDestinations = destinations.reduce((acc, dest) => {
+    const cat = dest.category || "other";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(dest);
+    return acc;
+  }, {} as Record<string, Destination[]>);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -297,54 +344,90 @@ const Destinations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Barcha manzillar</CardTitle>
+          <CardTitle>Kategoriyalar bo'yicha manzillar</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Rasm</TableHead>
-                <TableHead>Inglizcha</TableHead>
-                <TableHead>O'zbekcha</TableHead>
-                <TableHead>Mamlakat</TableHead>
-                <TableHead>Kategoriya</TableHead>
-                <TableHead className="text-right">Amallar</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {destinations.map((destination) => (
-                <TableRow key={destination.id}>
-                  <TableCell>
-                    {destination.image_url ? (
-                      <img 
-                        src={destination.image_url} 
-                        alt={destination.name_en}
-                        className="h-16 w-24 object-cover rounded border"
-                      />
-                    ) : (
-                      <div className="h-16 w-24 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
-                        Rasm yo'q
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>{destination.name_en}</TableCell>
-                  <TableCell>{destination.name_uz}</TableCell>
-                  <TableCell>{destination.country}</TableCell>
-                  <TableCell>{destination.category || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(destination)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(destination.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <Accordion type="multiple" className="w-full space-y-4">
+            {Object.entries(groupedDestinations).map(([category, categoryDestinations]) => (
+              <AccordionItem key={category} value={category} className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center justify-between w-full pr-4">
+                    <span className="text-lg font-semibold">{getCategoryName(category)}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {categoryDestinations.length} manzil
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4 pt-4">
+                    {categoryDestinations.map((destination) => {
+                      const destinationTours = getToursForDestination(destination.id);
+                      return (
+                        <Card key={destination.id} className="border-l-4 border-l-primary">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex gap-4 flex-1">
+                                {destination.image_url ? (
+                                  <img 
+                                    src={destination.image_url} 
+                                    alt={destination.name_en}
+                                    className="h-20 w-32 object-cover rounded border"
+                                  />
+                                ) : (
+                                  <div className="h-20 w-32 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
+                                    Rasm yo'q
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <h3 className="font-semibold text-lg">{destination.name_en}</h3>
+                                  <p className="text-sm text-muted-foreground">{destination.name_uz}</p>
+                                  <p className="text-sm mt-1">
+                                    <span className="font-medium">Mamlakat:</span> {destination.country}
+                                  </p>
+                                  <p className="text-sm text-primary mt-1">
+                                    {destinationTours.length} ta tur
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" onClick={() => handleEdit(destination)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button size="sm" variant="destructive" onClick={() => handleDelete(destination.id)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          {destinationTours.length > 0 && (
+                            <CardContent className="pt-0">
+                              <div className="border-t pt-3">
+                                <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Turlar:</h4>
+                                <div className="space-y-2">
+                                  {destinationTours.map((tour) => (
+                                    <div key={tour.id} className="flex items-center justify-between bg-muted/50 p-3 rounded">
+                                      <div>
+                                        <p className="font-medium text-sm">{tour.title_en}</p>
+                                        <p className="text-xs text-muted-foreground">{tour.title_uz}</p>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-semibold text-primary">${tour.price}</p>
+                                        <p className="text-xs text-muted-foreground">{tour.duration}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </CardContent>
+                          )}
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </CardContent>
       </Card>
     </div>
