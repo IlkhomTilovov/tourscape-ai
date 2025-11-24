@@ -41,8 +41,8 @@ const MegaMenu = ({ categories, onClose }: MegaMenuProps) => {
   };
 
   return (
-    <div className="absolute top-full left-0 w-full bg-background border-t border-border shadow-lg z-50 animate-fade-in">
-      <div className="container mx-auto px-4 py-8">
+    <div className="absolute top-full left-0 right-0 w-screen bg-background border-t border-border shadow-lg z-50 animate-fade-in">
+      <div className="max-w-full px-8 py-8 mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Categories Sidebar */}
           <div className="md:col-span-1 space-y-2">
