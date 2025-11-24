@@ -95,6 +95,56 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          created_at: string | null
+          display_order: number
+          icon: string | null
+          id: string
+          name_de: string
+          name_en: string
+          name_ru: string
+          name_uz: string
+          parent_id: string | null
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name_de: string
+          name_en: string
+          name_ru: string
+          name_uz: string
+          parent_id?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number
+          icon?: string | null
+          id?: string
+          name_de?: string
+          name_en?: string
+          name_ru?: string
+          name_uz?: string
+          parent_id?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           comment: string

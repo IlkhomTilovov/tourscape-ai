@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
-import { LayoutDashboard, List, MapPin, Package } from "lucide-react";
+import { LayoutDashboard, List, MapPin, Package, Menu } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +18,7 @@ const items = [
   { title: "Kategoriyalar", url: "/admin/categories", icon: List },
   { title: "Manzillar", url: "/admin/destinations", icon: MapPin },
   { title: "Turlar", url: "/admin/tours", icon: Package },
+  { title: "Menyu", url: "/admin/menu-items", icon: Menu },
 ];
 
 export function AdminSidebar() {
