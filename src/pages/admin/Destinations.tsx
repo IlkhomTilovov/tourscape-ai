@@ -83,13 +83,15 @@ const Destinations = () => {
     const categories: Record<string, string> = {
       regions: "Viloyatlar bo'yicha",
       cities: "Shaharlar bo'yicha",
+      city: "Shaharlar bo'yicha",
       nature: "Tabiiy yo'nalishlar",
       cultural: "Madaniy yo'nalishlar",
       eco_tourism: "Eko-turizm",
       health_spa: "Sog'lomlashtirish va SPA",
       seasonal: "Mavsumiy yo'nalishlar",
       thematic: "Tematik yo'nalishlar",
-      events: "Mahalliy tadbirlar"
+      events: "Mahalliy tadbirlar",
+      other: "Boshqa"
     };
     return category ? categories[category] || category : "Boshqa";
   };
@@ -344,90 +346,96 @@ const Destinations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Kategoriyalar bo'yicha manzillar</CardTitle>
+          <CardTitle>Barcha manzillar ({destinations.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <Accordion type="multiple" className="w-full space-y-4">
-            {Object.entries(groupedDestinations).map(([category, categoryDestinations]) => (
-              <AccordionItem key={category} value={category} className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full pr-4">
-                    <span className="text-lg font-semibold">{getCategoryName(category)}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {categoryDestinations.length} manzil
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-4 pt-4">
-                    {categoryDestinations.map((destination) => {
-                      const destinationTours = getToursForDestination(destination.id);
-                      return (
-                        <Card key={destination.id} className="border-l-4 border-l-primary">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex gap-4 flex-1">
-                                {destination.image_url ? (
-                                  <img 
-                                    src={destination.image_url} 
-                                    alt={destination.name_en}
-                                    className="h-20 w-32 object-cover rounded border"
-                                  />
-                                ) : (
-                                  <div className="h-20 w-32 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
-                                    Rasm yo'q
-                                  </div>
-                                )}
-                                <div className="flex-1">
-                                  <h3 className="font-semibold text-lg">{destination.name_en}</h3>
-                                  <p className="text-sm text-muted-foreground">{destination.name_uz}</p>
-                                  <p className="text-sm mt-1">
-                                    <span className="font-medium">Mamlakat:</span> {destination.country}
-                                  </p>
-                                  <p className="text-sm text-primary mt-1">
-                                    {destinationTours.length} ta tur
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline" onClick={() => handleEdit(destination)}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button size="sm" variant="destructive" onClick={() => handleDelete(destination.id)}>
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          {destinationTours.length > 0 && (
-                            <CardContent className="pt-0">
-                              <div className="border-t pt-3">
-                                <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Turlar:</h4>
-                                <div className="space-y-2">
-                                  {destinationTours.map((tour) => (
-                                    <div key={tour.id} className="flex items-center justify-between bg-muted/50 p-3 rounded">
-                                      <div>
-                                        <p className="font-medium text-sm">{tour.title_en}</p>
-                                        <p className="text-xs text-muted-foreground">{tour.title_uz}</p>
-                                      </div>
-                                      <div className="text-right">
-                                        <p className="font-semibold text-primary">${tour.price}</p>
-                                        <p className="text-xs text-muted-foreground">{tour.duration}</p>
-                                      </div>
+          {destinations.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">Hech qanday manzil topilmadi</p>
+          ) : (
+            <Accordion type="multiple" className="w-full space-y-4" defaultValue={Object.keys(groupedDestinations)}>
+              {Object.entries(groupedDestinations).map(([category, categoryDestinations]) => (
+                <AccordionItem key={category} value={category} className="border rounded-lg px-4">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center justify-between w-full pr-4">
+                      <span className="text-lg font-semibold">{getCategoryName(category)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {categoryDestinations.length} manzil
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 pt-4">
+                      {categoryDestinations.map((destination) => {
+                        const destinationTours = getToursForDestination(destination.id);
+                        return (
+                          <Card key={destination.id} className="border-l-4 border-l-primary">
+                            <CardHeader className="pb-3">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex gap-4 flex-1">
+                                  {destination.image_url ? (
+                                    <img 
+                                      src={destination.image_url} 
+                                      alt={destination.name_en}
+                                      className="h-20 w-32 object-cover rounded border"
+                                    />
+                                  ) : (
+                                    <div className="h-20 w-32 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
+                                      Rasm yo'q
                                     </div>
-                                  ))}
+                                  )}
+                                  <div className="flex-1">
+                                    <h3 className="font-semibold text-lg">{destination.name_en}</h3>
+                                    <p className="text-sm text-muted-foreground">{destination.name_uz}</p>
+                                    <p className="text-sm mt-1">
+                                      <span className="font-medium">Mamlakat:</span> {destination.country}
+                                    </p>
+                                    {destinationTours.length > 0 && (
+                                      <p className="text-sm text-primary mt-1">
+                                        {destinationTours.length} ta tur
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button size="sm" variant="outline" onClick={() => handleEdit(destination)}>
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button size="sm" variant="destructive" onClick={() => handleDelete(destination.id)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
                                 </div>
                               </div>
-                            </CardContent>
-                          )}
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                            </CardHeader>
+                            {destinationTours.length > 0 && (
+                              <CardContent className="pt-0">
+                                <div className="border-t pt-3">
+                                  <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Turlar:</h4>
+                                  <div className="space-y-2">
+                                    {destinationTours.map((tour) => (
+                                      <div key={tour.id} className="flex items-center justify-between bg-muted/50 p-3 rounded">
+                                        <div>
+                                          <p className="font-medium text-sm">{tour.title_en}</p>
+                                          <p className="text-xs text-muted-foreground">{tour.title_uz}</p>
+                                        </div>
+                                        <div className="text-right">
+                                          <p className="font-semibold text-primary">${tour.price}</p>
+                                          <p className="text-xs text-muted-foreground">{tour.duration} kun</p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            )}
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
         </CardContent>
       </Card>
     </div>
