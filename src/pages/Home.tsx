@@ -5,6 +5,13 @@ import SearchBar from "@/components/SearchBar";
 import TourCard from "@/components/TourCard";
 import DestinationCard from "@/components/DestinationCard";
 import Footer from "@/components/Footer";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import heroImage from "@/assets/hero-travel.jpg";
 import * as LucideIcons from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -150,18 +157,29 @@ const Home = () => {
       {/* Popular Destinations */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold mb-8">{t("destinationsTitle")}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {destinations.map((destination) => (
-            <DestinationCard
-              key={destination.id}
-              name={getLocalizedName(destination, "name")}
-              country={destination.country}
-              image={destination.image_url || ""}
-              tourCount={0}
-              slug={destination.id}
-            />
-          ))}
-        </div>
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {destinations.map((destination) => (
+              <CarouselItem key={destination.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                <DestinationCard
+                  name={getLocalizedName(destination, "name")}
+                  country={destination.country}
+                  image={destination.image_url || ""}
+                  tourCount={0}
+                  slug={destination.id}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden md:flex" />
+          <CarouselNext className="hidden md:flex" />
+        </Carousel>
       </section>
 
       {/* Trust Section */}
