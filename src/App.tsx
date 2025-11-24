@@ -5,11 +5,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 import Home from "./pages/Home";
 import SearchResults from "./pages/SearchResults";
 import TourDetails from "./pages/TourDetails";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Cart from "./pages/Cart";
 import Tours from "./pages/Tours";
 import Categories from "./pages/Categories";
 import Destinations from "./pages/Destinations";
@@ -32,9 +34,10 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <LanguageProvider>
-        <TooltipProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <CartProvider>
+            <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -50,6 +53,7 @@ const App = () => (
               <Route path="/hotels" element={<Hotels />} />
               <Route path="/visas" element={<Visas />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/cart" element={<Cart />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="destinations" element={<AdminDestinations />} />
@@ -65,9 +69,10 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
-      </LanguageProvider>
-    </AuthProvider>
+            </TooltipProvider>
+          </CartProvider>
+        </LanguageProvider>
+      </AuthProvider>
   </QueryClientProvider>
 );
 
