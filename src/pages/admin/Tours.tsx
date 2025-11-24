@@ -580,6 +580,7 @@ const Tours = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Rasm</TableHead>
                 <TableHead>Inglizcha</TableHead>
                 <TableHead>O'zbekcha</TableHead>
                 <TableHead>Narx</TableHead>
@@ -591,6 +592,19 @@ const Tours = () => {
             <TableBody>
               {tours.map((tour) => (
                 <TableRow key={tour.id}>
+                  <TableCell>
+                    {tour.image_url ? (
+                      <img 
+                        src={tour.image_url} 
+                        alt={tour.title_en}
+                        className="h-16 w-24 object-cover rounded border"
+                      />
+                    ) : (
+                      <div className="h-16 w-24 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
+                        Rasm yo'q
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>{tour.title_en}</TableCell>
                   <TableCell>{tour.title_uz}</TableCell>
                   <TableCell>${tour.price}</TableCell>
