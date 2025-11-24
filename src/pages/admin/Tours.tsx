@@ -86,11 +86,17 @@ const Tours = () => {
   }, []);
 
   const fetchTours = async () => {
-    const { data, error } = await supabase.from("tours").select("*").order("created_at", { ascending: false });
+    const { data, error, count } = await supabase
+      .from("tours")
+      .select("*", { count: 'exact' })
+      .order("created_at", { ascending: false });
+    
     if (error) {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      console.error("Tours fetch error:", error);
     } else {
       setTours(data || []);
+      console.log(`Loaded ${data?.length} tours (total: ${count})`);
     }
   };
 

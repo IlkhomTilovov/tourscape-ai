@@ -59,11 +59,15 @@ const MenuItems = () => {
   const { data: menuItems = [], isLoading } = useQuery({
     queryKey: ["menuItems"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("menu_items")
-        .select("*")
+        .select("*", { count: 'exact' })
         .order("display_order");
-      if (error) throw error;
+      if (error) {
+        console.error("Menu items fetch error:", error);
+        throw error;
+      }
+      console.log(`Loaded ${data?.length} menu items (total: ${count})`);
       return data as MenuItem[];
     },
   });

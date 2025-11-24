@@ -53,11 +53,15 @@ const Flights = () => {
   const { data: flights = [], isLoading } = useQuery({
     queryKey: ["flights"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("flights" as any)
-        .select("*")
+        .select("*", { count: 'exact' })
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) {
+        console.error("Flights fetch error:", error);
+        throw error;
+      }
+      console.log(`Loaded ${data?.length} flights (total: ${count})`);
       return data as unknown as Flight[];
     },
   });
