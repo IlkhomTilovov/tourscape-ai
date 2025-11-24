@@ -157,12 +157,28 @@ const Home = () => {
       {/* Popular Destinations */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold mb-8">{t("destinationsTitle")}</h2>
+        
+        {/* Mobile: Grid Layout */}
+        <div className="grid grid-cols-1 gap-6 md:hidden">
+          {destinations.map((destination) => (
+            <DestinationCard
+              key={destination.id}
+              name={getLocalizedName(destination, "name")}
+              country={destination.country}
+              image={destination.image_url || ""}
+              tourCount={0}
+              slug={destination.id}
+            />
+          ))}
+        </div>
+
+        {/* Desktop/Tablet: Carousel */}
         <Carousel
           opts={{
             align: "start",
             loop: true,
           }}
-          className="w-full"
+          className="w-full hidden md:block"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
             {destinations.map((destination) => (
