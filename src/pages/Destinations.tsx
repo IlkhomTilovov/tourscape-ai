@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import DestinationCard from "@/components/DestinationCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
-import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Destination {
   id: string;
@@ -162,27 +162,30 @@ const Destinations = () => {
           </p>
 
           {categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
-              <Button
-                variant={selectedCategory === null ? "default" : "outline"}
-                onClick={() => setSelectedCategory(null)}
-                size="sm"
-              >
-                {language === "UZ" && "Barchasi"}
-                {language === "EN" && "All"}
-                {language === "RU" && "Все"}
-                {language === "DE" && "Alle"}
-              </Button>
-              {categories.map((cat) => (
-                <Button
-                  key={cat}
-                  variant={selectedCategory === cat ? "default" : "outline"}
-                  onClick={() => setSelectedCategory(cat)}
-                  size="sm"
-                >
-                  {categoryLabels[cat]?.[language] || cat}
-                </Button>
-              ))}
+            <div className="mb-8">
+              <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}>
+                <SelectTrigger className="w-full md:w-[300px]">
+                  <SelectValue placeholder={
+                    language === "UZ" ? "Kategoriya tanlang" :
+                    language === "EN" ? "Select category" :
+                    language === "RU" ? "Выберите категорию" :
+                    "Kategorie auswählen"
+                  } />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {language === "UZ" && "Barchasi"}
+                    {language === "EN" && "All"}
+                    {language === "RU" && "Все"}
+                    {language === "DE" && "Alle"}
+                  </SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat || ""}>
+                      {categoryLabels[cat || ""]?.[language] || cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
