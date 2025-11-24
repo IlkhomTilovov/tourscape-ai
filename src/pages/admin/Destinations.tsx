@@ -5,76 +5,81 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type Category = {
+type Destination = {
   id: string;
   name_en: string;
   name_uz: string;
   name_ru: string;
   name_de: string;
-  icon: string | null;
+  description_en: string | null;
+  description_uz: string | null;
+  description_ru: string | null;
+  description_de: string | null;
+  country: string;
+  image_url: string | null;
+  category: string | null;
 };
 
-type Tour = {
+type Category = {
   id: string;
-  title_en: string;
-  title_uz: string;
-  title_ru: string;
-  title_de: string;
-  duration: string;
-  price: number;
-  category_id: string | null;
+  name_en: string;
 };
 
 const Destinations = () => {
+  const [destinations, setDestinations] = useState<Destination[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [tours, setTours] = useState<Tour[]>([]);
   const [open, setOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [formData, setFormData] = useState({
     name_en: "",
-    icon: "",
+    country: "",
+    image_url: "",
+    category: "",
   });
   const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
+    fetchDestinations();
     fetchCategories();
-    fetchTours();
 
-    // Real-time updates for categories
-    const categoriesChannel = supabase
-      .channel('admin-categories-changes')
+    // Real-time updates for destinations
+    const destinationsChannel = supabase
+      .channel('admin-destinations-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'categories' },
-        () => fetchCategories()
-      )
-      .subscribe();
-
-    // Real-time updates for tours
-    const toursChannel = supabase
-      .channel('admin-tours-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'tours' },
-        () => fetchTours()
+        { event: '*', schema: 'public', table: 'destinations' },
+        () => fetchDestinations()
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(categoriesChannel);
-      supabase.removeChannel(toursChannel);
+      supabase.removeChannel(destinationsChannel);
     };
   }, []);
+
+  const fetchDestinations = async () => {
+    const { data, error } = await supabase
+      .from("destinations")
+      .select("*")
+      .order("name_en", { ascending: true });
+    
+    if (error) {
+      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+    } else {
+      setDestinations(data || []);
+    }
+  };
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
       .from("categories")
-      .select("*")
+      .select("id, name_en")
       .order("name_en", { ascending: true });
     
     if (error) {
@@ -82,23 +87,6 @@ const Destinations = () => {
     } else {
       setCategories(data || []);
     }
-  };
-
-  const fetchTours = async () => {
-    const { data, error } = await supabase
-      .from("tours")
-      .select("id, title_en, title_uz, title_ru, title_de, duration, price, category_id")
-      .order("created_at", { ascending: false });
-    
-    if (error) {
-      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
-    } else {
-      setTours(data || []);
-    }
-  };
-
-  const getToursByCategory = (categoryId: string) => {
-    return tours.filter(tour => tour.category_id === categoryId);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,30 +108,32 @@ const Destinations = () => {
         name_uz: translations.translations.Uzbek,
         name_ru: translations.translations.Russian,
         name_de: translations.translations.German,
-        icon: formData.icon || null,
+        country: formData.country,
+        image_url: formData.image_url || null,
+        category: formData.category || null,
       };
       
-      if (editingCategory) {
+      if (editingDestination) {
         const { error } = await supabase
-          .from("categories")
+          .from("destinations")
           .update(dataToSave)
-          .eq("id", editingCategory.id);
+          .eq("id", editingDestination.id);
         
         if (error) {
           toast({ title: "Xatolik", description: error.message, variant: "destructive" });
         } else {
-          toast({ title: "Muvaffaqiyat", description: "Kategoriya yangilandi" });
-          fetchCategories();
+          toast({ title: "Muvaffaqiyat", description: "Manzil yangilandi" });
+          fetchDestinations();
           handleClose();
         }
       } else {
-        const { error } = await supabase.from("categories").insert([dataToSave]);
+        const { error } = await supabase.from("destinations").insert([dataToSave]);
         
         if (error) {
           toast({ title: "Xatolik", description: error.message, variant: "destructive" });
         } else {
-          toast({ title: "Muvaffaqiyat", description: "Kategoriya qo'shildi" });
-          fetchCategories();
+          toast({ title: "Muvaffaqiyat", description: "Manzil qo'shildi" });
+          fetchDestinations();
           handleClose();
         }
       }
@@ -154,11 +144,13 @@ const Destinations = () => {
     }
   };
 
-  const handleEdit = (category: Category) => {
-    setEditingCategory(category);
+  const handleEdit = (destination: Destination) => {
+    setEditingDestination(destination);
     setFormData({
-      name_en: category.name_en,
-      icon: category.icon || "",
+      name_en: destination.name_en,
+      country: destination.country,
+      image_url: destination.image_url || "",
+      category: destination.category || "",
     });
     setOpen(true);
   };
@@ -166,22 +158,24 @@ const Destinations = () => {
   const handleDelete = async (id: string) => {
     if (!confirm("Haqiqatan ham o'chirmoqchimisiz?")) return;
     
-    const { error } = await supabase.from("categories").delete().eq("id", id);
+    const { error } = await supabase.from("destinations").delete().eq("id", id);
     
     if (error) {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Muvaffaqiyat", description: "Kategoriya o'chirildi" });
-      fetchCategories();
+      toast({ title: "Muvaffaqiyat", description: "Manzil o'chirildi" });
+      fetchDestinations();
     }
   };
 
   const handleClose = () => {
     setOpen(false);
-    setEditingCategory(null);
+    setEditingDestination(null);
     setFormData({
       name_en: "",
-      icon: "",
+      country: "",
+      image_url: "",
+      category: "",
     });
   };
 
@@ -189,21 +183,21 @@ const Destinations = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Kategoriyalar va Turlar</h1>
+          <h1 className="text-3xl font-bold">Manzillar</h1>
           <p className="text-muted-foreground">
-            {categories.length} ta kategoriya, {tours.length} ta tur
+            {destinations.length} ta manzil
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditingCategory(null); setFormData({ name_en: "", icon: "" }); }}>
+            <Button onClick={() => { setEditingDestination(null); setFormData({ name_en: "", country: "", image_url: "", category: "" }); }}>
               <Plus className="h-4 w-4 mr-2" />
-              Yangi kategoriya
+              Yangi manzil
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{editingCategory ? "Kategoriyani tahrirlash" : "Yangi kategoriya"}</DialogTitle>
+              <DialogTitle>{editingDestination ? "Manzilni tahrirlash" : "Yangi manzil"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -212,21 +206,47 @@ const Destinations = () => {
                   value={formData.name_en} 
                   onChange={(e) => setFormData({ ...formData, name_en: e.target.value })} 
                   required 
-                  placeholder="Kategoriya nomini kiriting" 
+                  placeholder="Manzil nomini kiriting" 
                 />
                 <p className="text-sm text-muted-foreground">Boshqa tillarga avtomatik tarjima qilinadi</p>
               </div>
-              
+
               <div className="space-y-2">
-                <Label>Icon (Lucide icon nomi)</Label>
+                <Label>Mamlakat</Label>
                 <Input 
-                  value={formData.icon} 
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="Compass, Map, Mountain..." 
+                  value={formData.country} 
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })} 
+                  required 
+                  placeholder="Mamlakat nomini kiriting" 
                 />
-                <p className="text-sm text-muted-foreground">
-                  Lucide icon nomlaridan foydalaning (masalan: Compass, Map, Mountain)
-                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Kategoriya</Label>
+                <Select 
+                  value={formData.category} 
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kategoriya tanlang" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name_en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Rasm URL</Label>
+                <Input 
+                  value={formData.image_url} 
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="https://example.com/image.jpg" 
+                />
               </div>
 
               <div className="flex justify-end gap-2">
@@ -234,7 +254,7 @@ const Destinations = () => {
                   Bekor qilish
                 </Button>
                 <Button type="submit" disabled={isTranslating}>
-                  {isTranslating ? "Tarjima qilinmoqda..." : editingCategory ? "Yangilash" : "Qo'shish"}
+                  {isTranslating ? "Tarjima qilinmoqda..." : editingDestination ? "Yangilash" : "Qo'shish"}
                 </Button>
               </div>
             </form>
@@ -244,94 +264,65 @@ const Destinations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Kategoriyalar va ularga tegishli turlar</CardTitle>
+          <CardTitle>Barcha manzillar</CardTitle>
         </CardHeader>
         <CardContent>
-          {categories.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">Kategoriyalar topilmadi</p>
+          {destinations.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">Manzillar topilmadi</p>
           ) : (
-            <Accordion type="multiple" defaultValue={categories.map(c => c.id)} className="space-y-2">
-              {categories.map((category) => {
-                const categoryTours = getToursByCategory(category.id);
-                return (
-                  <AccordionItem key={category.id} value={category.id} className="border rounded-lg px-4">
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex items-center justify-between w-full pr-4">
-                        <div className="flex items-center gap-3">
-                          <div className="font-semibold">{category.name_en}</div>
-                          <div className="text-sm text-muted-foreground">
-                            ({categoryTours.length} ta tur)
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(category);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="destructive" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(category.id);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-4 pt-4">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">O'zbekcha:</span> {category.name_uz}
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Ruscha:</span> {category.name_ru}
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Nemischa:</span> {category.name_de}
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Icon:</span> {category.icon || "-"}
-                          </div>
-                        </div>
-
-                        {categoryTours.length > 0 ? (
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-muted-foreground uppercase">Turlar:</h4>
-                            <div className="space-y-2">
-                              {categoryTours.map((tour) => (
-                                <div 
-                                  key={tour.id} 
-                                  className="bg-muted/50 p-3 rounded-lg space-y-1"
-                                >
-                                  <div className="font-medium">{tour.title_en}</div>
-                                  <div className="text-sm text-muted-foreground">
-                                    Davomiyligi: {tour.duration} • Narxi: ${tour.price}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground italic">
-                            Bu kategoriyada turlar yo'q
-                          </p>
+            <div className="space-y-4">
+              {destinations.map((destination) => (
+                <div key={destination.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        {destination.image_url && (
+                          <img 
+                            src={destination.image_url} 
+                            alt={destination.name_en}
+                            className="w-16 h-16 object-cover rounded"
+                          />
                         )}
+                        <div>
+                          <h3 className="font-semibold text-lg">{destination.name_en}</h3>
+                          <p className="text-sm text-muted-foreground">{destination.country}</p>
+                        </div>
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                );
-              })}
-            </Accordion>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">O'zbekcha:</span> {destination.name_uz}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Ruscha:</span> {destination.name_ru}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Nemischa:</span> {destination.name_de}
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Kategoriya:</span> {destination.category || "-"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 ml-4">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleEdit(destination)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        onClick={() => handleDelete(destination.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
