@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Banknote, Building2, Users, CalendarIcon, CheckCircle, Clock } from "lucide-react";
+import { Users, CalendarIcon, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -28,12 +28,9 @@ export default function Checkout() {
     fullName: "",
     email: "",
     phone: "",
-    address: "",
-    city: "",
-    zipCode: "",
   });
   
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  
   const [adults, setAdults] = useState("1");
   const [bookingDate, setBookingDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("9:00 AM");
@@ -264,106 +261,6 @@ export default function Checkout() {
                   </CardContent>
                 </Card>
 
-                {/* Address Information */}
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle>
-                      {getText("Manzil", "Address", "Адрес", "Adresse")}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <Label htmlFor="address">
-                        {getText("Ko'cha manzili", "Street Address", "Адрес улицы", "Straßenadresse")} *
-                      </Label>
-                      <Input
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="city">
-                          {getText("Shahar", "City", "Город", "Stadt")}
-                        </Label>
-                        <Input
-                          id="city"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="zipCode">
-                          {getText("Pochta indeksi", "Zip Code", "Почтовый индекс", "Postleitzahl")}
-                        </Label>
-                        <Input
-                          id="zipCode"
-                          name="zipCode"
-                          value={formData.zipCode}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Payment Method */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      {getText("To'lov usuli", "Payment Method", "Способ оплаты", "Zahlungsmethode")}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                      <Label
-                        htmlFor="card"
-                        className={cn(
-                          "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
-                          paymentMethod === "card" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                        )}
-                      >
-                        <RadioGroupItem value="card" id="card" />
-                        <CreditCard className="h-5 w-5" />
-                        <span className="flex-1">
-                          {getText("Karta orqali", "Credit/Debit Card", "Кредитная/дебетовая карта", "Kredit-/Debitkarte")}
-                        </span>
-                      </Label>
-
-                      <Label
-                        htmlFor="cash"
-                        className={cn(
-                          "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
-                          paymentMethod === "cash" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                        )}
-                      >
-                        <RadioGroupItem value="cash" id="cash" />
-                        <Banknote className="h-5 w-5" />
-                        <span className="flex-1">
-                          {getText("Naqd pul", "Cash on Arrival", "Наличные при прибытии", "Barzahlung bei Ankunft")}
-                        </span>
-                      </Label>
-
-                      <Label
-                        htmlFor="transfer"
-                        className={cn(
-                          "flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
-                          paymentMethod === "transfer" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                        )}
-                      >
-                        <RadioGroupItem value="transfer" id="transfer" />
-                        <Building2 className="h-5 w-5" />
-                        <span className="flex-1">
-                          {getText("Bank o'tkazmasi", "Bank Transfer", "Банковский перевод", "Banküberweisung")}
-                        </span>
-                      </Label>
-                    </RadioGroup>
-                  </CardContent>
-                </Card>
               </form>
             </div>
 
