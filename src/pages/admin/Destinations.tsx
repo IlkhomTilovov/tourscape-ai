@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -233,22 +234,22 @@ const Destinations = () => {
 
               <div className="space-y-2">
                 <Label>Kategoriya</Label>
-                <select 
-                  value={formData.category} 
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="">Tanlang</option>
-                  <option value="regions">Viloyatlar bo'yicha</option>
-                  <option value="cities">Shaharlar bo'yicha</option>
-                  <option value="nature">Tabiiy yo'nalishlar</option>
-                  <option value="cultural">Madaniy yo'nalishlar</option>
-                  <option value="eco_tourism">Eko-turizm</option>
-                  <option value="health_spa">Sog'lomlashtirish va SPA</option>
-                  <option value="seasonal">Mavsumiy yo'nalishlar</option>
-                  <option value="thematic">Tematik yo'nalishlar</option>
-                  <option value="events">Mahalliy tadbirlar</option>
-                </select>
+                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Tanlang" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="regions">Viloyatlar bo'yicha</SelectItem>
+                    <SelectItem value="cities">Shaharlar bo'yicha</SelectItem>
+                    <SelectItem value="nature">Tabiiy yo'nalishlar</SelectItem>
+                    <SelectItem value="cultural">Madaniy yo'nalishlar</SelectItem>
+                    <SelectItem value="eco_tourism">Eko-turizm</SelectItem>
+                    <SelectItem value="health_spa">Sog'lomlashtirish va SPA</SelectItem>
+                    <SelectItem value="seasonal">Mavsumiy yo'nalishlar</SelectItem>
+                    <SelectItem value="thematic">Tematik yo'nalishlar</SelectItem>
+                    <SelectItem value="events">Mahalliy tadbirlar</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
