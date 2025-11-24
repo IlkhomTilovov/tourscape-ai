@@ -73,36 +73,37 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-background border-b border-border">
-      <div className="container mx-auto px-4">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
+      <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 hero-gradient rounded-lg flex items-center justify-center">
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded flex items-center justify-center">
               <span className="text-white font-bold text-xl">T</span>
             </div>
-            <span className="font-bold text-xl text-foreground hidden sm:block">
+            <span className="font-semibold text-xl text-gray-900 hidden sm:block">
               TravelHub
             </span>
           </Link>
 
           {/* Desktop Navigation with Dropdowns */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-8">
             {menuItems.map((item) => {
               if (item.children && item.children.length > 0) {
                 return (
                   <DropdownMenu key={item.id}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="gap-1">
+                      <button className="text-gray-700 hover:text-gray-900 font-medium text-[15px] flex items-center gap-1 py-2 border-b-2 border-transparent hover:border-orange-500 transition-colors">
                         {getMenuName(item)}
                         <ChevronDown className="h-4 w-4" />
-                      </Button>
+                      </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className="bg-white">
                       {item.children.map((child) => (
                         <DropdownMenuItem
                           key={child.id}
                           onClick={() => navigate(child.url || "/")}
+                          className="cursor-pointer hover:bg-gray-50"
                         >
                           {getMenuName(child)}
                         </DropdownMenuItem>
@@ -112,43 +113,39 @@ const Navbar = () => {
                 );
               }
               return (
-                <Button
+                <button
                   key={item.id}
-                  variant="ghost"
                   onClick={() => navigate(item.url || "/")}
+                  className="text-gray-700 hover:text-gray-900 font-medium text-[15px] py-2 border-b-2 border-transparent hover:border-orange-500 transition-colors"
                 >
                   {getMenuName(item)}
-                </Button>
+                </button>
               );
             })}
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-1">
-            {/* Wishlist */}
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <Heart className="h-5 w-5" />
-            </Button>
-
-            {/* Cart */}
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <button className="hidden lg:flex items-center gap-2 text-gray-700 hover:text-gray-900">
+              <Globe className="h-5 w-5" />
+              <span className="text-[15px] font-medium">Qidiruv</span>
+            </button>
 
             {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hidden sm:flex gap-1">
+                <Button variant="ghost" size="sm" className="hidden sm:flex gap-1 text-gray-700 hover:text-gray-900">
                   <Globe className="h-4 w-4" />
                   {language}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="bg-white">
                 {languages.map((lang) => (
                   <DropdownMenuItem 
                     key={lang.code}
                     onClick={() => setLanguage(lang.code)}
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:bg-gray-50"
                   >
                     {lang.name}
                   </DropdownMenuItem>
@@ -157,7 +154,7 @@ const Navbar = () => {
             </DropdownMenu>
 
             {/* User Profile */}
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hidden sm:flex text-gray-700 hover:text-gray-900">
               <User className="h-5 w-5" />
             </Button>
 
@@ -165,7 +162,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className="md:hidden text-gray-700 hover:text-gray-900"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -180,52 +177,42 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 animate-fade-in">
+          <div className="md:hidden py-4 space-y-1 animate-fade-in bg-white border-t border-gray-200">
             {menuItems.map((item) => {
               if (item.children && item.children.length > 0) {
                 return (
                   <div key={item.id} className="space-y-1">
-                    <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
+                    <div className="px-4 py-2 text-sm font-semibold text-gray-900">
                       {getMenuName(item)}
                     </div>
                     {item.children.map((child) => (
-                      <Button
+                      <button
                         key={child.id}
-                        variant="ghost"
-                        className="w-full justify-start pl-6"
+                        className="w-full text-left px-8 py-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                         onClick={() => {
                           navigate(child.url || "/");
                           setMobileMenuOpen(false);
                         }}
                       >
                         {getMenuName(child)}
-                      </Button>
+                      </button>
                     ))}
                   </div>
                 );
               }
               return (
-                <Button
+                <button
                   key={item.id}
-                  variant="ghost"
-                  className="w-full justify-start"
+                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors font-medium"
                   onClick={() => {
                     navigate(item.url || "/");
                     setMobileMenuOpen(false);
                   }}
                 >
                   {getMenuName(item)}
-                </Button>
+                </button>
               );
             })}
-            <div className="flex items-center gap-2 pt-2 border-t">
-              <Button variant="ghost" size="icon">
-                <Heart className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-            </div>
           </div>
         )}
       </div>
