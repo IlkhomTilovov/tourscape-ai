@@ -23,89 +23,24 @@ const Home = () => {
   const [tours, setTours] = useState<any[]>([]);
 
   useEffect(() => {
-    fetchCategories();
-    fetchDestinations();
-    fetchTours();
+    // Fetch all data in parallel for better performance
+    const fetchAllData = async () => {
+      const [categoriesData, destinationsData, toursData] = await Promise.all([
+        supabase.from("categories").select("*").limit(6),
+        supabase.from("destinations").select("*").limit(4),
+        supabase.from("tours")
+          .select("*, destinations(name_en, name_uz, name_ru, name_de), categories(name_en, name_uz, name_ru, name_de)")
+          .eq("is_bestseller", true)
+          .limit(3)
+      ]);
 
-    // Real-time updates for categories
-    const categoriesChannel = supabase
-      .channel('categories-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'categories'
-        },
-        () => {
-          fetchCategories();
-        }
-      )
-      .subscribe();
-
-    // Real-time updates for destinations
-    const destinationsChannel = supabase
-      .channel('destinations-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'destinations'
-        },
-        () => {
-          fetchDestinations();
-        }
-      )
-      .subscribe();
-
-    // Real-time updates for tours
-    const toursChannel = supabase
-      .channel('tours-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tours'
-        },
-        () => {
-          fetchTours();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(categoriesChannel);
-      supabase.removeChannel(destinationsChannel);
-      supabase.removeChannel(toursChannel);
+      if (categoriesData.data) setCategories(categoriesData.data);
+      if (destinationsData.data) setDestinations(destinationsData.data);
+      if (toursData.data) setTours(toursData.data);
     };
+
+    fetchAllData();
   }, []);
-
-  const fetchCategories = async () => {
-    const { data } = await supabase.from("categories").select("*").limit(6);
-    if (data) {
-      setCategories(data);
-    }
-  };
-
-  const fetchDestinations = async () => {
-    const { data } = await supabase.from("destinations").select("*").limit(4);
-    if (data) {
-      setDestinations(data);
-    }
-  };
-
-  const fetchTours = async () => {
-    const { data } = await supabase
-      .from("tours")
-      .select("*, destinations(name_en, name_uz, name_ru, name_de), categories(name_en, name_uz, name_ru, name_de)")
-      .eq("is_bestseller", true)
-      .limit(3);
-    if (data) {
-      setTours(data);
-    }
-  };
 
   const getIconComponent = (iconName: string | null) => {
     if (!iconName) return LucideIcons.Compass;
