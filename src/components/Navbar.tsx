@@ -248,6 +248,27 @@ const Navbar = () => {
                 <ShoppingCart className="h-5 w-5" />
               </Button>
             </div>
+            
+            {/* Language Selector for Mobile */}
+            <div className="pt-2 border-t mt-2">
+              <div className="px-3 py-2 text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                {language === "EN" && "Language"}
+                {language === "UZ" && "Til"}
+                {language === "RU" && "Язык"}
+                {language === "DE" && "Sprache"}
+              </div>
+              {languages.map((lang) => (
+                <Button
+                  key={lang.code}
+                  variant={language === lang.code ? "secondary" : "ghost"}
+                  className="w-full justify-start pl-6"
+                  onClick={() => setLanguage(lang.code)}
+                >
+                  {lang.name}
+                </Button>
+              ))}
+            </div>
           </div>
         )}
       </div>
