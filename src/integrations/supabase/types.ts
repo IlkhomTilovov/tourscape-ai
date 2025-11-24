@@ -53,6 +53,62 @@ export type Database = {
         }
         Relationships: []
       }
+      bookings: {
+        Row: {
+          adults: number
+          booking_date: string
+          booking_time: string | null
+          created_at: string
+          id: string
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string
+          total_price: number
+          tour_id: string
+          updated_at: string
+          user_email: string | null
+          user_phone: string | null
+        }
+        Insert: {
+          adults?: number
+          booking_date: string
+          booking_time?: string | null
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          total_price: number
+          tour_id: string
+          updated_at?: string
+          user_email?: string | null
+          user_phone?: string | null
+        }
+        Update: {
+          adults?: number
+          booking_date?: string
+          booking_time?: string | null
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          total_price?: number
+          tour_id?: string
+          updated_at?: string
+          user_email?: string | null
+          user_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
