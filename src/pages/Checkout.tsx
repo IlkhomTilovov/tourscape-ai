@@ -502,30 +502,32 @@ export default function Checkout() {
                       <span className="text-muted-foreground">
                         ${items[0]?.price || 0} x {adults} {getText("kishi", "person", "человек", "Person")}
                       </span>
-                      <span>${((items[0]?.price || 0) * parseInt(adults)).toFixed(2)}</span>
+                      <span className="font-medium">${((items[0]?.price || 0) * parseInt(adults)).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
                         {getText("Xizmat to'lovi", "Service Fee", "Сервисный сбор", "Servicegebühr")}
                       </span>
-                      <span>${((items[0]?.price || 0) * parseInt(adults) * 0.05).toFixed(2)}</span>
+                      <span className="font-medium">${((items[0]?.price || 0) * parseInt(adults) * 0.05).toFixed(2)}</span>
                     </div>
-                    <Separator />
-                    <div className="flex justify-between text-lg font-bold">
-                      <span>{getText("Jami", "Total", "Всего", "Gesamt")}</span>
-                      <span>${((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2)}</span>
+                    
+                    <Separator className="my-3" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-xl font-bold">{getText("Jami", "Total", "Всего", "Gesamt")}</span>
+                      <span className="text-2xl font-bold">${((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2)}</span>
                     </div>
                   </div>
 
                   <Button 
                     onClick={handleSubmit} 
-                    className="w-full" 
+                    className="w-full h-14 text-lg font-semibold mt-6" 
                     size="lg"
                   >
                     {getText("Buyurtmani tasdiqlash", "Confirm Booking", "Подтвердить бронирование", "Buchung bestätigen")}
                   </Button>
 
-                  <p className="text-xs text-muted-foreground text-center">
+                  <p className="text-xs text-muted-foreground text-center mt-4">
                     {getText(
                       "Buyurtmani tasdiqlash orqali siz shartlarimizga rozilik bildirasiz",
                       "By confirming your booking, you agree to our terms and conditions",
