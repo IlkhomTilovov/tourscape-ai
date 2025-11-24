@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
+import MegaMenu from "./MegaMenu";
 
 interface MenuItem {
   id: string;
@@ -27,6 +28,7 @@ interface MenuItem {
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [megaMenuOpen, setMegaMenuOpen] = useState<string | null>(null);
   const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   
@@ -86,29 +88,28 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation with Dropdowns */}
+          {/* Desktop Navigation with Mega Menu */}
           <div className="hidden md:flex items-center space-x-2">
             {menuItems.map((item) => {
               if (item.children && item.children.length > 0) {
                 return (
-                  <DropdownMenu key={item.id}>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="gap-1">
-                        {getMenuName(item)}
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {item.children.map((child) => (
-                        <DropdownMenuItem
-                          key={child.id}
-                          onClick={() => navigate(child.url || "/")}
-                        >
-                          {getMenuName(child)}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div 
+                    key={item.id}
+                    className="relative"
+                    onMouseEnter={() => setMegaMenuOpen(item.id)}
+                    onMouseLeave={() => setMegaMenuOpen(null)}
+                  >
+                    <Button variant="ghost" className="gap-1">
+                      {getMenuName(item)}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                    {megaMenuOpen === item.id && (
+                      <MegaMenu 
+                        categories={item.children}
+                        onClose={() => setMegaMenuOpen(null)}
+                      />
+                    )}
+                  </div>
                 );
               }
               return (
