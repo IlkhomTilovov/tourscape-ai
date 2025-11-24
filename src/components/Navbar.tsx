@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ interface Tour {
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState<string | null>(null);
+  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
   const { totalItems } = useCart();
   const navigate = useNavigate();
@@ -232,23 +233,34 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-2 animate-fade-in max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-hide">
-            {/* Categories Dropdown */}
-            <div className="px-3">
-              <Select onValueChange={(value) => {
-                navigate(value);
-                setMobileMenuOpen(false);
-              }}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={getLabel("categories")} />
-                </SelectTrigger>
-                <SelectContent>
+            {/* Categories Collapsible */}
+            <div>
+              <Button
+                variant="ghost"
+                className="w-full justify-between"
+                onClick={() => setMobileCategoriesOpen(!mobileCategoriesOpen)}
+              >
+                {getLabel("categories")}
+                <ChevronRight className={`h-4 w-4 transition-transform ${mobileCategoriesOpen ? 'rotate-90' : ''}`} />
+              </Button>
+              {mobileCategoriesOpen && (
+                <div className="pl-4 space-y-1 mt-1">
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={`/categories?category=${category.id}`}>
+                    <Button
+                      key={category.id}
+                      variant="ghost"
+                      className="w-full justify-start text-sm"
+                      onClick={() => {
+                        navigate(`/categories?category=${category.id}`);
+                        setMobileMenuOpen(false);
+                        setMobileCategoriesOpen(false);
+                      }}
+                    >
                       {category[`name_${language.toLowerCase()}` as keyof Category] as string}
-                    </SelectItem>
+                    </Button>
                   ))}
-                </SelectContent>
-              </Select>
+                </div>
+              )}
             </div>
 
             {/* Direct Navigation Links */}
