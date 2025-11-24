@@ -16,6 +16,7 @@ import Destinations from "./pages/Destinations";
 import About from "./pages/About";
 import Flights from "./pages/Flights";
 import Hotels from "./pages/Hotels";
+import Visas from "./pages/Visas";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminDestinations from "./pages/admin/Destinations";
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/flights" element={<Flights />} />
               <Route path="/hotels" element={<Hotels />} />
+              <Route path="/visas" element={<Visas />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
