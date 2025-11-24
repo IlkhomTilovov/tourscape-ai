@@ -71,7 +71,7 @@ const Payment = () => {
       return;
     }
 
-    if (paymentMethod === "card") {
+    if (paymentMethod === "card" || paymentMethod === "hamkorbank") {
       if (!cardDetails.cardNumber || !cardDetails.cardName || !cardDetails.expiryDate || !cardDetails.cvv) {
         toast.error(getText(
           "Iltimos, barcha maydonlarni to'ldiring",
@@ -83,11 +83,12 @@ const Payment = () => {
       }
       
       // For card payment, just show success (demo mode)
+      const bankName = paymentMethod === "hamkorbank" ? "Hamkor Bank" : "";
       toast.success(getText(
-        "To'lov muvaffaqiyatli amalga oshirildi!",
-        "Payment successful!",
-        "Оплата прошла успешно!",
-        "Zahlung erfolgreich!"
+        `To'lov ${bankName} orqali muvaffaqiyatli amalga oshirildi!`,
+        `Payment ${bankName ? 'via ' + bankName : ''} successful!`,
+        `Оплата ${bankName ? 'через ' + bankName : ''} прошла успешно!`,
+        `Zahlung ${bankName ? 'über ' + bankName : ''} erfolgreich!`
       ));
       clearCart();
       setTimeout(() => navigate("/"), 2000);
@@ -243,16 +244,35 @@ const Payment = () => {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="hamkorbank" id="hamkorbank" />
+                    <Label htmlFor="hamkorbank" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <CreditCard className="h-5 w-5" />
+                      <span>{getText("Hamkor Bank kartasi", "Hamkor Bank Card", "Карта Hamkor Bank", "Hamkor Bank Karte")}</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
                       <CreditCard className="h-5 w-5" />
-                      <span>{getText("Plastik karta", "Credit/Debit Card", "Банковская карта", "Kreditkarte")}</span>
+                      <span>{getText("Boshqa plastik karta", "Other Card", "Другая карта", "Andere Karte")}</span>
                     </Label>
                   </div>
                 </RadioGroup>
 
-                {paymentMethod === "card" && (
+                {(paymentMethod === "card" || paymentMethod === "hamkorbank") && (
                   <div className="space-y-4 animate-in fade-in-50">
+                    {paymentMethod === "hamkorbank" && (
+                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
+                        <p className="text-sm font-medium">
+                          {getText(
+                            "Hamkor Bank kartangiz ma'lumotlarini kiriting",
+                            "Enter your Hamkor Bank card details",
+                            "Введите данные вашей карты Hamkor Bank",
+                            "Geben Sie Ihre Hamkor Bank Kartendaten ein"
+                          )}
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <Label htmlFor="cardNumber">
                         {getText("Karta raqami", "Card Number", "Номер карты", "Kartennummer")}
