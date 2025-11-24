@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,8 +18,20 @@ type Category = {
   icon: string | null;
 };
 
+type Tour = {
+  id: string;
+  title_en: string;
+  title_uz: string;
+  title_ru: string;
+  title_de: string;
+  duration: string;
+  price: number;
+  category_id: string | null;
+};
+
 const Destinations = () => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [tours, setTours] = useState<Tour[]>([]);
   const [open, setOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
@@ -31,6 +43,32 @@ const Destinations = () => {
 
   useEffect(() => {
     fetchCategories();
+    fetchTours();
+
+    // Real-time updates for categories
+    const categoriesChannel = supabase
+      .channel('admin-categories-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'categories' },
+        () => fetchCategories()
+      )
+      .subscribe();
+
+    // Real-time updates for tours
+    const toursChannel = supabase
+      .channel('admin-tours-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tours' },
+        () => fetchTours()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(categoriesChannel);
+      supabase.removeChannel(toursChannel);
+    };
   }, []);
 
   const fetchCategories = async () => {
@@ -44,6 +82,23 @@ const Destinations = () => {
     } else {
       setCategories(data || []);
     }
+  };
+
+  const fetchTours = async () => {
+    const { data, error } = await supabase
+      .from("tours")
+      .select("id, title_en, title_uz, title_ru, title_de, duration, price, category_id")
+      .order("created_at", { ascending: false });
+    
+    if (error) {
+      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+    } else {
+      setTours(data || []);
+    }
+  };
+
+  const getToursByCategory = (categoryId: string) => {
+    return tours.filter(tour => tour.category_id === categoryId);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,14 +189,16 @@ const Destinations = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Manzillar</h1>
-          <p className="text-muted-foreground">Manzillarni boshqarish</p>
+          <h1 className="text-3xl font-bold">Kategoriyalar va Turlar</h1>
+          <p className="text-muted-foreground">
+            {categories.length} ta kategoriya, {tours.length} ta tur
+          </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { setEditingCategory(null); setFormData({ name_en: "", icon: "" }); }}>
               <Plus className="h-4 w-4 mr-2" />
-              Yangi qo'shish
+              Yangi kategoriya
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -187,42 +244,95 @@ const Destinations = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Barcha kategoriyalar</CardTitle>
+          <CardTitle>Kategoriyalar va ularga tegishli turlar</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Inglizcha</TableHead>
-                <TableHead>O'zbekcha</TableHead>
-                <TableHead>Ruscha</TableHead>
-                <TableHead>Nemischa</TableHead>
-                <TableHead>Icon</TableHead>
-                <TableHead className="text-right">Amallar</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell>{category.name_en}</TableCell>
-                  <TableCell>{category.name_uz}</TableCell>
-                  <TableCell>{category.name_ru}</TableCell>
-                  <TableCell>{category.name_de}</TableCell>
-                  <TableCell>{category.icon || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(category)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(category.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {categories.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">Kategoriyalar topilmadi</p>
+          ) : (
+            <Accordion type="multiple" defaultValue={categories.map(c => c.id)} className="space-y-2">
+              {categories.map((category) => {
+                const categoryTours = getToursByCategory(category.id);
+                return (
+                  <AccordionItem key={category.id} value={category.id} className="border rounded-lg px-4">
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center justify-between w-full pr-4">
+                        <div className="flex items-center gap-3">
+                          <div className="font-semibold">{category.name_en}</div>
+                          <div className="text-sm text-muted-foreground">
+                            ({categoryTours.length} ta tur)
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(category);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(category.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-4 pt-4">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">O'zbekcha:</span> {category.name_uz}
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Ruscha:</span> {category.name_ru}
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Nemischa:</span> {category.name_de}
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Icon:</span> {category.icon || "-"}
+                          </div>
+                        </div>
+
+                        {categoryTours.length > 0 ? (
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm text-muted-foreground uppercase">Turlar:</h4>
+                            <div className="space-y-2">
+                              {categoryTours.map((tour) => (
+                                <div 
+                                  key={tour.id} 
+                                  className="bg-muted/50 p-3 rounded-lg space-y-1"
+                                >
+                                  <div className="font-medium">{tour.title_en}</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    Davomiyligi: {tour.duration} • Narxi: ${tour.price}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground italic">
+                            Bu kategoriyada turlar yo'q
+                          </p>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          )}
         </CardContent>
       </Card>
     </div>
