@@ -54,7 +54,7 @@ const Destinations = () => {
   const { language, t } = useLanguage();
   const navigate = useNavigate();
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [categories, setCategories] = useState<CategoryWithCount[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -119,45 +119,15 @@ const Destinations = () => {
 
   const fetchCategories = async () => {
     try {
-      const { data: categoriesData, error: catError } = await supabase
+      const { data, error } = await supabase
         .from("categories")
         .select("*")
         .order("created_at", { ascending: true });
 
-      if (catError) throw catError;
-
-      // Get destinations to count for each category
-      const { data: destinationsData } = await supabase
-        .from("destinations")
-        .select("id, name_en");
-
-      // Get tours with category_id
-      const { data: toursData } = await supabase
-        .from("tours")
-        .select("id, category_id");
-
-      // Count destinations and tours for each category
-      const categoriesWithCounts = (categoriesData || []).map(cat => {
-        const categoryDestinations = destinationsData?.filter(
-          dest => dest.name_en.toLowerCase() === cat.name_en.toLowerCase()
-        ) || [];
-        
-        const categoryTours = toursData?.filter(
-          tour => tour.category_id === cat.id
-        ) || [];
-
-        return {
-          ...cat,
-          destinationCount: categoryDestinations.length,
-          tourCount: categoryTours.length
-        };
-      });
-
-      setCategories(categoriesWithCounts);
+      if (error) throw error;
+      setCategories(data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -172,11 +142,17 @@ const Destinations = () => {
       setDestinations(data || []);
     } catch (error) {
       console.error("Error fetching destinations:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCategoryClick = (categoryId: string) => {
-    navigate(`/search?category=${categoryId}`);
+  const handleDestinationClick = (destinationId: string) => {
+    navigate(`/search?destination=${destinationId}`);
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    setSelectedCategory(selectedCategory === categoryName ? null : categoryName);
   };
 
   const getLocalizedText = (
@@ -192,10 +168,6 @@ const Destinations = () => {
       DE: de,
     };
     return langMap[language] || en || "";
-  };
-
-  const handleDestinationClick = (destinationId: string) => {
-    navigate(`/search?destination=${destinationId}`);
   };
 
   const getIconComponent = (iconName: string | null) => {
@@ -215,9 +187,31 @@ const Destinations = () => {
     return item[field as keyof Category] || item.name_en;
   };
 
-  const filteredCategories = selectedCategory
-    ? categories.filter((c) => c.id === selectedCategory)
-    : categories;
+  const filteredDestinations = selectedCategory
+    ? destinations.filter((d) => d.category === selectedCategory)
+    : destinations;
+
+  const groupedDestinations = destinations.reduce((acc, dest) => {
+    const cat = dest.category || "other";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(dest);
+    return acc;
+  }, {} as Record<string, Destination[]>);
+
+  const getCategoryLabel = (categoryKey: string) => {
+    const category = categories.find(c => c.name_en.toLowerCase() === categoryKey.toLowerCase());
+    if (category) {
+      return getLocalizedName(category);
+    }
+    const labels: Record<string, Record<string, string>> = {
+      regions: { UZ: "Viloyatlar bo'yicha", EN: "By Regions", RU: "По регионам", DE: "Nach Regionen" },
+      cities: { UZ: "Shaharlar bo'yicha", EN: "By Cities", RU: "По городам", DE: "Nach Städten" },
+      nature: { UZ: "Tabiiy yo'nalishlar", EN: "Nature", RU: "Природа", DE: "Natur" },
+      cultural: { UZ: "Madaniy yo'nalishlar", EN: "Cultural", RU: "Культурные", DE: "Kulturell" },
+      other: { UZ: "Boshqa", EN: "Other", RU: "Другое", DE: "Andere" }
+    };
+    return labels[categoryKey]?.[language] || categoryKey;
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -257,21 +251,25 @@ const Destinations = () => {
                   <ChevronRight className="w-5 h-5" />
                 </button>
 
-                {categories.map((category) => {
-                  const Icon = getIconComponent(category.icon);
+                {Object.keys(groupedDestinations).map((categoryKey) => {
+                  const Icon = LucideIcons.MapPin;
+                  const categoryDestinations = groupedDestinations[categoryKey];
                   return (
                     <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
+                      key={categoryKey}
+                      onClick={() => handleCategoryClick(categoryKey)}
                       className={`w-full flex items-center justify-between p-4 rounded-lg transition-colors ${
-                        selectedCategory === category.id
+                        selectedCategory === categoryKey
                           ? "bg-primary text-primary-foreground"
                           : "bg-card hover:bg-accent text-foreground border border-border"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon className="w-5 h-5" />
-                        <span className="font-medium">{getLocalizedName(category)}</span>
+                        <div className="flex flex-col items-start">
+                          <span className="font-medium">{getCategoryLabel(categoryKey)}</span>
+                          <span className="text-xs opacity-75">{categoryDestinations.length} manzil</span>
+                        </div>
                       </div>
                       <ChevronRight className="w-5 h-5" />
                     </button>
@@ -280,58 +278,80 @@ const Destinations = () => {
               </div>
             </div>
 
-            {/* Right Content - Categories */}
+            {/* Right Content - Destinations */}
             <div className="flex-1">
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+                    <div key={i} className="h-80 bg-muted animate-pulse rounded-lg" />
                   ))}
                 </div>
-              ) : filteredCategories.length === 0 ? (
+              ) : filteredDestinations.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
-                    {language === "UZ" && "Kategoriyalar topilmadi"}
-                    {language === "EN" && "No categories found"}
-                    {language === "RU" && "Категории не найдены"}
-                    {language === "DE" && "Keine Kategorien gefunden"}
+                    {language === "UZ" && "Manzillar topilmadi"}
+                    {language === "EN" && "No destinations found"}
+                    {language === "RU" && "Направления не найдены"}
+                    {language === "DE" && "Keine Reiseziele gefunden"}
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredCategories.map((category) => {
-                    const Icon = getIconComponent(category.icon);
-                    return (
-                      <Card
-                        key={category.id}
-                        onClick={() => handleCategoryClick(category.id)}
-                        className="cursor-pointer hover:shadow-lg transition-shadow group"
-                      >
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-4">
-                            <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                              <Icon className="w-8 h-8 text-primary" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="text-lg font-semibold mb-2">
-                                {getLocalizedName(category)}
-                              </h3>
-                              <div className="space-y-1 text-sm text-muted-foreground">
-                                <p>
-                                  {category.tourCount} {
-                                    language === "UZ" ? "ta tur" :
-                                    language === "RU" ? "туров" :
-                                    language === "DE" ? "Touren" :
-                                    "tours"
-                                  }
+                <div className="space-y-6">
+                  {Object.entries(groupedDestinations)
+                    .filter(([categoryKey]) => !selectedCategory || categoryKey === selectedCategory)
+                    .map(([categoryKey, categoryDestinations]) => (
+                      <div key={categoryKey}>
+                        <h2 className="text-2xl font-bold mb-4">{getCategoryLabel(categoryKey)}</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {categoryDestinations.map((destination) => (
+                            <Card
+                              key={destination.id}
+                              onClick={() => handleDestinationClick(destination.id)}
+                              className="cursor-pointer hover:shadow-lg transition-shadow group overflow-hidden"
+                            >
+                              {destination.image_url && (
+                                <div className="h-48 overflow-hidden">
+                                  <img 
+                                    src={destination.image_url} 
+                                    alt={getLocalizedText(
+                                      destination.name_en,
+                                      destination.name_uz,
+                                      destination.name_ru,
+                                      destination.name_de
+                                    )}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                  />
+                                </div>
+                              )}
+                              <CardContent className="p-4">
+                                <h3 className="text-lg font-semibold mb-1">
+                                  {getLocalizedText(
+                                    destination.name_en,
+                                    destination.name_uz,
+                                    destination.name_ru,
+                                    destination.name_de
+                                  )}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {language === "UZ" && "O'zbekcha: "}
+                                  {language === "EN" && "Uzbek: "}
+                                  {language === "RU" && "Узбекский: "}
+                                  {language === "DE" && "Usbekisch: "}
+                                  {destination.name_uz}
                                 </p>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                                <p className="text-sm font-medium">
+                                  {language === "UZ" && "Mamlakat: "}
+                                  {language === "EN" && "Country: "}
+                                  {language === "RU" && "Страна: "}
+                                  {language === "DE" && "Land: "}
+                                  {destination.country}
+                                </p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
