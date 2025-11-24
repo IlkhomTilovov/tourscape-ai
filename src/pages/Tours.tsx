@@ -59,6 +59,43 @@ const Tours = () => {
   useEffect(() => {
     fetchTours();
     fetchCategories();
+
+    // Real-time updates for tours
+    const toursChannel = supabase
+      .channel('tours-page-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tours'
+        },
+        () => {
+          fetchTours();
+        }
+      )
+      .subscribe();
+
+    // Real-time updates for categories
+    const categoriesChannel = supabase
+      .channel('categories-page-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'categories'
+        },
+        () => {
+          fetchCategories();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(toursChannel);
+      supabase.removeChannel(categoriesChannel);
+    };
   }, []);
 
   useEffect(() => {

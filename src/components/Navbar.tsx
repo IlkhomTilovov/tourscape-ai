@@ -39,7 +39,7 @@ const Navbar = () => {
     { code: "DE" as Language, name: "German", display: "DE" },
   ];
 
-  const { data: menuItems = [] } = useQuery({
+  const { data: menuItems = [], refetch } = useQuery({
     queryKey: ["menuItems"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -58,6 +58,28 @@ const Navbar = () => {
       }));
     },
   });
+
+  // Real-time updates for menu items
+  useEffect(() => {
+    const channel = supabase
+      .channel('menu-items-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'menu_items'
+        },
+        () => {
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   const getMenuName = (item: MenuItem) => {
     switch (language) {

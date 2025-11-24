@@ -31,6 +31,43 @@ const Categories = () => {
 
   useEffect(() => {
     fetchCategories();
+
+    // Real-time updates for categories
+    const categoriesChannel = supabase
+      .channel('categories-list-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'categories'
+        },
+        () => {
+          fetchCategories();
+        }
+      )
+      .subscribe();
+
+    // Real-time updates for tours (for tour counts)
+    const toursChannel = supabase
+      .channel('categories-tours-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tours'
+        },
+        () => {
+          fetchCategories();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(categoriesChannel);
+      supabase.removeChannel(toursChannel);
+    };
   }, []);
 
   const fetchCategories = async () => {
