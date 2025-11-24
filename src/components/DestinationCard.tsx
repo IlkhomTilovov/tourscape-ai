@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface DestinationCardProps {
   name: string;
@@ -19,11 +20,11 @@ const DestinationCard = ({
     <Link to={`/destination/${slug}`}>
       <div className="card-elevated rounded-xl overflow-hidden bg-card group cursor-pointer">
         <div className="relative h-64 overflow-hidden">
-          <img
+          <OptimizedImage
             src={image}
             alt={name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
