@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,20 @@ import { cn } from "@/lib/utils";
 
 export default function Checkout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { items, totalPrice, clearCart } = useCart();
   const { language } = useLanguage();
   const { toast } = useToast();
   
-  
+  // Get tour data from location state (from TourDetails) or cart
+  const locationTourData = location.state;
+  const tourData = locationTourData || (items[0] ? {
+    tourId: items[0].id,
+    tourTitle: items[0].title,
+    price: items[0].price,
+    duration: items[0].duration,
+    location: ""
+  } : null);
   
   const [adults, setAdults] = useState("1");
   const [bookingDate, setBookingDate] = useState<Date>();
@@ -57,19 +66,19 @@ export default function Checkout() {
     }
 
     const bookingData = {
-      tourId: items[0]?.id,
-      tourTitle: items[0]?.title,
+      tourId: tourData?.tourId,
+      tourTitle: tourData?.tourTitle,
       date: bookingDate?.toLocaleDateString(),
       time: selectedTime,
       adults: adults,
-      totalPrice: ((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2),
+      totalPrice: ((tourData?.price || 0) * parseInt(adults) * 1.05).toFixed(2),
     };
 
     navigate("/payment", { state: bookingData });
   };
 
-  if (items.length === 0) {
-    navigate("/cart");
+  if (!tourData) {
+    navigate("/tours");
     return null;
   }
 
@@ -86,42 +95,41 @@ export default function Checkout() {
             {/* Tour Details & Form Section */}
             <div className="lg:col-span-2 space-y-6">
               {/* Tour Details Card */}
-              {items.map((item) => (
-                <Card key={item.id} className="overflow-hidden">
-                  <CardHeader className="bg-muted/30 pb-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-2xl mb-2">{item.title}</CardTitle>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {getText(
-                            "Ajoyib sayohat tajribasi sizni kutmoqda",
-                            "Discover amazing travel experiences",
-                            "Откройте для себя удивительные впечатления от путешествий",
-                            "Entdecken Sie erstaunliche Reiseerlebnisse"
-                          )}
-                        </p>
+              <Card className="overflow-hidden">
+                <CardHeader className="bg-muted/30 pb-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-2xl mb-2">{tourData.tourTitle}</CardTitle>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {getText(
+                          "Ajoyib sayohat tajribasi sizni kutmoqda",
+                          "Discover amazing travel experiences",
+                          "Откройте для себя удивительные впечатления от путешествий",
+                          "Entdecken Sie erstaunliche Reiseerlebnisse"
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="pt-6 space-y-6">
+                  {/* Duration & Guide Info */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-semibold">{tourData.duration} {getText("soat", "hours", "часов", "Stunden")}</p>
+                        <p className="text-xs text-muted-foreground">{getText("Davomiyligi", "Duration", "Продолжительность", "Dauer")}</p>
                       </div>
                     </div>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-6 space-y-6">
-                    {/* Duration & Guide Info */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-semibold">{item.duration} {getText("soat", "hours", "часов", "Stunden")}</p>
-                          <p className="text-xs text-muted-foreground">{getText("Davomiyligi", "Duration", "Продолжительность", "Dauer")}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Users className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-semibold">{getText("Ingliz tili", "English", "Английский", "Englisch")}</p>
-                          <p className="text-xs text-muted-foreground">{getText("Gid tili", "Guide language", "Язык гида", "Sprache des Führers")}</p>
-                        </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Users className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-semibold">{getText("Ingliz tili", "English", "Английский", "Englisch")}</p>
+                        <p className="text-xs text-muted-foreground">{getText("Gid tili", "Guide language", "Язык гида", "Sprache des Führers")}</p>
                       </div>
                     </div>
+                  </div>
 
                     <Separator />
 
@@ -181,21 +189,20 @@ export default function Checkout() {
 
                     <Separator />
 
-                    {/* Price Summary */}
-                    <div className="bg-muted/30 p-4 rounded-lg space-y-2">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold">${item.price * parseInt(adults)}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {adults} {getText("kattalar", "Adult", "Взрослый", "Erwachsene")} x ${item.price}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {getText("Barcha soliq va to'lovlar kiritilgan", "All taxes and fees included", "Все налоги и сборы включены", "Alle Steuern und Gebühren inklusive")}
-                      </p>
+                  {/* Price Summary */}
+                  <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold">${tourData.price * parseInt(adults)}</span>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <p className="text-sm text-muted-foreground">
+                      {adults} {getText("kattalar", "Adult", "Взрослый", "Erwachsene")} x ${tourData.price}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {getText("Barcha soliq va to'lovlar kiritilgan", "All taxes and fees included", "Все налоги и сборы включены", "Alle Steuern und Gebühren inklusive")}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
             </div>
 
@@ -209,7 +216,7 @@ export default function Checkout() {
                       {getText("Dan boshlab", "From", "От", "Ab")}
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold">${items[0]?.price || 0}</span>
+                      <span className="text-3xl font-bold">${tourData.price || 0}</span>
                       <span className="text-muted-foreground">
                         {getText("odam uchun", "per person", "на человека", "pro Person")}
                       </span>
@@ -324,22 +331,22 @@ export default function Checkout() {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        ${items[0]?.price || 0} x {adults} {getText("kishi", "person", "человек", "Person")}
+                        ${tourData.price || 0} x {adults} {getText("kishi", "person", "человек", "Person")}
                       </span>
-                      <span className="font-medium">${((items[0]?.price || 0) * parseInt(adults)).toFixed(2)}</span>
+                      <span className="font-medium">${((tourData.price || 0) * parseInt(adults)).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
                         {getText("Xizmat to'lovi", "Service Fee", "Сервисный сбор", "Servicegebühr")}
                       </span>
-                      <span className="font-medium">${((items[0]?.price || 0) * parseInt(adults) * 0.05).toFixed(2)}</span>
+                      <span className="font-medium">${((tourData.price || 0) * parseInt(adults) * 0.05).toFixed(2)}</span>
                     </div>
                     
                     <Separator className="my-3" />
                     
                     <div className="flex justify-between items-center">
                       <span className="text-xl font-bold">{getText("Jami", "Total", "Всего", "Gesamt")}</span>
-                      <span className="text-2xl font-bold">${((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2)}</span>
+                      <span className="text-2xl font-bold">${((tourData.price || 0) * parseInt(adults) * 1.05).toFixed(2)}</span>
                     </div>
                   </div>
 
