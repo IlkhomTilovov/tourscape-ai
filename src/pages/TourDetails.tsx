@@ -814,7 +814,19 @@ const TourDetails = () => {
                   </div>
                 </div>
 
-                <Button className="w-full mb-3" size="lg">
+                <Button 
+                  className="w-full mb-3" 
+                  size="lg"
+                  onClick={() => navigate("/checkout", { 
+                    state: { 
+                      tourId: tour.id,
+                      tourTitle: getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de),
+                      price: tour.price,
+                      duration: tour.duration,
+                      location: getLocalizedText(tour.location_en, tour.location_uz, tour.location_ru, tour.location_de)
+                    } 
+                  })}
+                >
                   {language === "UZ" ? "Hozir band qilish" : language === "EN" ? "Book Now" : language === "RU" ? "Забронировать сейчас" : "Jetzt buchen"}
                 </Button>
 
