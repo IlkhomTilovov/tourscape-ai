@@ -207,7 +207,7 @@ export default function Checkout() {
                     {/* Price Summary */}
                     <div className="bg-muted/30 p-4 rounded-lg space-y-2">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold">${item.price}</span>
+                        <span className="text-3xl font-bold">${item.price * parseInt(adults)}</span>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {adults} {getText("kattalar", "Adult", "Взрослый", "Erwachsene")} x ${item.price}
@@ -385,7 +385,7 @@ export default function Checkout() {
                       {getText("Dan boshlab", "From", "От", "Ab")}
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold">${totalPrice}</span>
+                      <span className="text-3xl font-bold">${items[0]?.price || 0}</span>
                       <span className="text-muted-foreground">
                         {getText("odam uchun", "per person", "на человека", "pro Person")}
                       </span>
@@ -500,20 +500,20 @@ export default function Checkout() {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        ${totalPrice} x {adults} {getText("kishi", "person", "человек", "Person")}
+                        ${items[0]?.price || 0} x {adults} {getText("kishi", "person", "человек", "Person")}
                       </span>
-                      <span>${totalPrice * parseInt(adults)}</span>
+                      <span>${((items[0]?.price || 0) * parseInt(adults)).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
                         {getText("Xizmat to'lovi", "Service Fee", "Сервисный сбор", "Servicegebühr")}
                       </span>
-                      <span>${(totalPrice * parseInt(adults) * 0.05).toFixed(2)}</span>
+                      <span>${((items[0]?.price || 0) * parseInt(adults) * 0.05).toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between text-lg font-bold">
                       <span>{getText("Jami", "Total", "Всего", "Gesamt")}</span>
-                      <span>${(totalPrice * parseInt(adults) * 1.05).toFixed(2)}</span>
+                      <span>${((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2)}</span>
                     </div>
                   </div>
 
