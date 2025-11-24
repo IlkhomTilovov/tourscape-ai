@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Language } from "@/lib/translations";
 import {
   Star,
@@ -26,6 +27,7 @@ import {
   Loader2,
   Upload,
   ImageIcon,
+  Trash2,
 } from "lucide-react";
 
 interface Tour {
@@ -78,6 +80,7 @@ const TourDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { isAdmin } = useAuth();
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -218,6 +221,37 @@ const TourDetails = () => {
     const newImages = [...reviewForm.images];
     newImages.splice(index, 1);
     setReviewForm({ ...reviewForm, images: newImages });
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!isAdmin) return;
+
+    try {
+      const { error } = await supabase
+        .from("reviews")
+        .delete()
+        .eq("id", reviewId);
+
+      if (error) {
+        toast.error(language === "UZ" ? "O'chirishda xatolik yuz berdi" :
+                    language === "EN" ? "Error deleting review" :
+                    language === "RU" ? "Ошибка при удалении отзыва" :
+                    "Fehler beim Löschen der Bewertung");
+        console.error("Error deleting review:", error);
+      } else {
+        toast.success(language === "UZ" ? "Izoh o'chirildi" :
+                      language === "EN" ? "Review deleted" :
+                      language === "RU" ? "Отзыв удален" :
+                      "Bewertung gelöscht");
+        fetchReviews();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(language === "UZ" ? "Xatolik yuz berdi" :
+                  language === "EN" ? "An error occurred" :
+                  language === "RU" ? "Произошла ошибка" :
+                  "Ein Fehler ist aufgetreten");
+    }
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
@@ -718,6 +752,16 @@ const TourDetails = () => {
                                 </span>
                               </div>
                             </div>
+                            {isAdmin && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteReview(review.id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
                           </div>
                           <p className="text-muted-foreground mb-3">{review.comment}</p>
                           
