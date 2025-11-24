@@ -22,7 +22,7 @@ type Destination = {
   description_de: string | null;
   country: string;
   image_url: string | null;
-  category: string | null;
+  category_id: string | null;
 };
 
 type Category = {
@@ -39,7 +39,7 @@ const Destinations = () => {
     name_en: "",
     country: "",
     image_url: "",
-    category: "",
+    category_id: "",
   });
   const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
@@ -114,7 +114,7 @@ const Destinations = () => {
         name_de: translations.translations.German,
         country: formData.country,
         image_url: formData.image_url || null,
-        category: formData.category || null,
+        category_id: formData.category_id || null,
       };
       
       if (editingDestination) {
@@ -154,7 +154,7 @@ const Destinations = () => {
       name_en: destination.name_en,
       country: destination.country,
       image_url: destination.image_url || "",
-      category: destination.category || "",
+      category_id: destination.category_id || "",
     });
     setOpen(true);
   };
@@ -179,7 +179,7 @@ const Destinations = () => {
       name_en: "",
       country: "",
       image_url: "",
-      category: "",
+      category_id: "",
     });
   };
 
@@ -194,7 +194,7 @@ const Destinations = () => {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { setEditingDestination(null); setFormData({ name_en: "", country: "", image_url: "", category: "" }); }}>
+            <Button onClick={() => { setEditingDestination(null); setFormData({ name_en: "", country: "", image_url: "", category_id: "" }); }}>
               <Plus className="h-4 w-4 mr-2" />
               Yangi manzil
             </Button>
@@ -228,8 +228,8 @@ const Destinations = () => {
               <div className="space-y-2">
                 <Label>Kategoriya</Label>
                 <Select 
-                  value={formData.category} 
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  value={formData.category_id} 
+                  onValueChange={(value) => setFormData({ ...formData, category_id: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Kategoriya tanlang" />
@@ -303,7 +303,7 @@ const Destinations = () => {
                           <span className="text-muted-foreground">Nemischa:</span> {destination.name_de}
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Kategoriya:</span> {destination.category || "-"}
+                          <span className="text-muted-foreground">Kategoriya:</span> {destination.category_id || "-"}
                         </div>
                       </div>
                     </div>
