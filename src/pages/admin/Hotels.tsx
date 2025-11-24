@@ -54,17 +54,17 @@ const Hotels = () => {
     queryKey: ["hotels"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("hotels")
+        .from("hotels" as any)
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as Hotel[];
+      return data as unknown as Hotel[];
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("hotels").insert([data]);
+      const { error } = await supabase.from("hotels" as any).insert([data]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -80,7 +80,7 @@ const Hotels = () => {
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
       const { error } = await supabase
-        .from("hotels")
+        .from("hotels" as any)
         .update(data)
         .eq("id", id);
       if (error) throw error;
@@ -97,7 +97,7 @@ const Hotels = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("hotels").delete().eq("id", id);
+      const { error } = await supabase.from("hotels" as any).delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {

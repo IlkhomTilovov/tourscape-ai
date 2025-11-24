@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      about: {
+        Row: {
+          address: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string
+          id: string
+          mission: string | null
+          title: string
+          updated_at: string
+          vision: string | null
+        }
+        Insert: {
+          address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description: string
+          id: string
+          mission?: string | null
+          title: string
+          updated_at?: string
+          vision?: string | null
+        }
+        Update: {
+          address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          mission?: string | null
+          title?: string
+          updated_at?: string
+          vision?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -95,6 +134,84 @@ export type Database = {
           name_ru?: string
           name_uz?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      flights: {
+        Row: {
+          airline: string
+          arrival_time: string
+          available_seats: number
+          created_at: string
+          departure_time: string
+          from_city: string
+          id: string
+          price: number
+          to_city: string
+          updated_at: string
+        }
+        Insert: {
+          airline: string
+          arrival_time: string
+          available_seats?: number
+          created_at?: string
+          departure_time: string
+          from_city: string
+          id?: string
+          price: number
+          to_city: string
+          updated_at?: string
+        }
+        Update: {
+          airline?: string
+          arrival_time?: string
+          available_seats?: number
+          created_at?: string
+          departure_time?: string
+          from_city?: string
+          id?: string
+          price?: number
+          to_city?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hotels: {
+        Row: {
+          amenities: string | null
+          available_rooms: number
+          created_at: string
+          description: string
+          id: string
+          location: string
+          name: string
+          price_per_night: number
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string | null
+          available_rooms?: number
+          created_at?: string
+          description: string
+          id?: string
+          location: string
+          name: string
+          price_per_night: number
+          rating?: number
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string | null
+          available_rooms?: number
+          created_at?: string
+          description?: string
+          id?: string
+          location?: string
+          name?: string
+          price_per_night?: number
+          rating?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -357,6 +474,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      visas: {
+        Row: {
+          country: string
+          created_at: string
+          duration: string
+          id: string
+          price: number
+          processing_time: string
+          requirements: string
+          updated_at: string
+          visa_type: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          duration: string
+          id?: string
+          price: number
+          processing_time: string
+          requirements: string
+          updated_at?: string
+          visa_type: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          duration?: string
+          id?: string
+          price?: number
+          processing_time?: string
+          requirements?: string
+          updated_at?: string
+          visa_type?: string
         }
         Relationships: []
       }
