@@ -154,33 +154,6 @@ const Home = () => {
 
 
 
-      {/* Categories Section */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-8 text-muted-foreground uppercase tracking-wide text-sm">
-          {t("categories") || "CATEGORIES"}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {categories.map((category) => {
-            const Icon = getIconComponent(category.icon);
-            return (
-              <Link
-                key={category.id}
-                to={`/search?category=${category.id}`}
-                className="flex items-center justify-between p-4 bg-card hover:bg-accent transition-colors rounded-lg group border border-border"
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-foreground font-medium">
-                    {getLocalizedName(category, "name")}
-                  </span>
-                </div>
-                <LucideIcons.ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Popular Destinations */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold mb-8">{t("destinationsTitle")}</h2>
