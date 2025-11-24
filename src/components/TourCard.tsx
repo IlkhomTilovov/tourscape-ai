@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
-import { Star, Clock, MapPin } from "lucide-react";
+import { Star, Clock, MapPin, ShoppingCart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 
 interface TourCardProps {
   id: string;
@@ -29,6 +31,18 @@ const TourCard = ({
   bestseller,
 }: TourCardProps) => {
   const { t } = useLanguage();
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    addToCart({
+      id,
+      title,
+      price,
+      duration,
+      image_url: image,
+    });
+  };
   
   return (
     <Link to={`/tour/${id}`}>
@@ -83,14 +97,22 @@ const TourCard = ({
 
           {/* Price */}
           <div className="pt-2 border-t border-border">
-            <div className="flex items-baseline justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1">
                 <span className="text-sm text-muted-foreground">{t("from")} </span>
                 <span className="text-2xl font-bold text-foreground">
                   ${price}
                 </span>
                 <span className="text-sm text-muted-foreground"> {t("perPerson")}</span>
               </div>
+              <Button 
+                size="icon" 
+                variant="secondary"
+                onClick={handleAddToCart}
+                className="shrink-0"
+              >
+                <ShoppingCart className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import type { Language } from "@/lib/translations";
 import MegaMenu from "./MegaMenu";
 
@@ -45,6 +46,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState<string | null>(null);
   const { language, setLanguage } = useLanguage();
+  const { totalItems } = useCart();
   const navigate = useNavigate();
   
   const languages = [
@@ -173,9 +175,16 @@ const Navbar = () => {
             </Button>
 
             {/* Cart */}
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="hidden sm:flex relative">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
 
             {/* Language Selector */}
             <DropdownMenu>
