@@ -13,9 +13,6 @@ import Auth from "./pages/Auth";
 import Tours from "./pages/Tours";
 import Categories from "./pages/Categories";
 import Destinations from "./pages/Destinations";
-import Flights from "./pages/Flights";
-import Hotels from "./pages/Hotels";
-import Visas from "./pages/Visas";
 import About from "./pages/About";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -40,9 +37,6 @@ const App = () => (
               <Route path="/tour/:id" element={<TourDetails />} />
               <Route path="/destinations" element={<Destinations />} />
               <Route path="/tours" element={<Tours />} />
-              <Route path="/flights" element={<Flights />} />
-              <Route path="/hotels" element={<Hotels />} />
-              <Route path="/visas" element={<Visas />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/about" element={<About />} />
               <Route path="/auth" element={<Auth />} />
