@@ -143,6 +143,26 @@ const Home = () => {
           <p className="text-xl text-white mb-12 animate-slide-up drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {t("heroSubtitle")}
           </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-scale-in">
+            <Link to="/tours">
+              <button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl min-w-[200px]">
+                {language === "EN" && "Explore Tours"}
+                {language === "UZ" && "Turlarni Ko'rish"}
+                {language === "RU" && "Смотреть Туры"}
+                {language === "DE" && "Touren Erkunden"}
+              </button>
+            </Link>
+            <Link to="/destinations">
+              <button className="px-8 py-4 bg-background/90 hover:bg-background text-foreground rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm min-w-[200px]">
+                {language === "EN" && "View Destinations"}
+                {language === "UZ" && "Manzillar"}
+                {language === "RU" && "Направления"}
+                {language === "DE" && "Reiseziele"}
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
 
