@@ -93,13 +93,12 @@ const Navbar = () => {
             {menuItems.map((item) => {
               if (item.children && item.children.length > 0) {
                 return (
-                  <div 
-                    key={item.id}
-                    className="relative"
-                    onMouseEnter={() => setMegaMenuOpen(item.id)}
-                    onMouseLeave={() => setMegaMenuOpen(null)}
-                  >
-                    <Button variant="ghost" className="gap-1">
+                  <div key={item.id} className="relative">
+                    <Button 
+                      variant="ghost" 
+                      className="gap-1"
+                      onClick={() => setMegaMenuOpen(megaMenuOpen === item.id ? null : item.id)}
+                    >
                       {getMenuName(item)}
                       <ChevronDown className="h-4 w-4" />
                     </Button>
