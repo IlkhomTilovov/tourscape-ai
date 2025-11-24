@@ -36,9 +36,19 @@ type Tour = {
   destination_id: string;
 };
 
+type Category = {
+  id: string;
+  name_en: string;
+  name_uz: string;
+  name_ru: string;
+  name_de: string;
+  icon: string | null;
+};
+
 const Categories = () => {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [tours, setTours] = useState<Tour[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [open, setOpen] = useState(false);
   const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [formData, setFormData] = useState({
@@ -53,9 +63,23 @@ const Categories = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    fetchCategories();
     fetchDestinations();
     fetchTours();
   }, []);
+
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .order("name_en", { ascending: true });
+    
+    if (error) {
+      toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+    } else {
+      setCategories(data || []);
+    }
+  };
 
   const fetchDestinations = async () => {
     const { data, error } = await supabase.from("destinations").select("*").order("created_at", { ascending: false });
@@ -287,18 +311,21 @@ const Categories = () => {
                   <SelectTrigger>
                     <SelectValue placeholder="Tanlang" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="regions">Viloyatlar bo'yicha</SelectItem>
-                    <SelectItem value="cities">Shaharlar bo'yicha</SelectItem>
-                    <SelectItem value="nature">Tabiiy yo'nalishlar</SelectItem>
-                    <SelectItem value="cultural">Madaniy yo'nalishlar</SelectItem>
-                    <SelectItem value="eco_tourism">Eko-turizm</SelectItem>
-                    <SelectItem value="health_spa">Sog'lomlashtirish va SPA</SelectItem>
-                    <SelectItem value="seasonal">Mavsumiy yo'nalishlar</SelectItem>
-                    <SelectItem value="thematic">Tematik yo'nalishlar</SelectItem>
-                    <SelectItem value="events">Mahalliy tadbirlar</SelectItem>
+                  <SelectContent className="bg-background">
+                    {categories.length === 0 ? (
+                      <SelectItem value="none" disabled>Kategoriyalar yuklanmoqda...</SelectItem>
+                    ) : (
+                      categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name_en}>
+                          {cat.name_uz} / {cat.name_en}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+                <p className="text-sm text-muted-foreground">
+                  Kategoriyalarni "Destinations" bo'limidan boshqarishingiz mumkin
+                </p>
               </div>
 
               <div className="space-y-2">
