@@ -261,7 +261,12 @@ const Navbar = () => {
               </div>
               <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {language === "EN" && "Language"}
+                    {language === "UZ" && "Til"}
+                    {language === "RU" && "Язык"}
+                    {language === "DE" && "Sprache"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {languages.map((lang) => (
