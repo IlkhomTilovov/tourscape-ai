@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
-import { LayoutDashboard, MapPin, Package, Plane, Hotel, FileText, Info } from "lucide-react";
+import { LayoutDashboard, MapPin, Package, Plane, Hotel, FileText, Info, Menu } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +20,7 @@ const items = [
   { title: "Flights", url: "/admin/flights", icon: Plane },
   { title: "Hotels", url: "/admin/hotels", icon: Hotel },
   { title: "Visas", url: "/admin/visas", icon: FileText },
+  { title: "Menu", url: "/admin/menu-items", icon: Menu },
   { title: "About", url: "/admin/about", icon: Info },
 ];
 
