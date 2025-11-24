@@ -16,10 +16,12 @@ import Destinations from "./pages/Destinations";
 import About from "./pages/About";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
-import AdminCategories from "./pages/admin/Categories";
 import AdminDestinations from "./pages/admin/Destinations";
 import AdminTours from "./pages/admin/Tours";
-import AdminMenuItems from "./pages/admin/MenuItems";
+import AdminFlights from "./pages/admin/Flights";
+import AdminHotels from "./pages/admin/Hotels";
+import AdminVisas from "./pages/admin/Visas";
+import AdminAbout from "./pages/admin/About";
 
 const queryClient = new QueryClient();
 
@@ -42,10 +44,12 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
-                <Route path="categories" element={<AdminCategories />} />
                 <Route path="destinations" element={<AdminDestinations />} />
                 <Route path="tours" element={<AdminTours />} />
-                <Route path="menu-items" element={<AdminMenuItems />} />
+                <Route path="flights" element={<AdminFlights />} />
+                <Route path="hotels" element={<AdminHotels />} />
+                <Route path="visas" element={<AdminVisas />} />
+                <Route path="about" element={<AdminAbout />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
