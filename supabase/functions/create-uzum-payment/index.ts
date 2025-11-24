@@ -22,6 +22,13 @@ serve(async (req) => {
 
     console.log('Creating Uzum payment for booking:', { tourId, adults, totalPrice });
 
+    // Convert date from DD/MM/YYYY to YYYY-MM-DD format
+    let formattedDate = bookingDate;
+    if (bookingDate && bookingDate.includes('/')) {
+      const [day, month, year] = bookingDate.split('/');
+      formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
     // Create booking record
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
@@ -30,7 +37,7 @@ serve(async (req) => {
         user_email: userEmail,
         user_phone: userPhone,
         adults,
-        booking_date: bookingDate,
+        booking_date: formattedDate,
         booking_time: bookingTime,
         total_price: totalPrice,
         payment_status: 'pending',
