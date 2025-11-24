@@ -58,37 +58,29 @@ export default function Checkout() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
+    if (!formData.fullName || !formData.email || !formData.phone) {
       toast({
         title: getText("Xato", "Error", "Ошибка", "Fehler"),
         description: getText(
-          "Iltimos, barcha maydonlarni to'ldiring",
-          "Please fill in all fields",
-          "Пожалуйста, заполните все поля",
-          "Bitte füllen Sie alle Felder aus"
+          "Iltimos, barcha majburiy maydonlarni to'ldiring",
+          "Please fill in all required fields",
+          "Пожалуйста, заполните все обязательные поля",
+          "Bitte füllen Sie alle Pflichtfelder aus"
         ),
         variant: "destructive",
       });
       return;
     }
 
-    // Process order
-    toast({
-      title: getText("Buyurtma qabul qilindi!", "Order Confirmed!", "Заказ подтвержден!", "Bestellung bestätigt!"),
-      description: getText(
-        "Tez orada siz bilan bog'lanamiz",
-        "We will contact you soon",
-        "Мы свяжемся с вами в ближайшее время",
-        "Wir werden Sie bald kontaktieren"
-      ),
-    });
+    const bookingData = {
+      tourTitle: items[0]?.title,
+      date: bookingDate?.toLocaleDateString(),
+      adults: adults,
+      totalPrice: ((items[0]?.price || 0) * parseInt(adults) * 1.05).toFixed(2),
+      formData: formData,
+    };
 
-    // Clear cart and redirect
-    clearCart();
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
+    navigate("/payment", { state: bookingData });
   };
 
   if (items.length === 0) {
