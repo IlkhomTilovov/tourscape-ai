@@ -91,18 +91,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
+        let errorMessage = error.message;
+        
+        // O'zbek tiliga tarjima qilish
+        if (error.message.includes("already registered")) {
+          errorMessage = "Bu email allaqachon ro'yxatdan o'tgan";
+        } else if (error.message.includes("Password should be")) {
+          errorMessage = "Parol kamida 6 ta belgidan iborat bo'lishi kerak";
+        }
+        
         toast({
-          title: "Xatolik",
-          description: error.message,
+          title: "Ro'yxatdan o'tish xatoligi",
+          description: errorMessage,
           variant: "destructive",
         });
       }
 
       return { error };
     } catch (error: any) {
+      // Network yoki boshqa xatolar
+      const errorMessage = error.message?.includes("fetch") 
+        ? "Serverga ulanishda xatolik. Iltimos, internetni tekshiring yoki keyinroq qayta urinib ko'ring."
+        : error.message || "Noma'lum xatolik yuz berdi";
+        
       toast({
         title: "Xatolik",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       return { error };
@@ -117,18 +131,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
+        let errorMessage = error.message;
+        
+        // O'zbek tiliga tarjima qilish
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Email yoki parol noto'g'ri";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Email tasdiqlanmagan";
+        }
+        
         toast({
-          title: "Xatolik",
-          description: error.message,
+          title: "Kirish xatoligi",
+          description: errorMessage,
           variant: "destructive",
         });
       }
 
       return { error };
     } catch (error: any) {
+      // Network yoki boshqa xatolar
+      const errorMessage = error.message?.includes("fetch") 
+        ? "Serverga ulanishda xatolik. Iltimos, internetni tekshiring yoki keyinroq qayta urinib ko'ring."
+        : error.message || "Noma'lum xatolik yuz berdi";
+        
       toast({
         title: "Xatolik",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       return { error };
