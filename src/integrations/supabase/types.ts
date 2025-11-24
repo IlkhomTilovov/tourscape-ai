@@ -88,7 +88,7 @@ export type Database = {
       }
       destinations: {
         Row: {
-          category: string | null
+          category_id: string | null
           country: string
           created_at: string | null
           description_de: string | null
@@ -104,7 +104,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          category?: string | null
+          category_id?: string | null
           country: string
           created_at?: string | null
           description_de?: string | null
@@ -120,7 +120,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          category?: string | null
+          category_id?: string | null
           country?: string
           created_at?: string | null
           description_de?: string | null
@@ -135,7 +135,15 @@ export type Database = {
           name_uz?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "destinations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       flights: {
         Row: {
