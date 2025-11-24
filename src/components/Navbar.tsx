@@ -207,23 +207,22 @@ const Navbar = () => {
             {menuItems.map((item) => {
               if (item.children && item.children.length > 0) {
                 return (
-                  <div key={item.id} className="space-y-1">
-                    <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
-                      {getMenuName(item)}
-                    </div>
-                    {item.children.map((child) => (
-                      <Button
-                        key={child.id}
-                        variant="ghost"
-                        className="w-full justify-start pl-6"
-                        onClick={() => {
-                          navigate(child.url || "/");
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        {getMenuName(child)}
-                      </Button>
-                    ))}
+                  <div key={item.id} className="px-3">
+                    <Select onValueChange={(value) => {
+                      navigate(value);
+                      setMobileMenuOpen(false);
+                    }}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={getMenuName(item)} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {item.children.map((child) => (
+                          <SelectItem key={child.id} value={child.url || "/"}>
+                            {getMenuName(child)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 );
               }
