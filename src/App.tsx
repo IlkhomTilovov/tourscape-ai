@@ -26,6 +26,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminDestinations from "./pages/admin/Destinations";
 import AdminTours from "./pages/admin/Tours";
 import AdminCategories from "./pages/admin/Categories";
+import AdminBookings from "./pages/admin/Bookings";
 import AdminReviews from "./pages/admin/Reviews";
 import AdminFlights from "./pages/admin/Flights";
 import AdminHotels from "./pages/admin/Hotels";
@@ -64,6 +65,7 @@ const App = () => (
                 <Route path="destinations" element={<AdminDestinations />} />
                 <Route path="tours" element={<AdminTours />} />
                 <Route path="categories" element={<AdminCategories />} />
+                <Route path="bookings" element={<AdminBookings />} />
                 <Route path="reviews" element={<AdminReviews />} />
                 <Route path="flights" element={<AdminFlights />} />
                 <Route path="hotels" element={<AdminHotels />} />
