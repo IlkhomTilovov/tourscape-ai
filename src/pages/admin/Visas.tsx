@@ -58,11 +58,15 @@ const Visas = () => {
   const { data: visas = [], isLoading } = useQuery({
     queryKey: ["visas"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("visas" as any)
-        .select("*")
+        .select("*", { count: 'exact' })
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (error) {
+        console.error("Visas fetch error:", error);
+        throw error;
+      }
+      console.log(`Loaded ${data?.length} visas (total: ${count})`);
       return data as unknown as Visa[];
     },
   });

@@ -30,7 +30,12 @@ const AdminAbout = () => {
         .select("*")
         .single();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error("About fetch error:", error);
+        throw error;
+      }
+      
+      console.log("About data loaded:", data ? "exists" : "not found");
       
       if (data) {
         setDataExists(true);

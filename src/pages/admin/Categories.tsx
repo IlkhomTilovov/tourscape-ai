@@ -69,15 +69,17 @@ const Categories = () => {
   }, []);
 
   const fetchCategories = async () => {
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from("categories")
-      .select("*")
+      .select("*", { count: 'exact' })
       .order("name_en", { ascending: true });
     
     if (error) {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      console.error("Categories fetch error:", error);
     } else {
       setCategories(data || []);
+      console.log(`Loaded ${data?.length} categories (total: ${count})`);
     }
   };
 

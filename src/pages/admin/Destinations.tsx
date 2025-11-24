@@ -64,28 +64,32 @@ const Destinations = () => {
   }, []);
 
   const fetchDestinations = async () => {
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from("destinations")
-      .select("*")
+      .select("*", { count: 'exact' })
       .order("name_en", { ascending: true });
     
     if (error) {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      console.error("Destinations fetch error:", error);
     } else {
       setDestinations(data || []);
+      console.log(`Loaded ${data?.length} destinations (total: ${count})`);
     }
   };
 
   const fetchCategories = async () => {
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from("categories")
-      .select("id, name_en")
+      .select("id, name_en", { count: 'exact' })
       .order("name_en", { ascending: true });
     
     if (error) {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
+      console.error("Categories fetch error:", error);
     } else {
       setCategories(data || []);
+      console.log(`Loaded ${data?.length} categories (total: ${count})`);
     }
   };
 
