@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import SearchBar from "@/components/SearchBar";
 import TourCard from "@/components/TourCard";
 import DestinationCard from "@/components/DestinationCard";
 import Footer from "@/components/Footer";
@@ -144,11 +143,6 @@ const Home = () => {
           <p className="text-xl text-white mb-12 animate-slide-up drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
             {t("heroSubtitle")}
           </p>
-
-          {/* Search Bar */}
-          <div className="animate-scale-in">
-            <SearchBar />
-          </div>
         </div>
       </section>
 
