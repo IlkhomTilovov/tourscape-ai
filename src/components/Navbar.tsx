@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,9 +13,21 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
 
+interface MenuItem {
+  id: string;
+  name_en: string;
+  name_uz: string;
+  name_ru: string;
+  name_de: string;
+  url: string | null;
+  parent_id: string | null;
+  display_order: number;
+  children?: MenuItem[];
+}
+
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const navigate = useNavigate();
   
   const languages = [
@@ -22,6 +36,41 @@ const Navbar = () => {
     { code: "RU" as Language, name: "Russian", display: "RU" },
     { code: "DE" as Language, name: "German", display: "DE" },
   ];
+
+  const { data: menuItems = [] } = useQuery({
+    queryKey: ["menuItems"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .select("*")
+        .order("display_order");
+      if (error) throw error;
+      
+      // Build hierarchical structure
+      const items = data as MenuItem[];
+      const parentItems = items.filter((item) => !item.parent_id);
+      
+      return parentItems.map((parent) => ({
+        ...parent,
+        children: items.filter((item) => item.parent_id === parent.id),
+      }));
+    },
+  });
+
+  const getMenuName = (item: MenuItem) => {
+    switch (language) {
+      case "EN":
+        return item.name_en;
+      case "UZ":
+        return item.name_uz;
+      case "RU":
+        return item.name_ru;
+      case "DE":
+        return item.name_de;
+      default:
+        return item.name_en;
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background border-b border-border">
@@ -39,51 +88,39 @@ const Navbar = () => {
 
           {/* Desktop Navigation with Dropdowns */}
           <div className="hidden md:flex items-center space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-1">
-                  {t("destinations")}
-                  <ChevronDown className="h-4 w-4" />
+            {menuItems.map((item) => {
+              if (item.children && item.children.length > 0) {
+                return (
+                  <DropdownMenu key={item.id}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="gap-1">
+                        {getMenuName(item)}
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {item.children.map((child) => (
+                        <DropdownMenuItem
+                          key={child.id}
+                          onClick={() => navigate(child.url || "/")}
+                        >
+                          {getMenuName(child)}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
+              return (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  onClick={() => navigate(item.url || "/")}
+                >
+                  {getMenuName(item)}
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => navigate("/destinations")}>
-                  {t("destinations")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-1">
-                  {t("tours")}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => navigate("/tours")}>
-                  {t("tours")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-1">
-                  {t("categories")}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => navigate("/categories")}>
-                  {t("categories")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Button variant="ghost" onClick={() => navigate("/about")}>
-              {t("about")}
-            </Button>
+              );
+            })}
           </div>
 
           {/* Right Side Actions */}
@@ -144,46 +181,43 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-2 animate-fade-in">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                navigate("/destinations");
-                setMobileMenuOpen(false);
-              }}
-            >
-              {t("destinations")}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                navigate("/tours");
-                setMobileMenuOpen(false);
-              }}
-            >
-              {t("tours")}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                navigate("/categories");
-                setMobileMenuOpen(false);
-              }}
-            >
-              {t("categories")}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                navigate("/about");
-                setMobileMenuOpen(false);
-              }}
-            >
-              {t("about")}
-            </Button>
+            {menuItems.map((item) => {
+              if (item.children && item.children.length > 0) {
+                return (
+                  <div key={item.id} className="space-y-1">
+                    <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
+                      {getMenuName(item)}
+                    </div>
+                    {item.children.map((child) => (
+                      <Button
+                        key={child.id}
+                        variant="ghost"
+                        className="w-full justify-start pl-6"
+                        onClick={() => {
+                          navigate(child.url || "/");
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        {getMenuName(child)}
+                      </Button>
+                    ))}
+                  </div>
+                );
+              }
+              return (
+                <Button
+                  key={item.id}
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate(item.url || "/");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  {getMenuName(item)}
+                </Button>
+              );
+            })}
             <div className="flex items-center gap-2 pt-2 border-t">
               <Button variant="ghost" size="icon">
                 <Heart className="h-5 w-5" />

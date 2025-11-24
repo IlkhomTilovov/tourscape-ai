@@ -19,6 +19,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminCategories from "./pages/admin/Categories";
 import AdminDestinations from "./pages/admin/Destinations";
 import AdminTours from "./pages/admin/Tours";
+import AdminMenuItems from "./pages/admin/MenuItems";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="categories" element={<AdminCategories />} />
                 <Route path="destinations" element={<AdminDestinations />} />
                 <Route path="tours" element={<AdminTours />} />
+                <Route path="menu-items" element={<AdminMenuItems />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
