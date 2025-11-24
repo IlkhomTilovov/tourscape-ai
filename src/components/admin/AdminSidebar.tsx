@@ -15,9 +15,9 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { title: "Categories", url: "/admin/categories", icon: FolderTree },
   { title: "Destinations", url: "/admin/destinations", icon: MapPin },
   { title: "Tours", url: "/admin/tours", icon: Package },
-  { title: "Categories", url: "/admin/categories", icon: FolderTree },
   { title: "Flights", url: "/admin/flights", icon: Plane },
   { title: "Hotels", url: "/admin/hotels", icon: Hotel },
   { title: "Visas", url: "/admin/visas", icon: FileText },
