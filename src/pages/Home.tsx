@@ -146,35 +146,6 @@ const Home = () => {
       </section>
 
 
-      {/* Trending Tours */}
-      <section className="container mx-auto px-4 py-16 bg-muted/30">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold">{t("trendingTitle")}</h2>
-          <Link
-            to="/search"
-            className="text-primary hover:underline font-semibold"
-          >
-            {t("viewAll")}
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tours.map((tour) => (
-            <TourCard
-              key={tour.id}
-              id={tour.id}
-              image={tour.image_url || ""}
-              title={getLocalizedName(tour, "title")}
-              location={tour.destinations ? getLocalizedName(tour.destinations, "name") : ""}
-              duration={tour.duration}
-              rating={Number(tour.rating)}
-              reviewCount={tour.reviews_count}
-              price={Number(tour.price)}
-              category={tour.categories ? getLocalizedName(tour.categories, "name") : ""}
-              bestseller={tour.is_bestseller}
-            />
-          ))}
-        </div>
-      </section>
 
       {/* Popular Destinations */}
       <section className="container mx-auto px-4 py-16">
