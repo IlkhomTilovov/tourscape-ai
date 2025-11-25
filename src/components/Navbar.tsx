@@ -102,9 +102,7 @@ const Navbar = () => {
       categories: { EN: "Categories", UZ: "Kategoriyalar", RU: "Категории", DE: "Kategorien" },
       destinations: { EN: "Destinations", UZ: "Manzillar", RU: "Направления", DE: "Reiseziele" },
       tours: { EN: "Tours", UZ: "Turlar", RU: "Туры", DE: "Touren" },
-      flights: { EN: "Flights", UZ: "Parvozlar", RU: "Рейсы", DE: "Flüge" },
       hotels: { EN: "Hotels", UZ: "Mehmonxonalar", RU: "Отели", DE: "Hotels" },
-      visas: { EN: "Visas", UZ: "Vizalar", RU: "Визы", DE: "Visa" },
       about: { EN: "About", UZ: "Haqida", RU: "О нас", DE: "Über uns" },
     };
     return labels[key]?.[language] || key;
@@ -154,14 +152,8 @@ const Navbar = () => {
             <Button variant="ghost" onClick={() => navigate("/tours")}>
               {getLabel("tours")}
             </Button>
-            <Button variant="ghost" onClick={() => navigate("/flights")}>
-              {getLabel("flights")}
-            </Button>
             <Button variant="ghost" onClick={() => navigate("/hotels")}>
               {getLabel("hotels")}
-            </Button>
-            <Button variant="ghost" onClick={() => navigate("/visas")}>
-              {getLabel("visas")}
             </Button>
             <Button variant="ghost" onClick={() => navigate("/about")}>
               {getLabel("about")}
@@ -288,31 +280,11 @@ const Navbar = () => {
               variant="ghost"
               className="w-full justify-start"
               onClick={() => {
-                navigate("/flights");
-                setMobileMenuOpen(false);
-              }}
-            >
-              {getLabel("flights")}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
                 navigate("/hotels");
                 setMobileMenuOpen(false);
               }}
             >
               {getLabel("hotels")}
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                navigate("/visas");
-                setMobileMenuOpen(false);
-              }}
-            >
-              {getLabel("visas")}
             </Button>
             <Button
               variant="ghost"
