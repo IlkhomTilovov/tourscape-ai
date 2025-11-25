@@ -18,9 +18,7 @@ import Tours from "./pages/Tours";
 import Categories from "./pages/Categories";
 import Destinations from "./pages/Destinations";
 import About from "./pages/About";
-import Flights from "./pages/Flights";
 import Hotels from "./pages/Hotels";
-import Visas from "./pages/Visas";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminDestinations from "./pages/admin/Destinations";
@@ -28,9 +26,7 @@ import AdminTours from "./pages/admin/Tours";
 import AdminCategories from "./pages/admin/Categories";
 import AdminBookings from "./pages/admin/Bookings";
 import AdminReviews from "./pages/admin/Reviews";
-import AdminFlights from "./pages/admin/Flights";
 import AdminHotels from "./pages/admin/Hotels";
-import AdminVisas from "./pages/admin/Visas";
 import AdminMenuItems from "./pages/admin/MenuItems";
 import AdminAbout from "./pages/admin/About";
 
@@ -53,9 +49,7 @@ const App = () => (
               <Route path="/tours" element={<Tours />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/about" element={<About />} />
-              <Route path="/flights" element={<Flights />} />
               <Route path="/hotels" element={<Hotels />} />
-              <Route path="/visas" element={<Visas />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
@@ -67,9 +61,7 @@ const App = () => (
                 <Route path="categories" element={<AdminCategories />} />
                 <Route path="bookings" element={<AdminBookings />} />
                 <Route path="reviews" element={<AdminReviews />} />
-                <Route path="flights" element={<AdminFlights />} />
                 <Route path="hotels" element={<AdminHotels />} />
-                <Route path="visas" element={<AdminVisas />} />
                 <Route path="menu-items" element={<AdminMenuItems />} />
                 <Route path="about" element={<AdminAbout />} />
               </Route>
