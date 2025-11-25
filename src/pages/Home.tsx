@@ -34,7 +34,7 @@ const Home = () => {
           supabase.from("categories").select("*").limit(6),
           supabase.from("destinations").select("*").limit(4),
           supabase.from("tours")
-            .select("*, destinations(name_en, name_uz, name_ru, name_de), categories(name_en, name_uz, name_ru, name_de)")
+            .select("*")
             .eq("is_bestseller", true)
             .limit(3)
         ]);

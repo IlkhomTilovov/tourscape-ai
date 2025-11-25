@@ -9,8 +9,14 @@ import OptimizedImage from "@/components/OptimizedImage";
 interface TourCardProps {
   id: string;
   image: string;
-  title: string;
-  location: string;
+  title_en: string;
+  title_uz: string;
+  title_ru: string;
+  title_de: string;
+  location_en: string | null;
+  location_uz: string | null;
+  location_ru: string | null;
+  location_de: string | null;
   duration: string;
   rating: number;
   reviewCount: number;
@@ -22,8 +28,14 @@ interface TourCardProps {
 const TourCard = ({
   id,
   image,
-  title,
-  location,
+  title_en,
+  title_uz,
+  title_ru,
+  title_de,
+  location_en,
+  location_uz,
+  location_ru,
+  location_de,
   duration,
   rating,
   reviewCount,
@@ -31,8 +43,16 @@ const TourCard = ({
   category,
   bestseller,
 }: TourCardProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { addToCart } = useCart();
+
+  const getLocalizedText = (en: string | null, uz: string | null, ru: string | null, de: string | null) => {
+    const langMap: any = { EN: en, UZ: uz, RU: ru, DE: de };
+    return langMap[language] || en || "";
+  };
+
+  const title = getLocalizedText(title_en, title_uz, title_ru, title_de);
+  const location = getLocalizedText(location_en, location_uz, location_ru, location_de);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
