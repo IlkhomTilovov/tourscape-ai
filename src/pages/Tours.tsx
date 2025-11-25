@@ -395,18 +395,14 @@ const Tours = () => {
                 <div key={tour.id} className="animate-in fade-in duration-500">
                   <TourCard
                     id={tour.id}
-                    title={getLocalizedText(
-                      tour.title_en,
-                      tour.title_uz,
-                      tour.title_ru,
-                      tour.title_de
-                    )}
-                    location={getLocalizedText(
-                      tour.location_en,
-                      tour.location_uz,
-                      tour.location_ru,
-                      tour.location_de
-                    )}
+                    title_en={tour.title_en}
+                    title_uz={tour.title_uz}
+                    title_ru={tour.title_ru}
+                    title_de={tour.title_de}
+                    location_en={tour.location_en}
+                    location_uz={tour.location_uz}
+                    location_ru={tour.location_ru}
+                    location_de={tour.location_de}
                     price={tour.price}
                     duration={tour.duration}
                     rating={tour.rating || 0}
