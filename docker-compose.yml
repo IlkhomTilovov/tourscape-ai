@@ -53,8 +53,7 @@ services:
 
 networks:
   tourscape-network:
-    driver: bridge
-    name: tourscape-network
+    external: true
 
 volumes:
   node_modules:
