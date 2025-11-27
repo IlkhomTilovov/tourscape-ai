@@ -11,15 +11,16 @@ services:
     container_name: tourscape-ai
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "8443:443"
     environment:
       - NODE_ENV=production
     networks:
       - tourscape-network
     volumes:
-      # Mount SSL certificates if available
-      - ./ssl:/etc/nginx/ssl:ro
+      # Mount Certbot SSL certificates
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /etc/ssl/certs:/etc/ssl/certs:ro
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
       interval: 30s
