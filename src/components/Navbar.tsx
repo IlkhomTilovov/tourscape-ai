@@ -4,6 +4,7 @@ import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown, ChevronRight } 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.svg";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -114,9 +115,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 hero-gradient rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">T</span>
-            </div>
+            <img src={logo} alt="TravelHub Logo" className="h-12 w-auto" />
             <span className="font-bold text-xl text-foreground hidden sm:block">
               TravelHub
             </span>
