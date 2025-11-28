@@ -53,6 +53,28 @@ serve(async (req) => {
 
     console.log('Booking created:', booking.id);
 
+    // Send Telegram notification
+    try {
+      await supabase.functions.invoke('send-telegram-notification', {
+        body: {
+          id: booking.id,
+          tour_id: booking.tour_id,
+          booking_date: booking.booking_date,
+          booking_time: booking.booking_time,
+          adults: booking.adults,
+          total_price: booking.total_price,
+          user_email: booking.user_email,
+          user_phone: booking.user_phone,
+          payment_status: booking.payment_status,
+          payment_method: booking.payment_method
+        }
+      });
+      console.log('Telegram notification sent successfully');
+    } catch (notificationError) {
+      console.error('Failed to send Telegram notification:', notificationError);
+      // Don't fail the booking if notification fails
+    }
+
     // TODO: Integrate with Uzum API when credentials are available
     // For now, return a mock payment URL
     // When you get Uzum API credentials, uncomment and configure:
