@@ -114,11 +114,8 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center">
             <img src={logo} alt="TravelHub Logo" className="h-12 w-auto" />
-            <span className="font-bold text-xl text-foreground hidden sm:block">
-              TravelHub
-            </span>
           </Link>
 
           {/* Desktop Navigation with Mega Menu */}
