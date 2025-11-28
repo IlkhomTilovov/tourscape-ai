@@ -218,7 +218,9 @@ const AdminBookings = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {booking.payment_method || "N/A"}
+                    <Badge variant="outline" className="capitalize">
+                      {booking.payment_method || "N/A"}
+                    </Badge>
                   </TableCell>
                   <TableCell>{getStatusBadge(booking.payment_status)}</TableCell>
                   <TableCell>

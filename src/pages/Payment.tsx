@@ -18,7 +18,7 @@ const Payment = () => {
   const location = useLocation();
   const { language } = useLanguage();
   const { clearCart } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState("uzum");
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardDetails, setCardDetails] = useState({
     cardNumber: "",
@@ -71,7 +71,7 @@ const Payment = () => {
       return;
     }
 
-    if (paymentMethod === "card" || paymentMethod === "hamkorbank") {
+    if (paymentMethod === "mastercard" || paymentMethod === "visa" || paymentMethod === "other") {
       if (!cardDetails.cardNumber || !cardDetails.cardName || !cardDetails.expiryDate || !cardDetails.cvv) {
         toast.error(getText(
           "Iltimos, barcha maydonlarni to'ldiring",
@@ -81,17 +81,74 @@ const Payment = () => {
         ));
         return;
       }
+    }
+    
+    // For all payment methods except Uzum, create booking directly
+    if (paymentMethod !== "uzum") {
+      setIsProcessing(true);
       
-      // For card payment, just show success (demo mode)
-      const bankName = paymentMethod === "hamkorbank" ? "Hamkor Bank" : "";
-      toast.success(getText(
-        `To'lov ${bankName} orqali muvaffaqiyatli amalga oshirildi!`,
-        `Payment ${bankName ? 'via ' + bankName : ''} successful!`,
-        `Оплата ${bankName ? 'через ' + bankName : ''} прошла успешно!`,
-        `Zahlung ${bankName ? 'über ' + bankName : ''} erfolgreich!`
-      ));
-      clearCart();
-      setTimeout(() => navigate("/"), 2000);
+      try {
+        const { data: booking, error } = await supabase
+          .from('bookings')
+          .insert({
+            tour_id: bookingData.tourId,
+            booking_date: bookingData.date,
+            booking_time: bookingData.time,
+            adults: bookingData.adults || 1,
+            total_price: bookingData.totalPrice,
+            user_email: contactDetails.email,
+            user_phone: contactDetails.phone,
+            payment_method: paymentMethod,
+            payment_status: paymentMethod === "cash" ? "pending" : "completed"
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Send Telegram notification
+        await supabase.functions.invoke('send-telegram-notification', {
+          body: {
+            id: booking.id,
+            tour_id: booking.tour_id,
+            booking_date: booking.booking_date,
+            booking_time: booking.booking_time,
+            adults: booking.adults,
+            total_price: booking.total_price,
+            user_email: booking.user_email,
+            user_phone: booking.user_phone,
+            payment_status: booking.payment_status,
+            payment_method: booking.payment_method
+          }
+        });
+
+        const methodNames: Record<string, string> = {
+          cash: getText("Naqd pul", "Cash", "Наличные", "Bargeld"),
+          mastercard: "MasterCard",
+          visa: "Visa",
+          other: getText("Boshqa karta", "Other Card", "Другая карта", "Andere Karte")
+        };
+        
+        toast.success(getText(
+          `${methodNames[paymentMethod]} orqali buyurtma yaratildi!`,
+          `Booking created with ${methodNames[paymentMethod]}!`,
+          `Заказ создан через ${methodNames[paymentMethod]}!`,
+          `Buchung erstellt mit ${methodNames[paymentMethod]}!`
+        ));
+        clearCart();
+        setTimeout(() => navigate("/"), 2000);
+        return;
+      } catch (error) {
+        console.error('Booking error:', error);
+        toast.error(getText(
+          "Buyurtma yaratishda xatolik yuz berdi",
+          "Booking creation error occurred",
+          "Ошибка при создании заказа",
+          "Fehler bei der Buchungserstellung"
+        ));
+      } finally {
+        setIsProcessing(false);
+      }
       return;
     }
 
@@ -237,42 +294,54 @@ const Payment = () => {
 
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                   <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="cash" id="cash" />
+                    <Label htmlFor="cash" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <Wallet className="h-5 w-5" />
+                      <span>{getText("Naqd pul", "Cash", "Наличные", "Bargeld")}</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="mastercard" id="mastercard" />
+                    <Label htmlFor="mastercard" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <CreditCard className="h-5 w-5" />
+                      <span>MasterCard</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="visa" id="visa" />
+                    <Label htmlFor="visa" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <CreditCard className="h-5 w-5" />
+                      <span>Visa</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    <RadioGroupItem value="other" id="other" />
+                    <Label htmlFor="other" className="flex items-center gap-2 cursor-pointer flex-1">
+                      <CreditCard className="h-5 w-5" />
+                      <span>{getText("Boshqa", "Other", "Другое", "Andere")}</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
                     <RadioGroupItem value="uzum" id="uzum" />
                     <Label htmlFor="uzum" className="flex items-center gap-2 cursor-pointer flex-1">
                       <Wallet className="h-5 w-5" />
                       <span>Uzum</span>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="hamkorbank" id="hamkorbank" />
-                    <Label htmlFor="hamkorbank" className="flex items-center gap-2 cursor-pointer flex-1">
-                      <CreditCard className="h-5 w-5" />
-                      <span>{getText("Hamkor Bank kartasi", "Hamkor Bank Card", "Карта Hamkor Bank", "Hamkor Bank Karte")}</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer flex-1">
-                      <CreditCard className="h-5 w-5" />
-                      <span>{getText("Boshqa plastik karta", "Other Card", "Другая карта", "Andere Karte")}</span>
-                    </Label>
-                  </div>
                 </RadioGroup>
 
-                {(paymentMethod === "card" || paymentMethod === "hamkorbank") && (
+                {(paymentMethod === "mastercard" || paymentMethod === "visa" || paymentMethod === "other") && (
                   <div className="space-y-4 animate-in fade-in-50">
-                    {paymentMethod === "hamkorbank" && (
-                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
-                        <p className="text-sm font-medium">
-                          {getText(
-                            "Hamkor Bank kartangiz ma'lumotlarini kiriting",
-                            "Enter your Hamkor Bank card details",
-                            "Введите данные вашей карты Hamkor Bank",
-                            "Geben Sie Ihre Hamkor Bank Kartendaten ein"
-                          )}
-                        </p>
-                      </div>
-                    )}
+                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
+                      <p className="text-sm font-medium">
+                        {getText(
+                          "Karta ma'lumotlarini kiriting",
+                          "Enter your card details",
+                          "Введите данные карты",
+                          "Geben Sie Ihre Kartendaten ein"
+                        )}
+                      </p>
+                    </div>
                     <div>
                       <Label htmlFor="cardNumber">
                         {getText("Karta raqami", "Card Number", "Номер карты", "Kartennummer")}
@@ -325,6 +394,27 @@ const Payment = () => {
                         />
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {paymentMethod === "cash" && (
+                  <div className="text-center py-8 space-y-4 animate-in fade-in-50">
+                    <div className="text-lg font-semibold">
+                      {getText(
+                        "Naqd pul bilan to'lash",
+                        "Pay with Cash",
+                        "Оплата наличными",
+                        "Barzahlung"
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {getText(
+                        "Siz naqd pul bilan to'lashni tanladingiz. Buyurtma yaratilgandan so'ng siz bilan bog'lanamiz.",
+                        "You selected cash payment. We will contact you after booking is created.",
+                        "Вы выбрали оплату наличными. Мы свяжемся с вами после создания заказа.",
+                        "Sie haben Barzahlung gewählt. Wir werden uns nach der Buchung mit Ihnen in Verbindung setzen."
+                      )}
+                    </p>
                   </div>
                 )}
 
