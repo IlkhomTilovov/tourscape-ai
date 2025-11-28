@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -13,29 +12,14 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">{t("companySection")}</h3>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/about"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("aboutUsLink")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("aboutUsLink")}
               </li>
-              <li>
-                <Link
-                  to="/careers"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("careersLink")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("careersLink")}
               </li>
-              <li>
-                <Link
-                  to="/contact"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("contactLink")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("contactLink")}
               </li>
             </ul>
           </div>
@@ -44,29 +28,14 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">{t("supportSection")}</h3>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/help"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("helpCenterLink")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("helpCenterLink")}
               </li>
-              <li>
-                <Link
-                  to="/cancellation"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("cancellationOptions")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("cancellationOptions")}
               </li>
-              <li>
-                <Link
-                  to="/safety"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("safetyInfo")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("safetyInfo")}
               </li>
             </ul>
           </div>
@@ -75,21 +44,11 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">{t("partnersSection")}</h3>
             <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/partner"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("becomePartner")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("becomePartner")}
               </li>
-              <li>
-                <Link
-                  to="/affiliate"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t("affiliateProgram")}
-                </Link>
+              <li className="text-muted-foreground">
+                {t("affiliateProgram")}
               </li>
             </ul>
           </div>
@@ -98,30 +57,18 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold text-lg mb-4">{t("followUsSection")}</h3>
             <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              <span className="text-muted-foreground">
                 <Facebook className="h-6 w-6" />
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              </span>
+              <span className="text-muted-foreground">
                 <Instagram className="h-6 w-6" />
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              </span>
+              <span className="text-muted-foreground">
                 <Twitter className="h-6 w-6" />
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
+              </span>
+              <span className="text-muted-foreground">
                 <Youtube className="h-6 w-6" />
-              </a>
+              </span>
             </div>
           </div>
         </div>
