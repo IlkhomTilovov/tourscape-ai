@@ -220,7 +220,7 @@ const Tours = () => {
         overview_uz: translations.overview.Uzbek || null,
         overview_ru: translations.overview.Russian || null,
         overview_de: translations.overview.German || null,
-        itinerary_en: formData.itinerary_en || null,
+        itinerary_en: itineraryJson || null,
         itinerary_uz: translations.itinerary.Uzbek || null,
         itinerary_ru: translations.itinerary.Russian || null,
         itinerary_de: translations.itinerary.German || null,
