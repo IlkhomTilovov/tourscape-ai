@@ -65,6 +65,7 @@ const Tours = () => {
     price: "",
     duration: "",
     image_url: "",
+    image_urls: [] as string[],
     rating: "0",
     reviews_count: "0",
     is_bestseller: false,
@@ -111,45 +112,62 @@ const Tours = () => {
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "Xatolik", description: "Rasm hajmi 5MB dan kichik bo'lishi kerak", variant: "destructive" });
-      return;
-    }
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-      toast({ title: "Xatolik", description: "Faqat rasm fayllarini yuklash mumkin", variant: "destructive" });
-      return;
-    }
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
+    const uploadedUrls: string[] = [];
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const filePath = `tours/${fileName}`;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
 
-      const { error: uploadError } = await supabase.storage
-        .from('tour-images')
-        .upload(filePath, file);
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({ title: "Xatolik", description: `${file.name}: Rasm hajmi 5MB dan kichik bo'lishi kerak`, variant: "destructive" });
+          continue;
+        }
 
-      if (uploadError) throw uploadError;
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+          toast({ title: "Xatolik", description: `${file.name}: Faqat rasm fayllarini yuklash mumkin`, variant: "destructive" });
+          continue;
+        }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('tour-images')
-        .getPublicUrl(filePath);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+        const filePath = `tours/${fileName}`;
 
-      setFormData({ ...formData, image_url: publicUrl });
-      toast({ title: "Muvaffaqiyat", description: "Rasm yuklandi" });
+        const { error: uploadError } = await supabase.storage
+          .from('tour-images')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          toast({ title: "Xatolik", description: `${file.name}: ${uploadError.message}`, variant: "destructive" });
+          continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('tour-images')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
+      }
+
+      if (uploadedUrls.length > 0) {
+        setFormData({ ...formData, image_urls: [...formData.image_urls, ...uploadedUrls] });
+        toast({ title: "Muvaffaqiyat", description: `${uploadedUrls.length} ta rasm yuklandi` });
+      }
     } catch (error: any) {
       toast({ title: "Xatolik", description: error.message, variant: "destructive" });
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = formData.image_urls.filter((_, i) => i !== index);
+    setFormData({ ...formData, image_urls: newImages });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -224,7 +242,8 @@ const Tours = () => {
         not_included_de: translations.not_included.German || null,
         price: parseFloat(formData.price),
         duration: formData.duration,
-        image_url: formData.image_url || null,
+        image_url: formData.image_urls[0] || null,
+        image_urls: formData.image_urls,
         rating: parseFloat(formData.rating),
         reviews_count: parseInt(formData.reviews_count),
         is_bestseller: formData.is_bestseller,
@@ -277,6 +296,7 @@ const Tours = () => {
       price: tour.price.toString(),
       duration: tour.duration,
       image_url: tour.image_url || "",
+      image_urls: tour.image_urls || [],
       rating: tour.rating.toString(),
       reviews_count: tour.reviews_count.toString(),
       is_bestseller: tour.is_bestseller,
@@ -327,6 +347,7 @@ const Tours = () => {
       price: "",
       duration: "",
       image_url: "",
+      image_urls: [],
       rating: "0",
       reviews_count: "0",
       is_bestseller: false,
@@ -424,31 +445,40 @@ const Tours = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Rasm yuklash</Label>
+                <Label>Rasmlar yuklash (Ko'p rasm tanlash mumkin)</Label>
                 <div className="flex items-center gap-4">
                   <Input 
                     type="file" 
                     accept="image/*" 
+                    multiple
                     onChange={handleImageUpload}
                     disabled={isUploading}
                     className="cursor-pointer"
                   />
                   {isUploading && <span className="text-sm text-muted-foreground">Yuklanmoqda...</span>}
                 </div>
-                {formData.image_url && (
-                  <div className="mt-2">
-                    <img src={formData.image_url} alt="Preview" className="h-32 w-auto rounded-lg object-cover border" />
+                {formData.image_urls.length > 0 && (
+                  <div className="grid grid-cols-4 gap-4 mt-4">
+                    {formData.image_urls.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={url} 
+                          alt={`Preview ${index + 1}`} 
+                          className="h-32 w-full rounded-lg object-cover border" 
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeImage(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 )}
-                <div className="flex items-center gap-2 mt-2">
-                  <Label className="text-sm text-muted-foreground">yoki URL kiriting:</Label>
-                  <Input 
-                    value={formData.image_url} 
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://..."
-                    className="flex-1"
-                  />
-                </div>
               </div>
 
               <div className="flex items-center space-x-2">
