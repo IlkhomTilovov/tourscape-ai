@@ -379,6 +379,7 @@ export type Database = {
           duration: string
           id: string
           image_url: string | null
+          image_urls: string[] | null
           important_info_de: string | null
           important_info_en: string | null
           important_info_ru: string | null
@@ -424,6 +425,7 @@ export type Database = {
           duration: string
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           important_info_de?: string | null
           important_info_en?: string | null
           important_info_ru?: string | null
@@ -469,6 +471,7 @@ export type Database = {
           duration?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           important_info_de?: string | null
           important_info_en?: string | null
           important_info_ru?: string | null
