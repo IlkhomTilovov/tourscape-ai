@@ -69,6 +69,7 @@ interface Tour {
   rating: number | null;
   reviews_count: number | null;
   image_url: string | null;
+  image_urls: string[] | null;
   is_bestseller: boolean | null;
   category_id: string | null;
   destination_id: string | null;
@@ -93,9 +94,11 @@ const TourDetails = () => {
     images: [] as File[],
   });
 
-  const images = tour?.image_url ? [tour.image_url] : [
-    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80"
-  ];
+  const images = tour?.image_urls && tour.image_urls.length > 0 
+    ? tour.image_urls 
+    : tour?.image_url 
+    ? [tour.image_url] 
+    : ["https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=80"];
 
   // Fetch tour data
   useEffect(() => {
