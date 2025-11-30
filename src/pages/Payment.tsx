@@ -21,9 +21,8 @@ const Payment = () => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isProcessing, setIsProcessing] = useState(false);
   const [contactDetails, setContactDetails] = useState({
-    name: "",
+    email: "",
     phone: "",
-    address: "",
   });
 
   const bookingData = location.state || {};
@@ -49,12 +48,12 @@ const Payment = () => {
     e.preventDefault();
 
     // Validate contact details
-    if (!contactDetails.name || !contactDetails.phone) {
+    if (!contactDetails.email && !contactDetails.phone) {
       toast.error(getText(
-        "Iltimos, ism va telefon raqamini kiriting",
-        "Please enter name and phone number",
-        "Пожалуйста, введите имя и номер телефона",
-        "Bitte geben Sie Name und Telefonnummer ein"
+        "Iltimos, email yoki telefon raqamini kiriting",
+        "Please enter email or phone number",
+        "Пожалуйста, введите email или номер телефона",
+        "Bitte geben Sie E-Mail oder Telefonnummer ein"
       ));
       return;
     }
