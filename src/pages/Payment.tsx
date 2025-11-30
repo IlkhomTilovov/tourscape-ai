@@ -20,12 +20,6 @@ const Payment = () => {
   const { clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: "",
-    cardName: "",
-    expiryDate: "",
-    cvv: "",
-  });
   const [contactDetails, setContactDetails] = useState({
     email: "",
     phone: "",
@@ -41,13 +35,6 @@ const Payment = () => {
       case "DE": return de;
       default: return en;
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardDetails({
-      ...cardDetails,
-      [e.target.name]: e.target.value,
-    });
   };
 
   const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,18 +56,6 @@ const Payment = () => {
         "Bitte geben Sie E-Mail oder Telefonnummer ein"
       ));
       return;
-    }
-
-    if (paymentMethod === "mastercard" || paymentMethod === "visa" || paymentMethod === "other") {
-      if (!cardDetails.cardNumber || !cardDetails.cardName || !cardDetails.expiryDate || !cardDetails.cvv) {
-        toast.error(getText(
-          "Iltimos, barcha maydonlarni to'ldiring",
-          "Please fill in all fields",
-          "Пожалуйста, заполните все поля",
-          "Bitte füllen Sie alle Felder aus"
-        ));
-        return;
-      }
     }
     
     // For all payment methods except Uzum, create booking directly
@@ -329,73 +304,6 @@ const Payment = () => {
                     </Label>
                   </div>
                 </RadioGroup>
-
-                {(paymentMethod === "mastercard" || paymentMethod === "visa" || paymentMethod === "other") && (
-                  <div className="space-y-4 animate-in fade-in-50">
-                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
-                      <p className="text-sm font-medium">
-                        {getText(
-                          "Karta ma'lumotlarini kiriting",
-                          "Enter your card details",
-                          "Введите данные карты",
-                          "Geben Sie Ihre Kartendaten ein"
-                        )}
-                      </p>
-                    </div>
-                    <div>
-                      <Label htmlFor="cardNumber">
-                        {getText("Karta raqami", "Card Number", "Номер карты", "Kartennummer")}
-                      </Label>
-                      <Input
-                        id="cardNumber"
-                        name="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        value={cardDetails.cardNumber}
-                        onChange={handleInputChange}
-                        maxLength={19}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cardName">
-                        {getText("Karta egasining ismi", "Cardholder Name", "Имя владельца карты", "Karteninhaber")}
-                      </Label>
-                      <Input
-                        id="cardName"
-                        name="cardName"
-                        placeholder="JOHN DOE"
-                        value={cardDetails.cardName}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="expiryDate">
-                          {getText("Amal qilish muddati", "Expiry Date", "Срок действия", "Ablaufdatum")}
-                        </Label>
-                        <Input
-                          id="expiryDate"
-                          name="expiryDate"
-                          placeholder="MM/YY"
-                          value={cardDetails.expiryDate}
-                          onChange={handleInputChange}
-                          maxLength={5}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="cvv">CVV</Label>
-                        <Input
-                          id="cvv"
-                          name="cvv"
-                          placeholder="123"
-                          type="password"
-                          value={cardDetails.cvv}
-                          onChange={handleInputChange}
-                          maxLength={3}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {paymentMethod === "cash" && (
                   <div className="text-center py-8 space-y-4 animate-in fade-in-50">
