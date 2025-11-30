@@ -124,6 +124,18 @@ const AdminBookings = () => {
     );
   };
 
+  const getPaymentMethodLabel = (method: string | null) => {
+    const labels: Record<string, string> = {
+      cash: "Naqd pul",
+      mastercard: "MasterCard",
+      visa: "Visa",
+      other: "Boshqa",
+      uzum: "Uzum",
+    };
+
+    return labels[method || ""] || method || "N/A";
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -218,8 +230,8 @@ const AdminBookings = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="capitalize">
-                      {booking.payment_method || "N/A"}
+                    <Badge variant="outline">
+                      {getPaymentMethodLabel(booking.payment_method)}
                     </Badge>
                   </TableCell>
                   <TableCell>{getStatusBadge(booking.payment_status)}</TableCell>
