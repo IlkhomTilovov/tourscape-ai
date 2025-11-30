@@ -32,6 +32,7 @@ interface Tour {
   rating: number | null;
   reviews_count: number | null;
   image_url: string | null;
+  image_urls: string[] | null;
   is_bestseller: boolean | null;
   category_id: string | null;
   categories?: { name_uz: string; name_en: string; name_ru: string; name_de: string };
@@ -412,7 +413,7 @@ const Tours = () => {
                        language === "EN" ? tour.categories.name_en : 
                        language === "RU" ? tour.categories.name_ru : 
                        tour.categories.name_de) : ""}
-                    image={tour.image_url || "https://images.unsplash.com/photo-1488646953014-85cb44e25828"}
+                    image={(tour.image_urls && tour.image_urls.length > 0 ? tour.image_urls[0] : tour.image_url) || "https://images.unsplash.com/photo-1488646953014-85cb44e25828"}
                     bestseller={tour.is_bestseller || false}
                   />
                 </div>
