@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -28,6 +28,19 @@ const Payment = () => {
   });
 
   const bookingData = location.state || {};
+
+  // Redirect if no booking data
+  useEffect(() => {
+    if (!bookingData.tourId || !bookingData.totalPrice) {
+      toast.error(getText(
+        "Buyurtma ma'lumotlari topilmadi. Iltimos, avval turni tanlang",
+        "Booking data not found. Please select a tour first",
+        "Данные бронирования не найдены. Пожалуйста, сначала выберите тур",
+        "Buchungsdaten nicht gefunden. Bitte wählen Sie zuerst eine Tour"
+      ));
+      navigate("/tours");
+    }
+  }, [bookingData, navigate]);
 
   const getText = (uz: string, en: string, ru: string, de: string) => {
     switch (language) {
