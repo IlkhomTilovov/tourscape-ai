@@ -21,8 +21,10 @@ const Payment = () => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isProcessing, setIsProcessing] = useState(false);
   const [contactDetails, setContactDetails] = useState({
+    name: "",
     email: "",
     phone: "",
+    pickupAddress: "",
   });
 
   const bookingData = location.state || {};
@@ -48,12 +50,12 @@ const Payment = () => {
     e.preventDefault();
 
     // Validate contact details
-    if (!contactDetails.email && !contactDetails.phone) {
+    if (!contactDetails.name || !contactDetails.email || !contactDetails.phone || !contactDetails.pickupAddress) {
       toast.error(getText(
-        "Iltimos, email yoki telefon raqamini kiriting",
-        "Please enter email or phone number",
-        "Пожалуйста, введите email или номер телефона",
-        "Bitte geben Sie E-Mail oder Telefonnummer ein"
+        "Iltimos, barcha maydonlarni to'ldiring",
+        "Please fill in all fields",
+        "Пожалуйста, заполните все поля",
+        "Bitte füllen Sie alle Felder aus"
       ));
       return;
     }
@@ -242,6 +244,20 @@ const Payment = () => {
                     {getText("Aloqa ma'lumotlari", "Contact Information", "Контактная информация", "Kontaktinformationen")}
                   </h3>
                   <div>
+                    <Label htmlFor="name">
+                      {getText("Ism", "Name", "Имя", "Name")}
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder={getText("Ismingiz", "Your name", "Ваше имя", "Ihr Name")}
+                      value={contactDetails.name}
+                      onChange={handleContactChange}
+                      required
+                    />
+                  </div>
+                  <div>
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
@@ -250,6 +266,7 @@ const Payment = () => {
                       placeholder="example@email.com"
                       value={contactDetails.email}
                       onChange={handleContactChange}
+                      required
                     />
                   </div>
                   <div>
@@ -263,6 +280,21 @@ const Payment = () => {
                       placeholder="+998 90 123 45 67"
                       value={contactDetails.phone}
                       onChange={handleContactChange}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="pickupAddress">
+                      {getText("Olib ketish manzili", "Pickup Address", "Адрес получения", "Abholadresse")}
+                    </Label>
+                    <Input
+                      id="pickupAddress"
+                      name="pickupAddress"
+                      type="text"
+                      placeholder={getText("Manzilingiz", "Your address", "Ваш адрес", "Ihre Adresse")}
+                      value={contactDetails.pickupAddress}
+                      onChange={handleContactChange}
+                      required
                     />
                   </div>
                 </div>
