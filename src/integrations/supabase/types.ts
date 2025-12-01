@@ -63,10 +63,12 @@ export type Database = {
           payment_id: string | null
           payment_method: string | null
           payment_status: string
+          pickup_address: string | null
           total_price: number
           tour_id: string
           updated_at: string
           user_email: string | null
+          user_name: string | null
           user_phone: string | null
         }
         Insert: {
@@ -78,10 +80,12 @@ export type Database = {
           payment_id?: string | null
           payment_method?: string | null
           payment_status?: string
+          pickup_address?: string | null
           total_price: number
           tour_id: string
           updated_at?: string
           user_email?: string | null
+          user_name?: string | null
           user_phone?: string | null
         }
         Update: {
@@ -93,10 +97,12 @@ export type Database = {
           payment_id?: string | null
           payment_method?: string | null
           payment_status?: string
+          pickup_address?: string | null
           total_price?: number
           tour_id?: string
           updated_at?: string
           user_email?: string | null
+          user_name?: string | null
           user_phone?: string | null
         }
         Relationships: [

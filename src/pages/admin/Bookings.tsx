@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, Phone, Calendar, User, CreditCard } from "lucide-react";
+import { Loader2, Mail, Phone, Calendar, User, CreditCard, MapPin } from "lucide-react";
 
 interface Booking {
   id: string;
@@ -28,8 +28,10 @@ interface Booking {
   total_price: number;
   payment_status: string;
   payment_method: string | null;
+  user_name: string | null;
   user_email: string | null;
   user_phone: string | null;
+  pickup_address: string | null;
   created_at: string;
   tours: {
     title_en: string;
@@ -182,6 +184,12 @@ const AdminBookings = () => {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
+                      {booking.user_name && (
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          {booking.user_name}
+                        </div>
+                      )}
                       {booking.user_email && (
                         <div className="flex items-center gap-2 text-sm">
                           <Mail className="h-4 w-4 text-muted-foreground" />
@@ -202,6 +210,12 @@ const AdminBookings = () => {
                           >
                             {booking.user_phone}
                           </a>
+                        </div>
+                      )}
+                      {booking.pickup_address && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          {booking.pickup_address}
                         </div>
                       )}
                     </div>

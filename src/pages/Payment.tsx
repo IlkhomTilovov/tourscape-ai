@@ -73,8 +73,10 @@ const Payment = () => {
             booking_time: bookingData.time,
             adults: bookingData.adults || 1,
             total_price: bookingData.totalPrice,
+            user_name: contactDetails.name,
             user_email: contactDetails.email,
             user_phone: contactDetails.phone,
+            pickup_address: contactDetails.pickupAddress,
             payment_method: paymentMethod,
             payment_status: paymentMethod === "cash" ? "pending" : "completed"
           })
@@ -92,8 +94,10 @@ const Payment = () => {
             booking_time: booking.booking_time,
             adults: booking.adults,
             total_price: booking.total_price,
+            user_name: booking.user_name,
             user_email: booking.user_email,
             user_phone: booking.user_phone,
+            pickup_address: booking.pickup_address,
             payment_status: booking.payment_status,
             payment_method: booking.payment_method
           }
@@ -140,8 +144,10 @@ const Payment = () => {
             bookingDate: bookingData.date,
             bookingTime: bookingData.time,
             totalPrice: bookingData.totalPrice,
+            userName: contactDetails.name,
             userEmail: contactDetails.email,
             userPhone: contactDetails.phone,
+            pickupAddress: contactDetails.pickupAddress,
           }
         });
 
