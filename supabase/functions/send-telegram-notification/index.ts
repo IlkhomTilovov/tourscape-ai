@@ -13,8 +13,10 @@ interface BookingData {
   booking_time: string;
   adults: number;
   total_price: number;
+  user_name: string;
   user_email: string;
   user_phone: string;
+  pickup_address: string;
   payment_status: string;
   payment_method: string;
 }
@@ -57,8 +59,10 @@ Deno.serve(async (req) => {
 ${tour?.title_uz || 'N/A'}
 
 👤 *Mijoz ma\'lumotlari:*
+👨 Ism: ${bookingData.user_name || 'N/A'}
 📧 Email: ${bookingData.user_email || 'N/A'}
 📱 Telefon: ${bookingData.user_phone || 'N/A'}
+📍 Olib ketish manzili: ${bookingData.pickup_address || 'N/A'}
 
 📅 *Sana:* ${bookingData.booking_date}
 ⏰ *Vaqt:* ${bookingData.booking_time || 'N/A'}
