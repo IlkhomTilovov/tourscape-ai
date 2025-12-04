@@ -179,10 +179,7 @@ export default function Checkout() {
                             "You can reserve now & pay later.",
                             "Вы можете забронировать сейчас и оплатить позже.",
                             "Sie können jetzt reservieren und später bezahlen."
-                          )}{" "}
-                          <span className="underline cursor-pointer">
-                            {getText("Ko'proq", "Learn more", "Подробнее", "Mehr erfahren")}
-                          </span>
+                          )}
                         </p>
                       </div>
                     </div>
