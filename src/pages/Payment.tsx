@@ -318,42 +318,57 @@ const Payment = () => {
                   </div>
                 </div>
 
-                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-2">
+                  <Label 
+                    htmlFor="cash" 
+                    className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
+                  >
                     <RadioGroupItem value="cash" id="cash" />
-                    <Label htmlFor="cash" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 flex-1">
                       <Wallet className="h-5 w-5" />
                       <span>{getText("Naqd pul", "Cash", "Наличные", "Bargeld")}</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    </div>
+                  </Label>
+                  <Label 
+                    htmlFor="mastercard" 
+                    className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
+                  >
                     <RadioGroupItem value="mastercard" id="mastercard" />
-                    <Label htmlFor="mastercard" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 flex-1">
                       <CreditCard className="h-5 w-5" />
                       <span>MasterCard</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    </div>
+                  </Label>
+                  <Label 
+                    htmlFor="visa" 
+                    className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
+                  >
                     <RadioGroupItem value="visa" id="visa" />
-                    <Label htmlFor="visa" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 flex-1">
                       <CreditCard className="h-5 w-5" />
                       <span>Visa</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    </div>
+                  </Label>
+                  <Label 
+                    htmlFor="other" 
+                    className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
+                  >
                     <RadioGroupItem value="other" id="other" />
-                    <Label htmlFor="other" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 flex-1">
                       <CreditCard className="h-5 w-5" />
                       <span>{getText("Boshqa", "Other", "Другое", "Andere")}</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent">
+                    </div>
+                  </Label>
+                  <Label 
+                    htmlFor="uzum" 
+                    className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
+                  >
                     <RadioGroupItem value="uzum" id="uzum" />
-                    <Label htmlFor="uzum" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <div className="flex items-center gap-2 flex-1">
                       <Wallet className="h-5 w-5" />
                       <span>Uzum</span>
-                    </Label>
-                  </div>
+                    </div>
+                  </Label>
                 </RadioGroup>
 
                 {paymentMethod === "cash" && (
