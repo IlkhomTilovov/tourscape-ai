@@ -65,7 +65,7 @@ export type Database = {
           payment_status: string
           pickup_address: string | null
           total_price: number
-          tour_id: string
+          tour_id: string | null
           updated_at: string
           user_email: string | null
           user_name: string | null
@@ -82,7 +82,7 @@ export type Database = {
           payment_status?: string
           pickup_address?: string | null
           total_price: number
-          tour_id: string
+          tour_id?: string | null
           updated_at?: string
           user_email?: string | null
           user_name?: string | null
@@ -99,7 +99,7 @@ export type Database = {
           payment_status?: string
           pickup_address?: string | null
           total_price?: number
-          tour_id?: string
+          tour_id?: string | null
           updated_at?: string
           user_email?: string | null
           user_name?: string | null
