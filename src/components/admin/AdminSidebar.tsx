@@ -1,6 +1,6 @@
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
-import { LayoutDashboard, MapPin, Package, Hotel, Info, Menu, FolderTree, MessageSquare, ShoppingCart } from "lucide-react";
+import { LayoutDashboard, MapPin, Package, Hotel, Info, Menu, FolderTree, MessageSquare, ShoppingCart, Home } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,7 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { title: "Homepage", url: "/admin/homepage", icon: Home },
   { title: "Categories", url: "/admin/categories", icon: FolderTree },
   { title: "Destinations", url: "/admin/destinations", icon: MapPin },
   { title: "Tours", url: "/admin/tours", icon: Package },

@@ -246,6 +246,120 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_content: {
+        Row: {
+          created_at: string | null
+          hero_image_url: string | null
+          hero_subtitle_de: string
+          hero_subtitle_en: string
+          hero_subtitle_ru: string
+          hero_subtitle_uz: string
+          hero_title_de: string
+          hero_title_en: string
+          hero_title_ru: string
+          hero_title_uz: string
+          id: string
+          stat1_label_de: string
+          stat1_label_en: string
+          stat1_label_ru: string
+          stat1_label_uz: string
+          stat1_value: string
+          stat2_label_de: string
+          stat2_label_en: string
+          stat2_label_ru: string
+          stat2_label_uz: string
+          stat2_value: string
+          stat3_label_de: string
+          stat3_label_en: string
+          stat3_label_ru: string
+          stat3_label_uz: string
+          stat3_value: string
+          stats_subtitle_de: string
+          stats_subtitle_en: string
+          stats_subtitle_ru: string
+          stats_subtitle_uz: string
+          stats_title_de: string
+          stats_title_en: string
+          stats_title_ru: string
+          stats_title_uz: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hero_image_url?: string | null
+          hero_subtitle_de?: string
+          hero_subtitle_en?: string
+          hero_subtitle_ru?: string
+          hero_subtitle_uz?: string
+          hero_title_de?: string
+          hero_title_en?: string
+          hero_title_ru?: string
+          hero_title_uz?: string
+          id?: string
+          stat1_label_de?: string
+          stat1_label_en?: string
+          stat1_label_ru?: string
+          stat1_label_uz?: string
+          stat1_value?: string
+          stat2_label_de?: string
+          stat2_label_en?: string
+          stat2_label_ru?: string
+          stat2_label_uz?: string
+          stat2_value?: string
+          stat3_label_de?: string
+          stat3_label_en?: string
+          stat3_label_ru?: string
+          stat3_label_uz?: string
+          stat3_value?: string
+          stats_subtitle_de?: string
+          stats_subtitle_en?: string
+          stats_subtitle_ru?: string
+          stats_subtitle_uz?: string
+          stats_title_de?: string
+          stats_title_en?: string
+          stats_title_ru?: string
+          stats_title_uz?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hero_image_url?: string | null
+          hero_subtitle_de?: string
+          hero_subtitle_en?: string
+          hero_subtitle_ru?: string
+          hero_subtitle_uz?: string
+          hero_title_de?: string
+          hero_title_en?: string
+          hero_title_ru?: string
+          hero_title_uz?: string
+          id?: string
+          stat1_label_de?: string
+          stat1_label_en?: string
+          stat1_label_ru?: string
+          stat1_label_uz?: string
+          stat1_value?: string
+          stat2_label_de?: string
+          stat2_label_en?: string
+          stat2_label_ru?: string
+          stat2_label_uz?: string
+          stat2_value?: string
+          stat3_label_de?: string
+          stat3_label_en?: string
+          stat3_label_ru?: string
+          stat3_label_uz?: string
+          stat3_value?: string
+          stats_subtitle_de?: string
+          stats_subtitle_en?: string
+          stats_subtitle_ru?: string
+          stats_subtitle_uz?: string
+          stats_title_de?: string
+          stats_title_en?: string
+          stats_title_ru?: string
+          stats_title_uz?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       hotels: {
         Row: {
           amenities: string | null

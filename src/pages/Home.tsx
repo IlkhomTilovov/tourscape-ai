@@ -24,24 +24,27 @@ const Home = () => {
   const [destinations, setDestinations] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [homepageContent, setHomepageContent] = useState<any>(null);
 
   useEffect(() => {
     // Fetch all data in parallel for better performance
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        const [categoriesData, destinationsData, toursData] = await Promise.all([
+        const [categoriesData, destinationsData, toursData, homepageData] = await Promise.all([
           supabase.from("categories").select("*").limit(6),
           supabase.from("destinations").select("*").limit(4),
           supabase.from("tours")
             .select("*")
             .eq("is_bestseller", true)
-            .limit(3)
+            .limit(3),
+          supabase.from("homepage_content").select("*").eq("id", "main").single()
         ]);
 
         if (categoriesData.data) setCategories(categoriesData.data);
         if (destinationsData.data) setDestinations(destinationsData.data);
         if (toursData.data) setTours(toursData.data);
+        if (homepageData.data) setHomepageContent(homepageData.data);
       } finally {
         setLoading(false);
       }
@@ -49,6 +52,17 @@ const Home = () => {
 
     fetchAllData();
   }, []);
+
+  const getLocalizedContent = (field: string) => {
+    if (!homepageContent) return "";
+    const langMap: any = {
+      UZ: `${field}_uz`,
+      RU: `${field}_ru`,
+      DE: `${field}_de`,
+      EN: `${field}_en`,
+    };
+    return homepageContent[langMap[language]] || homepageContent[`${field}_en`] || "";
+  };
 
   const getIconComponent = (iconName: string | null) => {
     if (!iconName) return LucideIcons.Compass;
@@ -74,17 +88,17 @@ const Home = () => {
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${heroImage})` }}
+          style={{ backgroundImage: `url(${homepageContent?.hero_image_url || heroImage})` }}
         >
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 animate-fade-in text-balance drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-            {t("heroTitle")}
+            {getLocalizedContent("hero_title") || t("heroTitle")}
           </h1>
           <p className="text-xl text-white mb-12 animate-slide-up drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-            {t("heroSubtitle")}
+            {getLocalizedContent("hero_subtitle") || t("heroSubtitle")}
           </p>
 
           {/* CTA Buttons */}
@@ -186,22 +200,36 @@ const Home = () => {
       {/* Trust Section */}
       <section className="container mx-auto px-4 py-16 bg-muted/30 rounded-3xl my-8">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4 animate-fade-in">Why book with TravelHub?</h2>
+          <h2 className="text-3xl font-bold mb-4 animate-fade-in">
+            {getLocalizedContent("stats_title") || "Why book with TravelHub?"}
+          </h2>
           <p className="text-muted-foreground mb-12 animate-slide-up">
-            Join millions of travelers who trust us for their unforgettable experiences
+            {getLocalizedContent("stats_subtitle") || "Join millions of travelers who trust us for their unforgettable experiences"}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="p-6 rounded-xl hover:bg-background/50 transition-all duration-300 hover:scale-105 hover:shadow-lg group">
-              <div className="text-4xl font-bold text-primary mb-2 transition-all duration-300 group-hover:scale-110">15M+</div>
-              <p className="text-muted-foreground group-hover:text-foreground transition-colors">Happy customers</p>
+              <div className="text-4xl font-bold text-primary mb-2 transition-all duration-300 group-hover:scale-110">
+                {homepageContent?.stat1_value || "15M+"}
+              </div>
+              <p className="text-muted-foreground group-hover:text-foreground transition-colors">
+                {getLocalizedContent("stat1_label") || "Happy customers"}
+              </p>
             </div>
             <div className="p-6 rounded-xl hover:bg-background/50 transition-all duration-300 hover:scale-105 hover:shadow-lg group">
-              <div className="text-4xl font-bold text-primary mb-2 transition-all duration-300 group-hover:scale-110">500K+</div>
-              <p className="text-muted-foreground group-hover:text-foreground transition-colors">Experiences</p>
+              <div className="text-4xl font-bold text-primary mb-2 transition-all duration-300 group-hover:scale-110">
+                {homepageContent?.stat2_value || "500K+"}
+              </div>
+              <p className="text-muted-foreground group-hover:text-foreground transition-colors">
+                {getLocalizedContent("stat2_label") || "Experiences"}
+              </p>
             </div>
             <div className="p-6 rounded-xl hover:bg-background/50 transition-all duration-300 hover:scale-105 hover:shadow-lg group">
-              <div className="text-4xl font-bold text-primary mb-2 transition-all duration-300 group-hover:scale-110">180+</div>
-              <p className="text-muted-foreground group-hover:text-foreground transition-colors">Countries</p>
+              <div className="text-4xl font-bold text-primary mb-2 transition-all duration-300 group-hover:scale-110">
+                {homepageContent?.stat3_value || "180+"}
+              </div>
+              <p className="text-muted-foreground group-hover:text-foreground transition-colors">
+                {getLocalizedContent("stat3_label") || "Countries"}
+              </p>
             </div>
           </div>
         </div>
