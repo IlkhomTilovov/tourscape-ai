@@ -30,6 +30,7 @@ import AdminReviews from "./pages/admin/Reviews";
 import AdminHotels from "./pages/admin/Hotels";
 import AdminMenuItems from "./pages/admin/MenuItems";
 import AdminAbout from "./pages/admin/About";
+import AdminHomepage from "./pages/admin/Homepage";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const App = () => (
               <Route path="/payment" element={<Payment />} />
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<Dashboard />} />
+                <Route path="homepage" element={<AdminHomepage />} />
                 <Route path="destinations" element={<AdminDestinations />} />
                 <Route path="tours" element={<AdminTours />} />
                 <Route path="categories" element={<AdminCategories />} />
