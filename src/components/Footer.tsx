@@ -1,10 +1,45 @@
 import { Instagram, MessageCircle, Send, Phone, Mail, MapPin, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.svg";
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const { data: footerContent } = useQuery({
+    queryKey: ["footer-content"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("footer_content")
+        .select("*")
+        .eq("id", "main")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getAddress = () => {
+    if (!footerContent) return "Toshkent shahri, O'zbekiston";
+    switch (language) {
+      case "UZ": return footerContent.address_uz;
+      case "EN": return footerContent.address_en;
+      case "RU": return footerContent.address_ru;
+      case "DE": return footerContent.address_de;
+      default: return footerContent.address_uz;
+    }
+  };
+
+  const phone = footerContent?.phone || "+998 93 284 71 17";
+  const email = footerContent?.email || "info@bestour.uz";
+  const workingWeekday = footerContent?.working_hours_weekday || "09:00 - 18:00";
+  const workingWeekend = footerContent?.working_hours_weekend || "Dam olish";
+  const instagramUrl = footerContent?.instagram_url || "https://www.instagram.com/bestour.uz";
+  const whatsappNumber = footerContent?.whatsapp_number || "+998932847117";
+  const telegramUrl = footerContent?.telegram_url || "https://t.me/sherzod_757";
   
   return (
     <footer className="bg-muted/50 border-t border-border mt-20">
@@ -63,24 +98,24 @@ const Footer = () => {
             <ul className="space-y-4">
               <li>
                 <a
-                  href="tel:+998932847117"
+                  href={`tel:${phone.replace(/\s/g, "")}`}
                   className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors group"
                 >
                   <span className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
                     <Phone className="h-4 w-4 text-primary" />
                   </span>
-                  <span className="text-sm">+998 93 284 71 17</span>
+                  <span className="text-sm">{phone}</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:info@bestour.uz"
+                  href={`mailto:${email}`}
                   className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors group"
                 >
                   <span className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
                     <Mail className="h-4 w-4 text-primary" />
                   </span>
-                  <span className="text-sm">info@bestour.uz</span>
+                  <span className="text-sm">{email}</span>
                 </a>
               </li>
               <li>
@@ -88,7 +123,7 @@ const Footer = () => {
                   <span className="p-2 bg-primary/10 rounded-full">
                     <MapPin className="h-4 w-4 text-primary" />
                   </span>
-                  <span className="text-sm">Toshkent shahri, O'zbekiston</span>
+                  <span className="text-sm">{getAddress()}</span>
                 </div>
               </li>
             </ul>
@@ -107,15 +142,15 @@ const Footer = () => {
                 <Clock className="h-4 w-4 text-primary" />
               </span>
               <div className="text-sm">
-                <p className="text-foreground font-medium">Du-Sha: 09:00 - 18:00</p>
-                <p className="text-muted-foreground">Yak: Dam olish</p>
+                <p className="text-foreground font-medium">Du-Sha: {workingWeekday}</p>
+                <p className="text-muted-foreground">Yak: {workingWeekend}</p>
               </div>
             </div>
 
             {/* Social Links */}
             <div className="flex items-center gap-3">
               <a
-                href="https://www.instagram.com/bestour.uz"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2.5 bg-primary/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all"
@@ -124,7 +159,7 @@ const Footer = () => {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="https://wa.me/998932847117"
+                href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, "")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2.5 bg-primary/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all"
@@ -133,7 +168,7 @@ const Footer = () => {
                 <MessageCircle className="h-5 w-5" />
               </a>
               <a
-                href="https://t.me/sherzod_757"
+                href={telegramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2.5 bg-primary/10 rounded-full hover:bg-primary hover:text-primary-foreground transition-all"

@@ -246,6 +246,57 @@ export type Database = {
         }
         Relationships: []
       }
+      footer_content: {
+        Row: {
+          address_de: string
+          address_en: string
+          address_ru: string
+          address_uz: string
+          created_at: string | null
+          email: string
+          id: string
+          instagram_url: string | null
+          phone: string
+          telegram_url: string | null
+          updated_at: string | null
+          whatsapp_number: string | null
+          working_hours_weekday: string
+          working_hours_weekend: string
+        }
+        Insert: {
+          address_de?: string
+          address_en?: string
+          address_ru?: string
+          address_uz?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          instagram_url?: string | null
+          phone?: string
+          telegram_url?: string | null
+          updated_at?: string | null
+          whatsapp_number?: string | null
+          working_hours_weekday?: string
+          working_hours_weekend?: string
+        }
+        Update: {
+          address_de?: string
+          address_en?: string
+          address_ru?: string
+          address_uz?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          instagram_url?: string | null
+          phone?: string
+          telegram_url?: string | null
+          updated_at?: string | null
+          whatsapp_number?: string | null
+          working_hours_weekday?: string
+          working_hours_weekend?: string
+        }
+        Relationships: []
+      }
       homepage_content: {
         Row: {
           created_at: string | null
