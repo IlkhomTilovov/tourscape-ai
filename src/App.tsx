@@ -31,6 +31,7 @@ import AdminHotels from "./pages/admin/Hotels";
 import AdminMenuItems from "./pages/admin/MenuItems";
 import AdminAbout from "./pages/admin/About";
 import AdminHomepage from "./pages/admin/Homepage";
+import AdminFooter from "./pages/admin/Footer";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
                 <Route path="hotels" element={<AdminHotels />} />
                 <Route path="menu-items" element={<AdminMenuItems />} />
                 <Route path="about" element={<AdminAbout />} />
+                <Route path="footer" element={<AdminFooter />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
