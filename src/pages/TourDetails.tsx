@@ -414,11 +414,11 @@ const TourDetails = () => {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Image Gallery */}
-              <div className="relative rounded-2xl overflow-hidden h-[500px] group">
+              <div className="relative rounded-2xl overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-muted group">
                 <img
                   src={images[currentImageIndex]}
                   alt={getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de)}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
                 {images.length > 1 && (
                   <>
