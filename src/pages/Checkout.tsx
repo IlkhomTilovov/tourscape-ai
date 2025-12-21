@@ -71,7 +71,7 @@ export default function Checkout() {
       date: bookingDate?.toLocaleDateString(),
       time: selectedTime,
       adults: adults,
-      totalPrice: ((tourData?.price || 0) * parseInt(adults) * 1.05).toFixed(2),
+      totalPrice: ((tourData?.price || 0) * parseInt(adults)).toFixed(2),
     };
 
     navigate("/payment", { state: bookingData });
@@ -164,10 +164,10 @@ export default function Checkout() {
                         <CheckCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                         <p>
                           {getText(
-                            "9:00 AM gacha bekor qilsangiz to'liq qaytariladi",
-                            "Cancel before 9:00 AM for a full refund",
-                            "Отмена до 9:00 для полного возврата средств",
-                            "Stornierung vor 9:00 Uhr für volle Rückerstattung"
+                            `${selectedTime} gacha bekor qilsangiz to'liq qaytariladi`,
+                            `Cancel before ${selectedTime} for a full refund`,
+                            `Отмена до ${selectedTime} для полного возврата средств`,
+                            `Stornierung vor ${selectedTime} für volle Rückerstattung`
                           )}
                         </p>
                       </div>
@@ -332,18 +332,12 @@ export default function Checkout() {
                       </span>
                       <span className="font-medium">${((tourData.price || 0) * parseInt(adults)).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {getText("Xizmat to'lovi", "Service Fee", "Сервисный сбор", "Servicegebühr")}
-                      </span>
-                      <span className="font-medium">${((tourData.price || 0) * parseInt(adults) * 0.05).toFixed(2)}</span>
-                    </div>
                     
                     <Separator className="my-3" />
                     
                     <div className="flex justify-between items-center">
                       <span className="text-xl font-bold">{getText("Jami", "Total", "Всего", "Gesamt")}</span>
-                      <span className="text-2xl font-bold">${((tourData.price || 0) * parseInt(adults) * 1.05).toFixed(2)}</span>
+                      <span className="text-2xl font-bold">${((tourData.price || 0) * parseInt(adults)).toFixed(2)}</span>
                     </div>
                   </div>
 
