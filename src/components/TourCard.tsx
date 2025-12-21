@@ -69,7 +69,7 @@ const TourCard = ({
     <Link to={`/tour/${id}`}>
       <div className="card-elevated rounded-xl overflow-hidden bg-card group cursor-pointer">
         {/* Image */}
-        <div className="relative h-56 overflow-hidden">
+        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <OptimizedImage
             src={image}
             alt={title}
