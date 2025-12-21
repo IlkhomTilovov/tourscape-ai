@@ -28,7 +28,9 @@ import {
   Upload,
   ImageIcon,
   Trash2,
+  Expand,
 } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 
 interface Tour {
   id: string;
@@ -85,6 +87,7 @@ const TourDetails = () => {
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reviewForm, setReviewForm] = useState({
@@ -414,19 +417,37 @@ const TourDetails = () => {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Image Gallery */}
-              <div className="relative rounded-2xl overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-muted group">
+              <div 
+                className="relative rounded-2xl overflow-hidden aspect-[4/3] md:aspect-[16/10] bg-muted group cursor-pointer"
+                onClick={() => setIsLightboxOpen(true)}
+              >
                 <img
                   src={images[currentImageIndex]}
                   alt={getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de)}
                   className="w-full h-full object-contain"
                 />
+                {/* Expand button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLightboxOpen(true);
+                  }}
+                >
+                  <Expand className="h-5 w-5" />
+                </Button>
                 {images.length > 1 && (
                   <>
                     <Button
                       variant="secondary"
                       size="icon"
                       className="absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={prevImage}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        prevImage();
+                      }}
                     >
                       <ChevronLeft className="h-6 w-6" />
                     </Button>
@@ -434,7 +455,10 @@ const TourDetails = () => {
                       variant="secondary"
                       size="icon"
                       className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={nextImage}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        nextImage();
+                      }}
                     >
                       <ChevronRight className="h-6 w-6" />
                     </Button>
@@ -442,7 +466,10 @@ const TourDetails = () => {
                       {images.map((_, i) => (
                         <button
                           key={i}
-                          onClick={() => setCurrentImageIndex(i)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex(i);
+                          }}
                           className={`w-2 h-2 rounded-full transition-all ${
                             i === currentImageIndex
                               ? "bg-white w-8"
@@ -454,6 +481,16 @@ const TourDetails = () => {
                   </>
                 )}
               </div>
+
+              {/* Lightbox */}
+              <ImageLightbox
+                images={images}
+                currentIndex={currentImageIndex}
+                isOpen={isLightboxOpen}
+                onClose={() => setIsLightboxOpen(false)}
+                onIndexChange={setCurrentImageIndex}
+                alt={getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de)}
+              />
 
               {/* Tabs */}
               <Tabs defaultValue="overview" className="w-full">
