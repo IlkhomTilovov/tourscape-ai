@@ -65,10 +65,15 @@ export default function Checkout() {
       return;
     }
 
+    // Format date as YYYY-MM-DD for PostgreSQL
+    const formattedDate = bookingDate ? 
+      `${bookingDate.getFullYear()}-${String(bookingDate.getMonth() + 1).padStart(2, '0')}-${String(bookingDate.getDate()).padStart(2, '0')}` : 
+      '';
+
     const bookingData = {
       tourId: tourData?.tourId,
       tourTitle: tourData?.tourTitle,
-      date: bookingDate?.toLocaleDateString(),
+      date: formattedDate,
       time: selectedTime,
       adults: adults,
       totalPrice: ((tourData?.price || 0) * parseInt(adults)).toFixed(2),
