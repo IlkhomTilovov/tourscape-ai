@@ -388,6 +388,11 @@ const TourDetails = () => {
                 <h1 className="text-4xl font-bold mb-2">
                   {getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de)}
                 </h1>
+                {getLocalizedText(tour.description_en, tour.description_uz, tour.description_ru, tour.description_de) && (
+                  <p className="text-lg text-muted-foreground mb-3">
+                    {getLocalizedText(tour.description_en, tour.description_uz, tour.description_ru, tour.description_de)}
+                  </p>
+                )}
                 <div className="flex items-center flex-wrap gap-4 text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
