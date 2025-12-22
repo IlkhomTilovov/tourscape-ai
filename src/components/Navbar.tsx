@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Globe, User, Heart, ShoppingCart, ChevronDown, ChevronRight } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCart } from "@/contexts/CartContext";
+
 import type { Language } from "@/lib/translations";
 import MegaMenu from "./MegaMenu";
 
@@ -48,7 +48,7 @@ const Navbar = () => {
   const [megaMenuOpen, setMegaMenuOpen] = useState<string | null>(null);
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
-  const { totalItems } = useCart();
+  
   const navigate = useNavigate();
   
   const languages = [
@@ -158,23 +158,6 @@ const Navbar = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-1">
-            {/* Wishlist */}
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <Heart className="h-5 w-5" />
-            </Button>
-
-            {/* Cart */}
-            <Link to="/cart">
-              <Button variant="ghost" size="icon" className="hidden sm:flex relative">
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                    {totalItems}
-                  </span>
-                )}
-              </Button>
-            </Link>
-
             {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -195,11 +178,6 @@ const Navbar = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* User Profile */}
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
 
             {/* Mobile Menu Toggle */}
             <Button
@@ -292,14 +270,6 @@ const Navbar = () => {
             >
               {getLabel("about")}
             </Button>
-            <div className="flex items-center gap-2 pt-2 border-t">
-              <Button variant="ghost" size="icon">
-                <Heart className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="h-5 w-5" />
-              </Button>
-            </div>
             
             {/* Language Selector for Mobile */}
             <div className="pt-2 border-t mt-2 px-3">
