@@ -29,7 +29,7 @@ const About = () => {
       const { data, error } = await supabase
         .from("about")
         .select("*")
-        .single();
+        .maybeSingle();
       
       if (error && error.code !== 'PGRST116') {
         console.error("Error fetching about data:", error);
