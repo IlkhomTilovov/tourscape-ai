@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -332,8 +333,48 @@ const TourDetails = () => {
     setIsSubmitting(false);
   };
 
+  // Generate SEO data for tour
+  const tourTitle = tour ? getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de) : '';
+  const tourDescription = tour ? getLocalizedText(tour.description_en, tour.description_uz, tour.description_ru, tour.description_de) : '';
+  const tourImage = tour?.image_urls?.[0] || tour?.image_url || 'https://bestour.uz/og-image.jpg';
+  
+  // Structured data for tour
+  const tourStructuredData = tour ? {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    "name": tourTitle,
+    "description": tourDescription,
+    "image": tourImage,
+    "offers": {
+      "@type": "Offer",
+      "price": tour.price,
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock"
+    },
+    "touristType": getCategoryName(),
+    "itinerary": {
+      "@type": "ItemList",
+      "name": getLocalizedText(tour.itinerary_en, tour.itinerary_uz, tour.itinerary_ru, tour.itinerary_de)
+    },
+    "aggregateRating": tour.rating && tour.reviews_count ? {
+      "@type": "AggregateRating",
+      "ratingValue": tour.rating,
+      "reviewCount": tour.reviews_count
+    } : undefined
+  } : undefined;
+
   return (
     <div className="min-h-screen bg-background">
+      {tour && (
+        <SEO 
+          title={tourTitle}
+          description={tourDescription || `${tourTitle} - $${tour.price}`}
+          image={tourImage}
+          url={`/tours/${id}`}
+          type="product"
+          structuredData={tourStructuredData}
+        />
+      )}
       <Navbar />
 
       {loading ? (
