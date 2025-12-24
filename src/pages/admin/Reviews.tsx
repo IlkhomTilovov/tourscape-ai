@@ -141,7 +141,7 @@ const Reviews = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => navigate(`/tour/${review.tour_id}`)}
+                        onClick={() => navigate(`/tours/${review.tour_id}`)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>

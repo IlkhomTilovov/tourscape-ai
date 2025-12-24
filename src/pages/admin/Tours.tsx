@@ -649,7 +649,7 @@ const Tours = () => {
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="ghost" asChild>
-                        <Link to={`/tour/${tour.id}`} target="_blank" rel="noopener noreferrer">
+                        <Link to={`/tours/${tour.id}`} target="_blank" rel="noopener noreferrer">
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
