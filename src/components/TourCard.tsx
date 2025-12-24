@@ -66,7 +66,7 @@ const TourCard = ({
   };
   
   return (
-    <Link to={`/tour/${id}`}>
+    <Link to={`/tours/${id}`}>
       <div className="card-elevated rounded-xl overflow-hidden bg-card group cursor-pointer">
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
