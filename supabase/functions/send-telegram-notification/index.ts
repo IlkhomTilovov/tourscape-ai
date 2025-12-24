@@ -53,8 +53,6 @@ Deno.serve(async (req) => {
     const message = `
 🎉 *Yangi buyurtma!*
 
-📋 *Buyurtma ID:* ${bookingData.id}
-
 🏖️ *Tur nomi:*
 ${tour?.title_uz || 'N/A'}
 
@@ -71,8 +69,6 @@ ${tour?.title_uz || 'N/A'}
 💰 *Narx:* $${bookingData.total_price}
 💳 *To\'lov usuli:* ${bookingData.payment_method || 'N/A'}
 ✅ *To\'lov holati:* ${bookingData.payment_status}
-
-🔗 Admin panel: https://cryyvpzjerhlwbxpeeks.supabase.co
 `;
 
     // Send to Telegram
