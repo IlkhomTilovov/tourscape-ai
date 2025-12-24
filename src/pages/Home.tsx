@@ -5,6 +5,7 @@ import TourCard from "@/components/TourCard";
 import DestinationCard from "@/components/DestinationCard";
 import Footer from "@/components/Footer";
 import OptimizedImage from "@/components/OptimizedImage";
+import SEO from "@/components/SEO";
 import { CategoryCardSkeleton, DestinationCardSkeleton } from "@/components/LoadingSkeleton";
 import {
   Carousel,
@@ -80,8 +81,35 @@ const Home = () => {
     return item[fieldMap[language]] || item[`${field}_en`] || "";
   };
 
+  // Structured data for homepage
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "TravelAgency",
+    "name": "Bestour",
+    "url": "https://bestour.uz",
+    "logo": "https://bestour.uz/logo.svg",
+    "description": language === "UZ" 
+      ? "O'zbekiston bo'ylab eng yaxshi sayohatlar va turlar"
+      : language === "RU"
+      ? "Лучшие туры и путешествия по Узбекистану"
+      : "Best tours and travels across Uzbekistan",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Tashkent",
+      "addressCountry": "UZ"
+    },
+    "sameAs": [
+      "https://www.instagram.com/bestour.uz",
+      "https://t.me/bestour_uz"
+    ]
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        url="/"
+        structuredData={structuredData}
+      />
       <Navbar />
 
       {/* Hero Section */}

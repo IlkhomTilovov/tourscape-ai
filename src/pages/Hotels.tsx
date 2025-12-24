@@ -3,6 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,11 @@ const Hotels = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Mehmonxonalar"
+        description="O'zbekistondagi eng yaxshi mehmonxonalar. Qulay narxlarda bron qiling."
+        url="/hotels"
+      />
       <Navbar />
       
       <div className="container mx-auto px-4 py-16">

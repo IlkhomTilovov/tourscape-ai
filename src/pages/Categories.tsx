@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
 import { Card, CardContent } from "@/components/ui/card";
@@ -135,8 +136,27 @@ const Categories = () => {
     "from-red-400 to-pink-500",
   ];
 
+  const seoTitles: Record<Language, string> = {
+    UZ: "Kategoriyalar",
+    EN: "Categories",
+    RU: "Категории",
+    DE: "Kategorien"
+  };
+
+  const seoDescriptions: Record<Language, string> = {
+    UZ: "Sayohat kategoriyalari - madaniy turlar, tabiat sayohatlari, sog'lomlashtirish va boshqalar.",
+    EN: "Tour categories - cultural tours, nature trips, wellness and more.",
+    RU: "Категории туров - культурные туры, природные поездки, оздоровление и многое другое.",
+    DE: "Tourkategorien - Kulturtouren, Naturreisen, Wellness und mehr."
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-muted/10 to-background">
+      <SEO 
+        title={seoTitles[language]}
+        description={seoDescriptions[language]}
+        url="/categories"
+      />
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12">

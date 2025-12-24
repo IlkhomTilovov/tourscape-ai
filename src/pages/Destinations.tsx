@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
 import { ChevronRight } from "lucide-react";
@@ -205,10 +206,28 @@ const Destinations = () => {
     return category[field as keyof Category] || category.name_en;
   };
 
+  const seoTitles: Record<string, string> = {
+    UZ: "Yo'nalishlar",
+    EN: "Destinations",
+    RU: "Направления",
+    DE: "Reiseziele"
+  };
+
+  const seoDescriptions: Record<string, string> = {
+    UZ: "O'zbekistonning eng go'zal joylari va sayohat yo'nalishlari. Samarqand, Buxoro, Xiva va boshqa tarixiy shaharlar.",
+    EN: "Most beautiful places and travel destinations in Uzbekistan. Samarkand, Bukhara, Khiva and other historic cities.",
+    RU: "Самые красивые места и туристические направления Узбекистана. Самарканд, Бухара, Хива и другие исторические города.",
+    DE: "Die schönsten Orte und Reiseziele in Usbekistan. Samarkand, Buchara, Chiwa und andere historische Städte."
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO 
+        title={seoTitles[language]}
+        description={seoDescriptions[language]}
+        url="/destinations"
+      />
       <Navbar />
-      
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TourCard from "@/components/TourCard";
+import SEO from "@/components/SEO";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Language } from "@/lib/translations";
 import { Input } from "@/components/ui/input";
@@ -200,8 +201,27 @@ const Tours = () => {
     return langMap[language] || en || "";
   };
 
+  const seoTitles: Record<Language, string> = {
+    UZ: "Barcha Turlar",
+    EN: "All Tours",
+    RU: "Все Туры",
+    DE: "Alle Touren"
+  };
+
+  const seoDescriptions: Record<Language, string> = {
+    UZ: "O'zbekiston bo'ylab eng yaxshi turlar va sayohatlar. Samarqand, Buxoro, Xiva va boshqa shaharlarga ekskursiyalar.",
+    EN: "Best tours and travels across Uzbekistan. Excursions to Samarkand, Bukhara, Khiva and more.",
+    RU: "Лучшие туры и путешествия по Узбекистану. Экскурсии в Самарканд, Бухару, Хиву и другие города.",
+    DE: "Beste Touren und Reisen durch Usbekistan. Ausflüge nach Samarkand, Buchara, Chiwa und mehr."
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
+      <SEO 
+        title={seoTitles[language]}
+        description={seoDescriptions[language]}
+        url="/tours"
+      />
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-8">

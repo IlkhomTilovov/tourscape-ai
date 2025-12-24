@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, Phone, MapPin, Target, Eye, Building2, Users, Globe, Award, Shield } from "lucide-react";
@@ -158,8 +159,27 @@ const About = () => {
     );
   }
 
+  const seoTitles: Record<string, string> = {
+    UZ: "Biz haqimizda",
+    EN: "About Us",
+    RU: "О нас",
+    DE: "Über uns"
+  };
+
+  const seoDescriptions: Record<string, string> = {
+    UZ: "Bestour - O'zbekiston bo'ylab ishonchli sayohat agentligi. Bizning missiyamiz va tajribamiz haqida.",
+    EN: "Bestour - Trusted travel agency across Uzbekistan. Learn about our mission and experience.",
+    RU: "Bestour - Надежное туристическое агентство по Узбекистану. Узнайте о нашей миссии и опыте.",
+    DE: "Bestour - Zuverlässiges Reisebüro in Usbekistan. Erfahren Sie mehr über unsere Mission und Erfahrung."
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO 
+        title={seoTitles[language]}
+        description={seoDescriptions[language]}
+        url="/about"
+      />
       <Navbar />
       
       <main className="flex-1">
