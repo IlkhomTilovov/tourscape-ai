@@ -13,8 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-# Static sitemap
 Sitemap: https://bestour.uz/sitemap.xml
-
-# Dynamic sitemap (includes all tours)
-Sitemap: https://cryyvpzjerhlwbxpeeks.supabase.co/functions/v1/sitemap
