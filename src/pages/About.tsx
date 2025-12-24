@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Phone, MapPin, Target, Eye, Building2, Users, Globe, Award } from "lucide-react";
+import { Mail, Phone, MapPin, Target, Eye, Building2, Users, Globe, Award, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface AboutData {
@@ -14,6 +14,27 @@ interface AboutData {
   contact_email: string | null;
   contact_phone: string | null;
   address: string | null;
+  // Statistics
+  stat1_value: string | null;
+  stat1_label_uz: string | null;
+  stat1_label_en: string | null;
+  stat1_label_ru: string | null;
+  stat1_label_de: string | null;
+  stat2_value: string | null;
+  stat2_label_uz: string | null;
+  stat2_label_en: string | null;
+  stat2_label_ru: string | null;
+  stat2_label_de: string | null;
+  stat3_value: string | null;
+  stat3_label_uz: string | null;
+  stat3_label_en: string | null;
+  stat3_label_ru: string | null;
+  stat3_label_de: string | null;
+  stat4_value: string | null;
+  stat4_label_uz: string | null;
+  stat4_label_en: string | null;
+  stat4_label_ru: string | null;
+  stat4_label_de: string | null;
 }
 
 const About = () => {
@@ -76,6 +97,15 @@ const About = () => {
     };
     return translations[key]?.[language] || translations[key]?.EN || key;
   };
+
+  const getStatLabel = (statNum: number) => {
+    if (!aboutData) return "";
+    const langKey = language.toLowerCase() as 'uz' | 'en' | 'ru' | 'de';
+    const key = `stat${statNum}_label_${langKey}` as keyof AboutData;
+    return aboutData[key] || "";
+  };
+
+  const statIcons = [Users, Globe, Award, Shield];
 
   if (loading) {
     return (
@@ -165,20 +195,21 @@ const About = () => {
         <section className="py-12 border-b border-border/50">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              {[
-                { icon: Users, value: "10K+", label: language === "UZ" ? "Mijozlar" : language === "RU" ? "Клиентов" : language === "DE" ? "Kunden" : "Customers" },
-                { icon: Globe, value: "50+", label: language === "UZ" ? "Yo'nalishlar" : language === "RU" ? "Направлений" : language === "DE" ? "Ziele" : "Destinations" },
-                { icon: Award, value: "15+", label: language === "UZ" ? "Yil tajriba" : language === "RU" ? "Лет опыта" : language === "DE" ? "Jahre Erfahrung" : "Years Experience" },
-                { icon: Building2, value: "100%", label: language === "UZ" ? "Ishonch" : language === "RU" ? "Доверие" : language === "DE" ? "Vertrauen" : "Trust" }
-              ].map((stat, index) => (
-                <div key={index} className="text-center animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-3">
-                    <stat.icon className="h-6 w-6" />
+              {[1, 2, 3, 4].map((num, index) => {
+                const Icon = statIcons[index];
+                const value = aboutData[`stat${num}_value` as keyof AboutData];
+                const label = getStatLabel(num);
+                
+                return (
+                  <div key={num} className="text-center animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-3">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div className="text-2xl md:text-3xl font-bold text-foreground">{value}</div>
+                    <div className="text-sm text-muted-foreground">{label}</div>
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>

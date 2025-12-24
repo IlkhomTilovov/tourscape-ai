@@ -23,6 +23,26 @@ export type Database = {
           description: string
           id: string
           mission: string | null
+          stat1_label_de: string | null
+          stat1_label_en: string | null
+          stat1_label_ru: string | null
+          stat1_label_uz: string | null
+          stat1_value: string | null
+          stat2_label_de: string | null
+          stat2_label_en: string | null
+          stat2_label_ru: string | null
+          stat2_label_uz: string | null
+          stat2_value: string | null
+          stat3_label_de: string | null
+          stat3_label_en: string | null
+          stat3_label_ru: string | null
+          stat3_label_uz: string | null
+          stat3_value: string | null
+          stat4_label_de: string | null
+          stat4_label_en: string | null
+          stat4_label_ru: string | null
+          stat4_label_uz: string | null
+          stat4_value: string | null
           title: string
           updated_at: string
           vision: string | null
@@ -35,6 +55,26 @@ export type Database = {
           description: string
           id: string
           mission?: string | null
+          stat1_label_de?: string | null
+          stat1_label_en?: string | null
+          stat1_label_ru?: string | null
+          stat1_label_uz?: string | null
+          stat1_value?: string | null
+          stat2_label_de?: string | null
+          stat2_label_en?: string | null
+          stat2_label_ru?: string | null
+          stat2_label_uz?: string | null
+          stat2_value?: string | null
+          stat3_label_de?: string | null
+          stat3_label_en?: string | null
+          stat3_label_ru?: string | null
+          stat3_label_uz?: string | null
+          stat3_value?: string | null
+          stat4_label_de?: string | null
+          stat4_label_en?: string | null
+          stat4_label_ru?: string | null
+          stat4_label_uz?: string | null
+          stat4_value?: string | null
           title: string
           updated_at?: string
           vision?: string | null
@@ -47,6 +87,26 @@ export type Database = {
           description?: string
           id?: string
           mission?: string | null
+          stat1_label_de?: string | null
+          stat1_label_en?: string | null
+          stat1_label_ru?: string | null
+          stat1_label_uz?: string | null
+          stat1_value?: string | null
+          stat2_label_de?: string | null
+          stat2_label_en?: string | null
+          stat2_label_ru?: string | null
+          stat2_label_uz?: string | null
+          stat2_value?: string | null
+          stat3_label_de?: string | null
+          stat3_label_en?: string | null
+          stat3_label_ru?: string | null
+          stat3_label_uz?: string | null
+          stat3_value?: string | null
+          stat4_label_de?: string | null
+          stat4_label_en?: string | null
+          stat4_label_ru?: string | null
+          stat4_label_uz?: string | null
+          stat4_value?: string | null
           title?: string
           updated_at?: string
           vision?: string | null

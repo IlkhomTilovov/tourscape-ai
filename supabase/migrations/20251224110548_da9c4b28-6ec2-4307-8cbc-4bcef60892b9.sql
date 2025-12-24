@@ -1,0 +1,22 @@
+-- Add statistics columns to about table
+ALTER TABLE public.about
+ADD COLUMN IF NOT EXISTS stat1_value TEXT DEFAULT '10K+',
+ADD COLUMN IF NOT EXISTS stat1_label_uz TEXT DEFAULT 'Mijozlar',
+ADD COLUMN IF NOT EXISTS stat1_label_en TEXT DEFAULT 'Customers',
+ADD COLUMN IF NOT EXISTS stat1_label_ru TEXT DEFAULT 'Клиентов',
+ADD COLUMN IF NOT EXISTS stat1_label_de TEXT DEFAULT 'Kunden',
+ADD COLUMN IF NOT EXISTS stat2_value TEXT DEFAULT '50+',
+ADD COLUMN IF NOT EXISTS stat2_label_uz TEXT DEFAULT 'Yo''nalishlar',
+ADD COLUMN IF NOT EXISTS stat2_label_en TEXT DEFAULT 'Destinations',
+ADD COLUMN IF NOT EXISTS stat2_label_ru TEXT DEFAULT 'Направлений',
+ADD COLUMN IF NOT EXISTS stat2_label_de TEXT DEFAULT 'Ziele',
+ADD COLUMN IF NOT EXISTS stat3_value TEXT DEFAULT '15+',
+ADD COLUMN IF NOT EXISTS stat3_label_uz TEXT DEFAULT 'Yil tajriba',
+ADD COLUMN IF NOT EXISTS stat3_label_en TEXT DEFAULT 'Years Experience',
+ADD COLUMN IF NOT EXISTS stat3_label_ru TEXT DEFAULT 'Лет опыта',
+ADD COLUMN IF NOT EXISTS stat3_label_de TEXT DEFAULT 'Jahre Erfahrung',
+ADD COLUMN IF NOT EXISTS stat4_value TEXT DEFAULT '100%',
+ADD COLUMN IF NOT EXISTS stat4_label_uz TEXT DEFAULT 'Ishonch',
+ADD COLUMN IF NOT EXISTS stat4_label_en TEXT DEFAULT 'Trust',
+ADD COLUMN IF NOT EXISTS stat4_label_ru TEXT DEFAULT 'Доверие',
+ADD COLUMN IF NOT EXISTS stat4_label_de TEXT DEFAULT 'Vertrauen';
