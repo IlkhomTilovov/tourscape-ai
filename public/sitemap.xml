@@ -2,37 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://bestour.uz/</loc>
-    <lastmod>2024-12-13</lastmod>
+    <lastmod>2024-12-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://bestour.uz/tours</loc>
-    <lastmod>2024-12-13</lastmod>
+    <lastmod>2024-12-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://bestour.uz/destinations</loc>
-    <lastmod>2024-12-13</lastmod>
+    <lastmod>2024-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://bestour.uz/categories</loc>
-    <lastmod>2024-12-13</lastmod>
+    <lastmod>2024-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://bestour.uz/hotels</loc>
-    <lastmod>2024-12-13</lastmod>
+    <lastmod>2024-12-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://bestour.uz/about</loc>
-    <lastmod>2024-12-13</lastmod>
+    <lastmod>2024-12-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
