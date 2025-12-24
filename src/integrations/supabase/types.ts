@@ -128,6 +128,7 @@ export type Database = {
           tour_id: string | null
           updated_at: string
           user_email: string | null
+          user_id: string | null
           user_name: string | null
           user_phone: string | null
         }
@@ -145,6 +146,7 @@ export type Database = {
           tour_id?: string | null
           updated_at?: string
           user_email?: string | null
+          user_id?: string | null
           user_name?: string | null
           user_phone?: string | null
         }
@@ -162,6 +164,7 @@ export type Database = {
           tour_id?: string | null
           updated_at?: string
           user_email?: string | null
+          user_id?: string | null
           user_name?: string | null
           user_phone?: string | null
         }
