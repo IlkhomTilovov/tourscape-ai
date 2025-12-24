@@ -17,7 +17,7 @@ const AdminAbout = () => {
     address: "",
   });
   const [loading, setLoading] = useState(false);
-  const [dataExists, setDataExists] = useState(false);
+  const [existingId, setExistingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAboutData();
@@ -35,10 +35,10 @@ const AdminAbout = () => {
         throw error;
       }
       
-      console.log("About data loaded:", data ? "exists" : "not found");
+      console.log("About data loaded:", data ? "exists with id: " + data.id : "not found");
       
       if (data) {
-        setDataExists(true);
+        setExistingId(data.id);
         setFormData({
           title: data.title || "",
           description: data.description || "",
@@ -59,18 +59,20 @@ const AdminAbout = () => {
     setLoading(true);
 
     try {
-      if (dataExists) {
+      if (existingId) {
+        // Update existing record
         const { error } = await supabase
           .from("about")
           .update(formData)
-          .eq("id", "1");
+          .eq("id", existingId);
         if (error) throw error;
       } else {
+        // Insert new record with 'main' as default id
         const { error } = await supabase
           .from("about")
-          .insert([{ ...formData, id: "1" }]);
+          .insert([{ ...formData, id: "main" }]);
         if (error) throw error;
-        setDataExists(true);
+        setExistingId("main");
       }
       
       toast.success("Ma'lumot yangilandi");
