@@ -28,6 +28,7 @@ const AdminAbout = () => {
       const { data, error } = await supabase
         .from("about")
         .select("*")
+        .eq("id", "main")
         .maybeSingle();
       
       if (error && error.code !== 'PGRST116') {
