@@ -19,7 +19,7 @@ const Payment = () => {
   const location = useLocation();
   const { language } = useLanguage();
   const { clearCart } = useCart();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isProcessing, setIsProcessing] = useState(false);
   const [contactDetails, setContactDetails] = useState({
@@ -31,21 +31,8 @@ const Payment = () => {
 
   const bookingData = location.state || {};
 
-  // Redirect if no booking data or not authenticated
+  // Redirect if no booking data
   useEffect(() => {
-    if (authLoading) return;
-    
-    if (!user) {
-      toast.error(getText(
-        "Buyurtma berish uchun tizimga kiring",
-        "Please sign in to make a booking",
-        "Пожалуйста, войдите в систему для бронирования",
-        "Bitte melden Sie sich an, um eine Buchung vorzunehmen"
-      ));
-      navigate("/auth", { state: { returnTo: "/checkout" } });
-      return;
-    }
-    
     if (!bookingData.tourId || !bookingData.totalPrice) {
       toast.error(getText(
         "Buyurtma ma'lumotlari topilmadi. Iltimos, avval turni tanlang",
@@ -55,7 +42,7 @@ const Payment = () => {
       ));
       navigate("/tours");
     }
-  }, [bookingData, navigate, user, authLoading]);
+  }, [bookingData, navigate]);
 
   const getText = (uz: string, en: string, ru: string, de: string) => {
     switch (language) {
@@ -101,7 +88,7 @@ const Payment = () => {
             booking_time: bookingData.time,
             adults: bookingData.adults || 1,
             total_price: bookingData.totalPrice,
-            user_id: user?.id,
+            user_id: user?.id || null,
             user_name: contactDetails.name,
             user_email: contactDetails.email,
             user_phone: contactDetails.phone,
