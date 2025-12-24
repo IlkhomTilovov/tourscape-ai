@@ -3,7 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Target, Eye, Building2, Users, Globe, Award } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface AboutData {
   title: string;
@@ -29,6 +30,7 @@ const About = () => {
       const { data, error } = await supabase
         .from("about")
         .select("*")
+        .eq("id", "main")
         .maybeSingle();
       
       if (error && error.code !== 'PGRST116') {
@@ -45,17 +47,61 @@ const About = () => {
     }
   };
 
+  const getTranslation = (key: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      mission: {
+        UZ: "Bizning Missiyamiz",
+        EN: "Our Mission",
+        RU: "Наша Миссия",
+        DE: "Unsere Mission"
+      },
+      vision: {
+        UZ: "Bizning Viziyamiz",
+        EN: "Our Vision",
+        RU: "Наше Видение",
+        DE: "Unsere Vision"
+      },
+      contact: {
+        UZ: "Bog'lanish",
+        EN: "Contact Us",
+        RU: "Свяжитесь с Нами",
+        DE: "Kontaktieren Sie Uns"
+      },
+      noInfo: {
+        UZ: "Ma'lumot topilmadi.",
+        EN: "No information available.",
+        RU: "Информация недоступна.",
+        DE: "Keine Informationen verfügbar."
+      }
+    };
+    return translations[key]?.[language] || translations[key]?.EN || key;
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto animate-pulse">
-            <div className="h-10 bg-muted rounded w-1/3 mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-4 bg-muted rounded w-full"></div>
-              <div className="h-4 bg-muted rounded w-5/6"></div>
-              <div className="h-4 bg-muted rounded w-4/6"></div>
+        <main className="flex-1">
+          {/* Hero Skeleton */}
+          <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-background py-20">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto text-center animate-pulse">
+                <div className="h-12 bg-muted rounded-lg w-2/3 mx-auto mb-6"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-muted rounded w-full"></div>
+                  <div className="h-4 bg-muted rounded w-5/6 mx-auto"></div>
+                  <div className="h-4 bg-muted rounded w-4/6 mx-auto"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Cards Skeleton */}
+          <div className="container mx-auto px-4 py-16">
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {[1, 2].map((i) => (
+                <div key={i} className="h-64 bg-muted rounded-2xl animate-pulse"></div>
+              ))}
             </div>
           </div>
         </main>
@@ -64,20 +110,17 @@ const About = () => {
     );
   }
 
-  // If no data from database, show default content
   if (!aboutData) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold mb-8">{t("about")}</h1>
-            <p className="text-lg text-muted-foreground">
-              {language === "UZ" && "Ma'lumot topilmadi."}
-              {language === "EN" && "No information available."}
-              {language === "RU" && "Информация недоступна."}
-              {language === "DE" && "Keine Informationen verfügbar."}
-            </p>
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center py-20">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
+              <Building2 className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h1 className="text-3xl font-bold mb-4">{t("about")}</h1>
+            <p className="text-lg text-muted-foreground">{getTranslation("noInfo")}</p>
           </div>
         </main>
         <Footer />
@@ -86,90 +129,176 @@ const About = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">{aboutData.title}</h1>
-
-          <div className="space-y-8">
-            {/* Description */}
-            {aboutData.description && (
-              <div className="prose prose-lg max-w-none">
-                <p className="text-lg text-muted-foreground whitespace-pre-line">
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-background py-20 md:py-28">
+          {/* Decorative Elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
+          </div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-in">
+                <Building2 className="h-4 w-4" />
+                <span>{t("about")}</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in bg-gradient-to-r from-foreground via-foreground to-foreground/70 bg-clip-text">
+                {aboutData.title}
+              </h1>
+              
+              {aboutData.description && (
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed whitespace-pre-line animate-fade-in max-w-3xl mx-auto">
                   {aboutData.description}
                 </p>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+        </section>
 
-            {/* Mission */}
-            {aboutData.mission && (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">
-                  {language === "UZ" && "Bizning Missiyamiz"}
-                  {language === "EN" && "Our Mission"}
-                  {language === "RU" && "Наша Миссия"}
-                  {language === "DE" && "Unsere Mission"}
-                </h2>
-                <p className="text-lg text-muted-foreground whitespace-pre-line">
-                  {aboutData.mission}
-                </p>
-              </div>
-            )}
+        {/* Stats Section */}
+        <section className="py-12 border-b border-border/50">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+              {[
+                { icon: Users, value: "10K+", label: language === "UZ" ? "Mijozlar" : language === "RU" ? "Клиентов" : language === "DE" ? "Kunden" : "Customers" },
+                { icon: Globe, value: "50+", label: language === "UZ" ? "Yo'nalishlar" : language === "RU" ? "Направлений" : language === "DE" ? "Ziele" : "Destinations" },
+                { icon: Award, value: "15+", label: language === "UZ" ? "Yil tajriba" : language === "RU" ? "Лет опыта" : language === "DE" ? "Jahre Erfahrung" : "Years Experience" },
+                { icon: Building2, value: "100%", label: language === "UZ" ? "Ishonch" : language === "RU" ? "Доверие" : language === "DE" ? "Vertrauen" : "Trust" }
+              ].map((stat, index) => (
+                <div key={index} className="text-center animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-3">
+                    <stat.icon className="h-6 w-6" />
+                  </div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-            {/* Vision */}
-            {aboutData.vision && (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">
-                  {language === "UZ" && "Bizning Viziyamiz"}
-                  {language === "EN" && "Our Vision"}
-                  {language === "RU" && "Наше Видение"}
-                  {language === "DE" && "Unsere Vision"}
-                </h2>
-                <p className="text-lg text-muted-foreground whitespace-pre-line">
-                  {aboutData.vision}
-                </p>
-              </div>
-            )}
+        {/* Mission & Vision Cards */}
+        {(aboutData.mission || aboutData.vision) && (
+          <section className="py-16 md:py-24">
+            <div className="container mx-auto px-4">
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                {/* Mission Card */}
+                {aboutData.mission && (
+                  <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-primary/5 to-primary/10 hover:from-primary/10 hover:to-primary/15 transition-all duration-500 animate-fade-in">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl transform translate-x-16 -translate-y-16 group-hover:scale-150 transition-transform duration-500"></div>
+                    <CardContent className="p-8 relative z-10">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Target className="h-7 w-7 text-primary" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground">
+                          {getTranslation("mission")}
+                        </h2>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {aboutData.mission}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
 
-            {/* Contact Information */}
-            {(aboutData.contact_email || aboutData.contact_phone || aboutData.address) && (
-              <div className="bg-muted/50 rounded-lg p-6 mt-8">
-                <h2 className="text-2xl font-semibold mb-6">
-                  {language === "UZ" && "Bog'lanish"}
-                  {language === "EN" && "Contact Us"}
-                  {language === "RU" && "Свяжитесь с Нами"}
-                  {language === "DE" && "Kontaktieren Sie Uns"}
-                </h2>
-                <div className="space-y-4">
+                {/* Vision Card */}
+                {aboutData.vision && (
+                  <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-accent/30 to-accent/50 hover:from-accent/40 hover:to-accent/60 transition-all duration-500 animate-fade-in" style={{ animationDelay: '100ms' }}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-2xl transform translate-x-16 -translate-y-16 group-hover:scale-150 transition-transform duration-500"></div>
+                    <CardContent className="p-8 relative z-10">
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="w-14 h-14 rounded-2xl bg-accent/40 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Eye className="h-7 w-7 text-accent-foreground" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground">
+                          {getTranslation("vision")}
+                        </h2>
+                      </div>
+                      <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                        {aboutData.vision}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Contact Section */}
+        {(aboutData.contact_email || aboutData.contact_phone || aboutData.address) && (
+          <section className="py-16 md:py-24 bg-muted/30">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                    {getTranslation("contact")}
+                  </h2>
+                  <div className="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+                </div>
+                
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {aboutData.contact_email && (
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-5 w-5 text-primary" />
-                      <a href={`mailto:${aboutData.contact_email}`} className="text-lg hover:text-primary transition-colors">
+                    <a 
+                      href={`mailto:${aboutData.contact_email}`}
+                      className="group flex flex-col items-center p-6 bg-background rounded-2xl border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 animate-fade-in"
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                        <Mail className="h-6 w-6 text-primary" />
+                      </div>
+                      <span className="text-sm text-muted-foreground mb-1">Email</span>
+                      <span className="text-foreground font-medium text-center break-all">
                         {aboutData.contact_email}
-                      </a>
-                    </div>
+                      </span>
+                    </a>
                   )}
+                  
                   {aboutData.contact_phone && (
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-5 w-5 text-primary" />
-                      <a href={`tel:${aboutData.contact_phone}`} className="text-lg hover:text-primary transition-colors">
+                    <a 
+                      href={`tel:${aboutData.contact_phone}`}
+                      className="group flex flex-col items-center p-6 bg-background rounded-2xl border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 animate-fade-in"
+                      style={{ animationDelay: '100ms' }}
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                        <Phone className="h-6 w-6 text-primary" />
+                      </div>
+                      <span className="text-sm text-muted-foreground mb-1">
+                        {language === "UZ" ? "Telefon" : language === "RU" ? "Телефон" : language === "DE" ? "Telefon" : "Phone"}
+                      </span>
+                      <span className="text-foreground font-medium">
                         {aboutData.contact_phone}
-                      </a>
-                    </div>
+                      </span>
+                    </a>
                   )}
+                  
                   {aboutData.address && (
-                    <div className="flex items-center gap-3">
-                      <MapPin className="h-5 w-5 text-primary" />
-                      <span className="text-lg">{aboutData.address}</span>
+                    <div 
+                      className="group flex flex-col items-center p-6 bg-background rounded-2xl border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 animate-fade-in sm:col-span-2 lg:col-span-1"
+                      style={{ animationDelay: '200ms' }}
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                        <MapPin className="h-6 w-6 text-primary" />
+                      </div>
+                      <span className="text-sm text-muted-foreground mb-1">
+                        {language === "UZ" ? "Manzil" : language === "RU" ? "Адрес" : language === "DE" ? "Adresse" : "Address"}
+                      </span>
+                      <span className="text-foreground font-medium text-center">
+                        {aboutData.address}
+                      </span>
                     </div>
                   )}
                 </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
