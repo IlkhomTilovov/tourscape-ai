@@ -36,8 +36,20 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  ArrowUpDown
+  ArrowUpDown,
+  Trash2
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 
 interface Booking {
@@ -234,6 +246,31 @@ const AdminBookings = () => {
       toast({
         title: "Xatolik",
         description: "Statusni o'zgartirishda xatolik yuz berdi",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (bookingId: string) => {
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .delete()
+        .eq("id", bookingId);
+
+      if (error) throw error;
+
+      setBookings(bookings.filter((booking) => booking.id !== bookingId));
+
+      toast({
+        title: "Muvaffaqiyatli",
+        description: "Buyurtma o'chirildi",
+      });
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      toast({
+        title: "Xatolik",
+        description: "Buyurtmani o'chirishda xatolik yuz berdi",
         variant: "destructive",
       });
     }
@@ -606,21 +643,48 @@ const AdminBookings = () => {
                   </TableCell>
                   <TableCell>{getStatusBadge(booking.payment_status)}</TableCell>
                   <TableCell>
-                    <Select
-                      value={booking.payment_status}
-                      onValueChange={(value) =>
-                        handleStatusChange(booking.id, value)
-                      }
-                    >
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Kutilmoqda</SelectItem>
-                        <SelectItem value="completed">Yakunlangan</SelectItem>
-                        <SelectItem value="cancelled">Bekor qilingan</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={booking.payment_status}
+                        onValueChange={(value) =>
+                          handleStatusChange(booking.id, value)
+                        }
+                      >
+                        <SelectTrigger className="w-[130px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Kutilmoqda</SelectItem>
+                          <SelectItem value="completed">Yakunlangan</SelectItem>
+                          <SelectItem value="cancelled">Bekor qilingan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="icon" className="h-9 w-9">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Buyurtmani o'chirish</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Haqiqatan ham bu buyurtmani o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(booking.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              O'chirish
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
