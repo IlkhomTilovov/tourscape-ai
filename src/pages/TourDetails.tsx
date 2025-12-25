@@ -473,9 +473,6 @@ const TourDetails = () => {
                 >
                   <ShoppingCart className="h-5 w-5" />
                 </Button>
-                <Button variant="outline" size="icon">
-                  <Heart className="h-5 w-5" />
-                </Button>
                 <Button 
                   variant="outline" 
                   size="icon"
