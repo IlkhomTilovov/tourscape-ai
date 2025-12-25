@@ -826,16 +826,6 @@ const TourDetails = () => {
                                 </span>
                               </div>
                             </div>
-                            {isAdmin && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDeleteReview(review.id)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            )}
                           </div>
                           <p className="text-muted-foreground mb-3">{review.comment}</p>
                           
