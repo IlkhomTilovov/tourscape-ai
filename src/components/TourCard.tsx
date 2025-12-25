@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import { Star, Clock, MapPin, ShoppingCart } from "lucide-react";
+import { Star, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCart } from "@/contexts/CartContext";
 import OptimizedImage from "@/components/OptimizedImage";
 
 interface TourCardProps {
@@ -44,7 +42,6 @@ const TourCard = ({
   bestseller,
 }: TourCardProps) => {
   const { t, language } = useLanguage();
-  const { addToCart } = useCart();
 
   const getLocalizedText = (en: string | null, uz: string | null, ru: string | null, de: string | null) => {
     const langMap: any = { EN: en, UZ: uz, RU: ru, DE: de };
@@ -53,17 +50,6 @@ const TourCard = ({
 
   const title = getLocalizedText(title_en, title_uz, title_ru, title_de);
   const location = getLocalizedText(location_en, location_uz, location_ru, location_de);
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    addToCart({
-      id,
-      title,
-      price,
-      duration,
-      image_url: image,
-    });
-  };
   
   return (
     <Link to={`/tours/${id}`}>
@@ -118,22 +104,12 @@ const TourCard = ({
 
           {/* Price */}
           <div className="pt-2 border-t border-border">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex-1">
-                <span className="text-sm text-muted-foreground">{t("from")} </span>
-                <span className="text-2xl font-bold text-foreground">
-                  ${price}
-                </span>
-                <span className="text-sm text-muted-foreground"> {t("perPerson")}</span>
-              </div>
-              <Button 
-                size="icon" 
-                variant="secondary"
-                onClick={handleAddToCart}
-                className="shrink-0"
-              >
-                <ShoppingCart className="h-4 w-4" />
-              </Button>
+            <div>
+              <span className="text-sm text-muted-foreground">{t("from")} </span>
+              <span className="text-2xl font-bold text-foreground">
+                ${price}
+              </span>
+              <span className="text-sm text-muted-foreground"> {t("perPerson")}</span>
             </div>
           </div>
         </div>
