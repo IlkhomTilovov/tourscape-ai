@@ -30,7 +30,9 @@ import {
   ImageIcon,
   Trash2,
   Expand,
+  ShoppingCart,
 } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import ImageLightbox from "@/components/ImageLightbox";
 
 interface Tour {
@@ -85,6 +87,7 @@ const TourDetails = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { isAdmin } = useAuth();
+  const { addToCart } = useCart();
   const [tour, setTour] = useState<Tour | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -449,10 +452,43 @@ const TourDetails = () => {
                 </div>
               </div>
               <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => {
+                    addToCart({
+                      id: tour.id,
+                      title: getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de),
+                      price: tour.price,
+                      duration: tour.duration,
+                      image_url: tour.image_url,
+                    });
+                    toast.success(
+                      language === "UZ" ? "Savatga qo'shildi" :
+                      language === "EN" ? "Added to cart" :
+                      language === "RU" ? "Добавлено в корзину" :
+                      "Zum Warenkorb hinzugefügt"
+                    );
+                  }}
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                </Button>
                 <Button variant="outline" size="icon">
                   <Heart className="h-5 w-5" />
                 </Button>
-                <Button variant="outline" size="icon">
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success(
+                      language === "UZ" ? "Havola nusxalandi" :
+                      language === "EN" ? "Link copied" :
+                      language === "RU" ? "Ссылка скопирована" :
+                      "Link kopiert"
+                    );
+                  }}
+                >
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>
