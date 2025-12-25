@@ -456,27 +456,6 @@ const TourDetails = () => {
                   variant="outline" 
                   size="icon"
                   onClick={() => {
-                    addToCart({
-                      id: tour.id,
-                      title: getLocalizedText(tour.title_en, tour.title_uz, tour.title_ru, tour.title_de),
-                      price: tour.price,
-                      duration: tour.duration,
-                      image_url: tour.image_url,
-                    });
-                    toast.success(
-                      language === "UZ" ? "Savatga qo'shildi" :
-                      language === "EN" ? "Added to cart" :
-                      language === "RU" ? "Добавлено в корзину" :
-                      "Zum Warenkorb hinzugefügt"
-                    );
-                  }}
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     toast.success(
                       language === "UZ" ? "Havola nusxalandi" :
