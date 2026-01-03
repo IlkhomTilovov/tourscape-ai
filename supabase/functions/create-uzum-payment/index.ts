@@ -13,35 +13,87 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      supabaseUrl,
+      anonKey,
+      { global: { headers: { Authorization: authHeader } } }
     );
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData?.user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const { tourId, adults, bookingDate, bookingTime, totalPrice, userEmail, userPhone } = await req.json();
 
-    console.log('Creating Uzum payment for booking:', { tourId, adults, totalPrice });
+    const adultsCount = Number(adults);
+    if (!tourId || !Number.isFinite(adultsCount) || adultsCount < 1 || adultsCount > 20) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid booking data' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify tour and compute expected total
+    const { data: tour, error: tourError } = await supabase
+      .from('tours')
+      .select('id, price')
+      .eq('id', tourId)
+      .single();
+
+    if (tourError || !tour) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid tour' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const expectedTotal = Number(tour.price) * adultsCount;
+    const providedTotal = Number(totalPrice);
+    if (!Number.isFinite(providedTotal) || Math.abs(providedTotal - expectedTotal) > 0.01) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid price' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Creating Uzum payment for booking:', { tourId, adults: adultsCount, totalPrice: expectedTotal });
 
     // Convert date from DD/MM/YYYY to YYYY-MM-DD format
     let formattedDate = bookingDate;
-    if (bookingDate && bookingDate.includes('/')) {
+    if (bookingDate && typeof bookingDate === 'string' && bookingDate.includes('/')) {
       const [day, month, year] = bookingDate.split('/');
       formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 
-    // Create booking record
+    // Create booking record (RLS applies)
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         tour_id: tourId,
-        user_email: userEmail,
-        user_phone: userPhone,
-        adults,
+        user_id: userData.user.id,
+        user_email: typeof userEmail === 'string' ? userEmail.trim() : null,
+        user_phone: typeof userPhone === 'string' ? userPhone.trim() : null,
+        adults: adultsCount,
         booking_date: formattedDate,
-        booking_time: bookingTime,
-        total_price: totalPrice,
+        booking_time: bookingTime ?? null,
+        total_price: expectedTotal,
         payment_status: 'pending',
-        payment_method: 'uzum'
+        payment_method: 'uzum',
       })
       .select()
       .single();
@@ -52,7 +104,6 @@ serve(async (req) => {
     }
 
     console.log('Booking created:', booking.id);
-
     // Send Telegram notification
     try {
       await supabase.functions.invoke('send-telegram-notification', {

@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CreditCard, Wallet, CheckCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -34,7 +35,7 @@ const Payment = () => {
   const location = useLocation();
   const { language } = useLanguage();
   const { clearCart } = useCart();
-  
+  const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -107,23 +108,28 @@ const Payment = () => {
       user_phone: contactDetails.phone.trim(),
       pickup_address: contactDetails.pickupAddress.trim(),
       payment_method: paymentMethod,
-      payment_status: "pending"
+      payment_status: "pending",
+      ...(user?.id ? { user_id: user.id } : {}),
     };
 
-    console.log("Creating booking with payload:", bookingPayload);
+    // NOTE: Guest (unauthenticated) users cannot SELECT rows due to RLS.
+    // So we only request RETURNING data when the user is authenticated.
+    if (user?.id) {
+      const { data, error } = await supabase
+        .from("bookings")
+        .insert(bookingPayload)
+        .select()
+        .single();
 
-    const { data, error } = await supabase
-      .from('bookings')
-      .insert(bookingPayload)
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Supabase error:", error);
-      throw error;
+      if (error) throw error;
+      return data;
     }
 
-    return data;
+    const { error } = await supabase.from("bookings").insert(bookingPayload);
+    if (error) throw error;
+
+    // Return payload for Telegram notification (id is unknown for guest flow)
+    return { id: null, ...bookingPayload };
   };
 
   const sendTelegramNotification = async (booking: any) => {

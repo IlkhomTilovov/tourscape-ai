@@ -7,10 +7,10 @@ const corsHeaders = {
 };
 
 interface BookingData {
-  id: string;
+  id?: string | null;
   tour_id: string;
   booking_date: string;
-  booking_time: string;
+  booking_time: string | null;
   adults: number;
   total_price: number;
   user_name: string;
@@ -36,8 +36,7 @@ Deno.serve(async (req) => {
     }
 
     const bookingData: BookingData = await req.json();
-    console.log('Received booking data:', bookingData);
-
+    console.log('Received booking notification request');
     // Get tour details
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -52,6 +51,8 @@ Deno.serve(async (req) => {
     // Format message for Telegram
     const message = `
 🎉 *Yangi buyurtma!*
+
+🆔 *Buyurtma ID:* ${bookingData.id || 'N/A'}
 
 🏖️ *Tur nomi:*
 ${tour?.title_uz || 'N/A'}
